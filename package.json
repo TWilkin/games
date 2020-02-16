@@ -2,9 +2,9 @@
   "name": "games",
   "version": "0.0.1",
   "description": "Video game collection browser and time logging service.",
-  "main": "start.js",
+  "main": "src/start.js",
   "scripts": {
-    "start": "node start.js",
+    "start": "node src/start.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "TWilkin",
