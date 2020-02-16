@@ -1,0 +1,17 @@
+{
+  "name": "games",
+  "version": "0.0.1",
+  "description": "Video game collection browser and time logging service.",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TWilkin",
+  "dependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/register": "^7.8.3",
+    "express": "^4.17.1"
+  }
+}
