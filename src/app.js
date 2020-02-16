@@ -8,6 +8,7 @@ app.get(config.get('express.root'), (_, res) => {
 });
 
 // start listening
-let server = app.listen(config.get('express.port'), () => {
+const port = config.get('express.port') > 0 ? config.get('express.port') : undefined;
+let server = app.listen(port, () => {
     console.log('Listening on http://%s:%s%s', server.address().address, server.address().port, config.get('express.root'));
 });
