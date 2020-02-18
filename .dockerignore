@@ -1,0 +1,6 @@
+config/*.txt
+test
+Dockerfile
+docker-compose.yml
+npm-debug.log
+.gitignore
