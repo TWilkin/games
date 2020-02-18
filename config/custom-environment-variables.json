@@ -1,0 +1,7 @@
+{
+    "database": {
+        "schema": "MYSQL_DATABASE",
+        "user": "MYSQL_USER",
+        "password_file": "MYSQL_PASSWORD_FILE"
+    }
+}

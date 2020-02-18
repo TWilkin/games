@@ -3,6 +3,13 @@
         "root": "/",
         "port": -1
     },
+
+    "database": {
+        "schema": "games",
+        "user": "games",
+        "password_file": null,
+        "password": "password"
+    },
     
     "message": "Hello World!"
 }
