@@ -2,12 +2,17 @@
   "name": "games",
   "version": "0.0.1",
   "description": "Video game collection browser and time logging service.",
+  "author": "TWilkin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TWilkin/games/"
+  },
+  "license": "GPL-3.0",
   "main": "src/start.js",
   "scripts": {
     "start": "node src/start.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "TWilkin",
   "dependencies": {
     "@babel/core": "^7.8.4",
     "@babel/preset-env": "^7.8.4",
