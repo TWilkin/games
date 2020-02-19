@@ -19,4 +19,4 @@ export const sequelize = new Sequelize(
         dialect: 'mysql'
     }
 );
-delete password;
+password = undefined;
