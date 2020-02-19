@@ -1,14 +1,17 @@
-FROM node:13.8-alpine
+FROM node:13.8-alpine AS build-image
 
-LABEL maintainer="tom@twilkin.uk", description="Game browser and time API"
-
-# install the dependencies
+# install the application
 WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-
-# copy across the application code
 COPY . .
+RUN npm install --no-production
+
+# run the tests, then clean up
+RUN npm test \
+    && npm prune --production \
+    && rm -r ./test
 
 # start the node application
+FROM node:13.8-alpine AS run-image
+WORKDIR /usr/src/app
+COPY --from=build-image /usr/src/app .
 CMD npm start
