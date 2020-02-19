@@ -5,6 +5,8 @@
     },
 
     "database": {
+        "host": "localhost",
+        "port": 3306,
         "schema": "games",
         "user": "games",
         "password_file": null,

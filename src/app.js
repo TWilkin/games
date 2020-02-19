@@ -1,6 +1,8 @@
 import config from 'config';
 import express from 'express';
 
+import './db.js';
+
 // initialise express with a test route
 const app = express();
 app.get(config.get('express.root'), (_, res) => {

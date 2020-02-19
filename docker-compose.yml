@@ -3,15 +3,14 @@ version: "3.3"
 services:
   mysql:
     image: mysql:8.0
-    volumes:
-      - db_data:/var/lib/mysql
+    expose:
+      - '3306'
     environment:
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
       - MYSQL_DATABASE=games
       - MYSQL_USER=games
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
     secrets:
-      - db_root_password
       - db_password
   
   ui:
@@ -22,6 +21,7 @@ services:
       - mysql
     environment:
       - NODE_CONFIG_ENV=docker
+      - MYSQL_HOST=mysql
       - MYSQL_DATABASE=games
       - MYSQL_USER=games
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
@@ -31,8 +31,3 @@ services:
 secrets:
   db_password:
     file: ./config/mysql.txt
-  db_root_password:
-    file: ./config/mysql_root.txt
-
-volumes:
-  db_data:
