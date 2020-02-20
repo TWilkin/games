@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser';
 
 import { sequelize } from '../db';
+import '../models/models';
 
 export function initAPI(app, root) {
     app.use(bodyParser.json());

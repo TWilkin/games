@@ -2,9 +2,9 @@ import { Model, DataTypes} from 'sequelize';
 
 import { sequelize } from '../db'
 
-export class Game extends Model {}
+class Game extends Model {}
 Game.init({
-    game_id: { 
+    gameId: { 
         type: DataTypes.INTEGER, 
         primaryKey: true, 
         autoIncrement: true, 
