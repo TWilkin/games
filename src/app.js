@@ -1,7 +1,7 @@
 import config from 'config';
 import express from 'express';
 
-import { Game } from './models/game';
+import { initAPI } from './api/api';
 
 // initialise express with a test route
 const app = express();
@@ -9,18 +9,8 @@ app.get(config.get('express.root'), (_, res) => {
     res.end(config.get('message'));
 });
 
-// add test db routes
-app.get(config.get('express.root') + 'add', async (_, res) => {
-    await Game.create({
-        title: 'Minecraft'
-    });
-    
-    res.end('Success');
-});
-app.get(config.get('express.root') + 'get', async (_, res) => {
-    const games = await Game.findAll();
-    res.end(JSON.stringify(games, null, 2));
-});
+// add the API routes
+initAPI(app, config.get('express.root'));
 
 // start listening
 const port = config.get('express.port') > 0 ? config.get('express.port') : undefined;
