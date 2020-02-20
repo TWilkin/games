@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+const HttpStatus = require('http-status-codes');
 
 import { sequelize } from '../db';
 import '../models/models';
@@ -15,20 +16,20 @@ export function initAPI(app, root) {
 
         // create the GET endpoint
         app.get(url, async (_, res) => {
-            let result = await model.findAll();
-            return res.json(result);
+            let data = await model.findAll();
+            generateResponse(data, res);
         });
 
         // create the GET by id endpoint
         app.get(`${url}/:id`, async (req, res) => {
-            let result = await model.findByPk(req.params.id);
-            return res.json(result);
+            let data = await model.findByPk(req.params.id);
+            generateResponse(data, res);
         });
 
         // create the POST endpoint
         app.post(url, async (req, res) => {
-            let result = await model.create(req.body);
-            return res.json(result);
+            let data = await model.create(req.body);
+            generateResponse(data, res);
         });
 
         // create the PUT endpoint
@@ -38,8 +39,25 @@ export function initAPI(app, root) {
             const query = { where: { }};
             query.where[primaryKey] = req.params.id;
 
-            let result = await model.update(req.body, query);
-            return res.json(result);
+            let data = await model.update(req.body, query);
+
+            // send the response based on what (if anything) was updated
+            if(data[0] == 0) {
+                generateResponse(undefined, res);
+            }
+            generateResponse(undefined, res, HttpStatus.NO_CONTENT);
         });
     });
+}
+
+function generateResponse(data, res, ifNull=HttpStatus.NOT_FOUND) {
+    if(!data || Object.keys(data).length == 0 ) {
+        res.status(ifNull).send();
+    } else {
+        // check if we created a new record
+        if(data.isNewRecord) {
+            res.status(HttpStatus.CREATED);
+        }
+        res.json(data);
+    }
 }
