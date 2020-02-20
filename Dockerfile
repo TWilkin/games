@@ -2,8 +2,9 @@ FROM node:13.8-alpine AS build-image
 
 # install the application
 WORKDIR /usr/src/app
-COPY . .
+COPY ./package*.json .
 RUN npm install --no-production
+COPY . .
 
 # run the tests, then clean up
 RUN npm test \
