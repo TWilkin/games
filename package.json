@@ -10,8 +10,8 @@
   "license": "GPL-3.0",
   "main": "src/app.ts",
   "scripts": {
-    "start": "ts-node src/app.ts",
-    "test": "nyc mocha test/**/*.ts"
+    "start": "node -r ts-node/register src/app.ts",
+    "test": "nyc mocha -r ts-node/register test/**/*.ts"
   },
   "dependencies": {
     "@types/config": "0.0.36",
