@@ -34,10 +34,10 @@ export function initAPI(app: Express, root: string) {
         });
 
         // create the PUT endpoint
-        /*app.put(`${url}/:id`, async (req, res) => {
-            // create the query
-            const primaryKey = Object.values(model.rawAttributes).find(field => field.primaryKey).fieldName;
-            const query = { where: { }};
+        app.put(`${url}/:id`, async (req, res) => {
+            // create the query (assume no composite primary keys)
+            const primaryKey = model.primaryKeyAttribute;
+            const query: any = { where: { } };
             query.where[primaryKey] = req.params.id;
 
             let data = await model.update(req.body, query);
@@ -47,7 +47,7 @@ export function initAPI(app: Express, root: string) {
                 generateResponse(undefined, res);
             }
             generateResponse(undefined, res, HttpStatus.NO_CONTENT);
-        });*/
+        });
     });
 }
 
