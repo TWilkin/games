@@ -3,6 +3,7 @@ import config from 'config';
 import express from 'express';
 
 //import { initAPI } from './api/api';
+import { sequelize } from './db';
 
 // initialise express with a test route
 const app = express();
