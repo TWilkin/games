@@ -10,6 +10,9 @@ services:
       - MYSQL_DATABASE=games
       - MYSQL_USER=games
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+    networks:
+      network:
+        ipv4_address: 172.20.0.2
     secrets:
       - db_password
   
@@ -25,8 +28,17 @@ services:
       - MYSQL_DATABASE=games
       - MYSQL_USER=games
       - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+    networks:
+      network:
+        ipv4_address: 172.20.0.3
     secrets:
       - db_password
+
+networks:
+  network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 
 secrets:
   db_password:
