@@ -2,8 +2,7 @@ import { AddressInfo } from 'net';
 import config from 'config';
 import express from 'express';
 
-//import { initAPI } from './api/api';
-import { sequelize } from './db';
+import { initAPI } from './api/api';
 
 // initialise express with a test route
 const app = express();
@@ -12,7 +11,7 @@ app.get(config.get('express.root'), (_, res) => {
 });
 
 // add the API routes
-//initAPI(app, config.get('express.root'));
+initAPI(app, config.get('express.root'));
 
 // start listening
 const port: number | undefined = config.get('express.port') as number > 0 ? config.get('express.port') : undefined;

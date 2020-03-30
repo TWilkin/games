@@ -1,10 +1,11 @@
 import bodyParser from 'body-parser';
-const HttpStatus = require('http-status-codes');
+import { Express, Response } from 'express';
+import HttpStatus from 'http-status-codes';
 
 import { sequelize } from '../db';
 import '../models/models';
 
-export function initAPI(app, root) {
+export function initAPI(app: Express, root: string) {
     app.use(bodyParser.json());
 
     // the base URLs for the API
@@ -33,7 +34,7 @@ export function initAPI(app, root) {
         });
 
         // create the PUT endpoint
-        app.put(`${url}/:id`, async (req, res) => {
+        /*app.put(`${url}/:id`, async (req, res) => {
             // create the query
             const primaryKey = Object.values(model.rawAttributes).find(field => field.primaryKey).fieldName;
             const query = { where: { }};
@@ -46,11 +47,11 @@ export function initAPI(app, root) {
                 generateResponse(undefined, res);
             }
             generateResponse(undefined, res, HttpStatus.NO_CONTENT);
-        });
+        });*/
     });
 }
 
-function generateResponse(data, res, ifNull=HttpStatus.NOT_FOUND) {
+function generateResponse(data: any, res: Response<any>, ifNull=HttpStatus.NOT_FOUND) {
     if(!data || Object.keys(data).length == 0 ) {
         res.status(ifNull).send();
     } else {
