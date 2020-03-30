@@ -1,3 +1,4 @@
+.nyc_output
 config/*.txt
 config/development.json
 config/production.json
