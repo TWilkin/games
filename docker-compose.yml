@@ -1,0 +1,45 @@
+version: "3.3"
+
+services:
+  mysql:
+    image: mysql:8.0
+    expose:
+      - '3306'
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_DATABASE=games
+      - MYSQL_USER=games
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+    networks:
+      network:
+        ipv4_address: 172.20.0.2
+    secrets:
+      - db_password
+  
+  ui:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      - NODE_CONFIG_ENV=docker
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=games
+      - MYSQL_USER=games
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+    networks:
+      network:
+        ipv4_address: 172.20.0.3
+    secrets:
+      - db_password
+
+networks:
+  network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+secrets:
+  db_password:
+    file: ./config/mysql.txt

@@ -1,0 +1,7 @@
+{
+    "express": {
+        "port": 3000
+    },
+    
+    "message": "Hello Docker!"
+}

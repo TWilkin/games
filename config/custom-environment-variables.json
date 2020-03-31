@@ -1,0 +1,8 @@
+{
+    "database": {
+        "host": "MYSQL_HOST",
+        "schema": "MYSQL_DATABASE",
+        "user": "MYSQL_USER",
+        "password_file": "MYSQL_PASSWORD_FILE"
+    }
+}
