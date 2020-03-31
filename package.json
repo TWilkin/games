@@ -8,9 +8,9 @@
     "url": "https://github.com/TWilkin/games/"
   },
   "license": "GPL-3.0",
-  "main": "src/app.ts",
+  "main": "src/start.js",
   "scripts": {
-    "start": "node -r ts-node/register src/app.ts",
+    "start": "node src/start.js",
     "test": "nyc mocha -r ts-node/register test/**/*.ts"
   },
   "dependencies": {
@@ -32,6 +32,7 @@
   "nyc": {
     "all": true,
     "include": [
+      "src/**/*.js",
       "src/**/*.ts"
     ],
     "exclude": [
