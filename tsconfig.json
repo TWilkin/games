@@ -12,7 +12,8 @@
       "inlineSources": true,
       "types": ["node", "mocha"],
       "stripInternal": true,
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "experimentalDecorators": true
     },
     "include": [
       "src/**/*"

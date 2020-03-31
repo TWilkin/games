@@ -3,7 +3,6 @@ import { Express, Response } from 'express';
 import HttpStatus from 'http-status-codes';
 
 import { sequelize } from '../db';
-import '../models/models';
 
 export function initAPI(app: Express, root: string) {
     app.use(bodyParser.json());
