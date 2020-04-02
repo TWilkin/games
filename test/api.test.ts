@@ -72,7 +72,7 @@ describe('API', () => {
                 expect(response.statusCode).to.equal(200);
                 expect(data).to.be.not.null;
                 expect(data).to.not.be.an('array');
-                expect(data.gameId).to.be.a('number');
+                expect(data[model.primaryKeyAttribute]).to.be.a('number');
             });
 
             it('PUT with valid id', async () => {
