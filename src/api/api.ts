@@ -14,9 +14,8 @@ export default class API {
     }
 
     public get = (req: Request<any>, res: Response<any>): Promise<any> => {
-        console.log(this.model);
         let data: any;
-        if(req.param && req.params.id) {
+        if(req.params && req.params.id) {
             data = this.model.findByPk(req.params.id);
         } else {
             data = this.model.findAll();
@@ -30,13 +29,13 @@ export default class API {
         return this.generateResponse(data, res);
     }
 
-    public put = (req: Request<any>, res: Response<any>): Promise<any> => {
+    public put = async (req: Request<any>, res: Response<any>): Promise<any> => {
         // create the query (assume no composite primary keys)
         const primaryKey = this.model.primaryKeyAttribute;
         const query: any = { where: { } };
         query.where[primaryKey] = req.params.id;
 
-        let data = this.model.update(req.body, query);
+        let data = await this.model.update(req.body, query);
 
         // send the response based on what (if anything) was updated
         if(data[0] == 0) {
