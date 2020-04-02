@@ -15,15 +15,6 @@ export function generateData(model: ModelCtor<Model<any, any>>, includeId=true):
     return generated;
 }
 
-export function generateDataArray(model: ModelCtor<Model<any, any>>, size: number): any[] {
-    return Array.apply(null, Array(size)).map(() => {
-        return {
-            'model': model.name,
-            'data': generateData(model)
-        }
-    });
-}
-
 function generateType(type: AbstractDataType): any {
     switch(type.key) {
 

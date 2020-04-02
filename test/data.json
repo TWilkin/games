@@ -1,0 +1,43 @@
+[
+    {
+        "model": "Game",
+        "data": {
+            "gameId": 1,
+            "title": "Test Game 1"
+        }
+    }, {
+        "model": "Game",
+        "data": {
+            "gameId": 2,
+            "title": "Test Game 2"
+        }
+    },
+
+    {
+        "model": "Platform",
+        "data": {
+            "platformId": 1,
+            "name": "Test Platform 1"
+        }
+    }, {
+        "model": "Platform",
+        "data": {
+            "platformId": 2,
+            "name": "Test Platform 2"
+        }
+    },
+
+    {
+        "model": "Series",
+        "data": {
+            "seriesId": 1,
+            "title": "Test Series 1"
+        }
+    }, {
+        "model": "Series",
+        "data": {
+            "seriesId": 2,
+            "title": "Test Series 2"
+        }
+    }
+]
