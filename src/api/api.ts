@@ -15,13 +15,15 @@ export default class API {
 
     public get = (req: Request<any>, res: Response<any>): Promise<any> => {
         let data: any;
+        let ifNull = HttpStatus.NOT_FOUND;
         if(req.params && req.params.id) {
             data = this.model.findByPk(req.params.id);
         } else {
             data = this.model.findAll();
+            ifNull = HttpStatus.NO_CONTENT;
         }
 
-        return this.generateResponse(data, res);
+        return this.generateResponse(data, res, ifNull);
     }
 
     public post = (req: Request<any>, res: Response<any>): Promise<any> => {
