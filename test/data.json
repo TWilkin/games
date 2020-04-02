@@ -39,5 +39,24 @@
             "seriesId": 2,
             "title": "Test Series 2"
         }
+    },
+
+    {
+        "model": "GamePlatform",
+        "data": {
+            "id": 1,
+            "gameId": 1,
+            "platformId": 1,
+            "alias": "Test Alias"
+        }
+    },
+    {
+        "model": "GamePlatform",
+        "data": {
+            "id": 2,
+            "gameId": 2,
+            "platformId": 2,
+            "alias": null
+        }
     }
 ]
