@@ -1,4 +1,5 @@
-FROM node:13.8-alpine AS build-image
+FROM node:13.8-stretch AS build-image
+
 
 # install the application
 WORKDIR /usr/src/app
@@ -12,7 +13,7 @@ RUN npm test \
     && rm -r ./test
 
 # start the node application
-FROM node:13.8-alpine AS run-image
+FROM node:13.8-stretch AS run-image
 WORKDIR /usr/src/app
 COPY --from=build-image /usr/src/app .
 CMD npm start
