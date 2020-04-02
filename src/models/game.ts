@@ -1,21 +1,13 @@
-import { Model, DataTypes} from 'sequelize';
+import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { sequelize } from '../db'
+@Table
+export default class Game extends Model<Game> {
 
-class Game extends Model {}
-Game.init({
-    gameId: { 
-        type: DataTypes.INTEGER, 
-        primaryKey: true, 
-        autoIncrement: true, 
-        allowNull: false
-    },
+    @PrimaryKey
+    @AutoIncrement
+    @Column(DataType.INTEGER)
+    gameId!: number;
 
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false
-    }
-}, {
-    sequelize
-});
-Game.sync();
+    @Column(DataType.STRING)
+    title!: string;
+}

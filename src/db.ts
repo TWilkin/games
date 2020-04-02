@@ -1,6 +1,6 @@
 import config from 'config';
 import fs from 'fs';
-import { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 // extract the password
 let password: string | undefined = config.get('database.password');
@@ -16,7 +16,8 @@ export const sequelize = new Sequelize(
     { 
         host: config.get('database.host'),
         port: config.get('database.port'),
-        dialect: 'mysql'
+        dialect: 'mysql',
+        modelPaths: [`${__dirname}/models/*.ts`]
     }
 );
 password = undefined;
