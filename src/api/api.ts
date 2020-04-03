@@ -14,12 +14,17 @@ export default class API {
     }
 
     public get = (req: Request<any>, res: Response<any>): Promise<any> => {
+        // generate the includes for any referenced fields
+        let includes = {
+            include: Object.values(this.model.associations).map(association => association.target)
+        };
+
         let data: any;
         let ifNull = HttpStatus.NOT_FOUND;
         if(req.params && req.params.id) {
-            data = this.model.findByPk(req.params.id);
+            data = this.model.findByPk(req.params.id, includes);
         } else {
-            data = this.model.findAll();
+            data = this.model.findAll(includes);
             ifNull = HttpStatus.NO_CONTENT;
         }
 

@@ -1,6 +1,6 @@
 import casual from 'casual';
 import dateformat from 'dateformat';
-import { Model, ModelCtor, AbstractDataType, DataTypes } from 'sequelize';
+import { Model, ModelCtor, AbstractDataType, DataTypes, ModelAttributeColumnOptions } from 'sequelize';
 
 export function generateData(model: ModelCtor<Model<any, any>>, includeId=true): any {
     let generated = {};
@@ -9,14 +9,19 @@ export function generateData(model: ModelCtor<Model<any, any>>, includeId=true):
     Object.values(model.rawAttributes)
         .filter(field => !field.primaryKey || includeId)
         .forEach((field) => {
-            generated[field.field as string] = generateType(field.type as AbstractDataType);
+            generated[field.field as string] = generateType(field);
         });
 
     return generated;
 }
 
-function generateType(type: AbstractDataType): any {
-    switch(type.key) {
+function generateType(field: ModelAttributeColumnOptions): any {
+    // when generating a foreign key return a known good id
+    if(field.references) {
+        return 1;
+    }
+
+    switch((field.type as AbstractDataType).key) {
 
         case DataTypes.INTEGER.toString():
             return casual.integer(0);
