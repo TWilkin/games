@@ -72,5 +72,22 @@
             "platformId": 2,
             "alias": null
         }
+    },
+
+    {
+        "model": "GameCollection",
+        "data": {
+            "id": 1,
+            "gamePlatformId": 1,
+            "userId": 1
+        }
+    },
+    {
+        "model": "GameCollection",
+        "data": {
+            "id": 2,
+            "gamePlatformId": 2,
+            "userId": 2
+        }
     }
 ]
