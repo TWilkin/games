@@ -1,5 +1,19 @@
 [
     {
+        "model": "User",
+        "data": {
+            "userId": 1,
+            "userName": "TestUser1"
+        }
+    }, {
+        "model": "User",
+        "data": {
+            "userId": 2,
+            "userName": "TestUser2"
+        }
+    },
+
+    {
         "model": "Game",
         "data": {
             "gameId": 1,
