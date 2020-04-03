@@ -9,22 +9,26 @@ export default class API {
 
     private model: ModelCtor<Model<any, any>>;
 
+    private includes: any;
+
     constructor(model: ModelCtor<Model<any, any>>) {
         this.model = model;
+
+        // generate the includes for any referenced fields
+        this.includes = {
+            include: Object
+                    .values(this.model.associations)
+                    .map(association => association.target)
+        };
     }
 
     public get = (req: Request<any>, res: Response<any>): Promise<any> => {
-        // generate the includes for any referenced fields
-        let includes = {
-            include: Object.values(this.model.associations).map(association => association.target)
-        };
-
         let data: any;
         let ifNull = HttpStatus.NOT_FOUND;
         if(req.params && req.params.id) {
-            data = this.model.findByPk(req.params.id, includes);
+            data = this.model.findByPk(req.params.id, this.includes);
         } else {
-            data = this.model.findAll(includes);
+            data = this.model.findAll(this.includes);
             ifNull = HttpStatus.NO_CONTENT;
         }
 
