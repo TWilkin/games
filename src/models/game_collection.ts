@@ -9,7 +9,7 @@ export default class GameCollection extends Model<GameCollection> {
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
-    id!: number;
+    gameCollectionId!: number;
 
     @ForeignKey(() => GamePlatform)
     @Column(DataType.INTEGER)

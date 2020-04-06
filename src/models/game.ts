@@ -1,4 +1,6 @@
-import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+
+import GamePlatform from './game_platform';
 
 @Table
 export default class Game extends Model<Game> {
@@ -10,4 +12,7 @@ export default class Game extends Model<Game> {
 
     @Column(DataType.STRING)
     title!: string;
+
+    @HasMany(() => GamePlatform)
+    platforms!: GamePlatform[];
 }

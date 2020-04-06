@@ -1,4 +1,4 @@
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import Game from './game';
 import Platform from './platform';
@@ -9,7 +9,7 @@ export default class GamePlatform extends Model<GamePlatform> {
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
-    id!: number;
+    gamePlatformId!: number;
 
     @ForeignKey(() => Game)
     @Column(DataType.INTEGER)
@@ -25,6 +25,7 @@ export default class GamePlatform extends Model<GamePlatform> {
     @BelongsTo(() => Platform)
     platform!: Platform;
 
+    @AllowNull(true)
     @Column(DataType.STRING)
     alias!: string;
 }

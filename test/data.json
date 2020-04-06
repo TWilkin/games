@@ -58,7 +58,7 @@
     {
         "model": "GamePlatform",
         "data": {
-            "id": 1,
+            "gamePlatformId": 1,
             "gameId": 1,
             "platformId": 1,
             "alias": "Test Alias"
@@ -67,7 +67,7 @@
     {
         "model": "GamePlatform",
         "data": {
-            "id": 2,
+            "gamePlatformId": 2,
             "gameId": 2,
             "platformId": 2,
             "alias": null
@@ -77,7 +77,7 @@
     {
         "model": "GamePlayTime",
         "data": {
-            "playTimeId": 1,
+            "gamePlayTimeId": 1,
             "gamePlatformId": 1,
             "startTime": "2020-04-06T13:53:00.000Z",
             "endTime": "2020-04-06T14:53:00.000Z"
@@ -86,17 +86,17 @@
     {
         "model": "GamePlayTime",
         "data": {
-            "playTimeId": 2,
+            "gamePlayTimeId": 2,
             "gamePlatformId": 2,
             "startTime": "2020-04-07T13:53:00.000Z",
-            "endTime": "2020-04-08T13:53:00.000Z"
+            "endTime": null
         }
     },
 
     {
         "model": "GameCollection",
         "data": {
-            "id": 1,
+            "gameCollectionId": 1,
             "gamePlatformId": 1,
             "userId": 1
         }
@@ -104,7 +104,7 @@
     {
         "model": "GameCollection",
         "data": {
-            "id": 2,
+            "gameCollectionId": 2,
             "gamePlatformId": 2,
             "userId": 2
         }

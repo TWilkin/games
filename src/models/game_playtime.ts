@@ -1,4 +1,4 @@
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import GamePlatform from './game_platform';
 import User from './user';
@@ -9,7 +9,7 @@ export default class GamePlayTime extends Model<GamePlayTime> {
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
-    playTimeId!: number;
+    gamePlayTimeId!: number;
 
     @ForeignKey(() => GamePlatform)
     @Column(DataType.INTEGER)
@@ -28,6 +28,7 @@ export default class GamePlayTime extends Model<GamePlayTime> {
     @Column(DataType.DATE)
     startTime!: Date;
 
+    @AllowNull(true)
     @Column(DataType.DATE)
     endTime!: Date;
 }

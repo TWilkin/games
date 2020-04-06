@@ -1,6 +1,7 @@
 import { AutoIncrement, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import GameCollection from './game_collection';
+import GamePlayTime from './game_playtime';
 
 @Table
 export default class User extends Model<User> {
@@ -15,4 +16,7 @@ export default class User extends Model<User> {
 
     @HasMany(() => GameCollection)
     games!: GameCollection[];
+
+    @HasMany(() => GamePlayTime)
+    playTime!: GamePlayTime[];
 }
