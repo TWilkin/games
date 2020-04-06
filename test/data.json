@@ -108,5 +108,22 @@
             "gamePlatformId": 2,
             "userId": 2
         }
+    },
+
+    {
+        "model": "GameSeries",
+        "data": {
+            "gameSeriesId": 1,
+            "gameId": 1,
+            "seriesId": 1
+        }
+    },
+    {
+        "model": "GameSeries",
+        "data": {
+            "gameSeriesId": 2,
+            "gameId": 2,
+            "seriesId": 2
+        }
     }
 ]
