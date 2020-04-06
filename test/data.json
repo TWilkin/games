@@ -75,6 +75,25 @@
     },
 
     {
+        "model": "GamePlayTime",
+        "data": {
+            "playTimeId": 1,
+            "gamePlatformId": 1,
+            "startTime": "2020-04-06T13:53:00.000Z",
+            "endTime": "2020-04-06T14:53:00.000Z"
+        }
+    },
+    {
+        "model": "GamePlayTime",
+        "data": {
+            "playTimeId": 2,
+            "gamePlatformId": 2,
+            "startTime": "2020-04-07T13:53:00.000Z",
+            "endTime": "2020-04-08T13:53:00.000Z"
+        }
+    },
+
+    {
         "model": "GameCollection",
         "data": {
             "id": 1,
