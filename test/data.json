@@ -79,8 +79,8 @@
         "data": {
             "gamePlayTimeId": 1,
             "gamePlatformId": 1,
-            "startTime": "2020-04-06T13:53:00.000Z",
-            "endTime": "2020-04-06T14:53:00.000Z"
+            "startTime": "2020-04-06T13:53:00Z",
+            "endTime": "2020-04-06T14:53:00Z"
         }
     },
     {
@@ -88,7 +88,7 @@
         "data": {
             "gamePlayTimeId": 2,
             "gamePlatformId": 2,
-            "startTime": "2020-04-07T13:53:00.000Z",
+            "startTime": "2020-04-07T13:53:00Z",
             "endTime": null
         }
     },
@@ -107,6 +107,25 @@
             "gameCollectionId": 2,
             "gamePlatformId": 2,
             "userId": 2
+        }
+    },
+
+    {
+        "model": "GameCompletion",
+        "data": {
+            "gameCompletionId": 1,
+            "gamePlatformId": 1,
+            "userId": 1,
+            "date": "2020-04-07T14:54:00Z"
+        }
+    },
+    {
+        "model": "GameCompletion",
+        "data": {
+            "gameCompletionId": 2,
+            "gamePlatformId": 2,
+            "userId": 2,
+            "date": "2020-04-07T13:54:00Z"
         }
     },
 
