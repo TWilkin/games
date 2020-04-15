@@ -1,6 +1,6 @@
 import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
-import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLScalarType, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLFieldConfig, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType } from 'graphql';
 import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes } from 'sequelize';
 
 import { sequelize } from '../db';
@@ -81,7 +81,7 @@ export default class GraphQLAPI {
     }
 
     private static generateFields(fields: ModelAttributeColumnOptions[], includeId=true): 
-            GraphQLFieldConfigMap<any, any, any> | GraphQLInputFieldConfig
+            GraphQLFieldConfigMap<any, any, any> | GraphQLInputFieldConfigMap
     {
         let f = {};
         fields
