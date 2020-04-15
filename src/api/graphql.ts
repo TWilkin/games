@@ -28,7 +28,7 @@ export default class GraphQLAPI {
         });
         this.input  = new GraphQLInputObjectType({
             name: `${model.name}Input`,
-            fields: () => GraphQLAPI.generateFields(Object.values(model.rawAttributes), false) as GraphQLInputFieldConfigMap
+            fields: () => GraphQLAPI.generateFields(Object.values(model.rawAttributes), true) as GraphQLInputFieldConfigMap
         });
     }
 
@@ -80,12 +80,12 @@ export default class GraphQLAPI {
         };
     }
 
-    private static generateFields(fields: ModelAttributeColumnOptions[], includeId=true): 
+    private static generateFields(fields: ModelAttributeColumnOptions[], isInput=false): 
             GraphQLFieldConfigMap<any, any, any> | GraphQLInputFieldConfigMap
     {
         let f = {};
         fields
-            .filter(field => includeId || !field.primaryKey)
+            .filter(field => !(isInput && (field.primaryKey || 'updatedAt' === field.field || 'createdAt' === field.field)))
             .forEach(field => {
                 f[field.field as string] = {
                     type: this.generateType(field)
