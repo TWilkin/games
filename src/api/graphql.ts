@@ -1,6 +1,6 @@
 import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
-import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLScalarType, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLFieldConfig, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLScalarType, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLFieldConfig, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType } from 'graphql';
 import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes } from 'sequelize';
 
 import { sequelize } from '../db';
@@ -94,19 +94,31 @@ export default class GraphQLAPI {
         return f;
     }
 
-    private static generateType(field: ModelAttributeColumnOptions): GraphQLScalarType {
+    private static generateType(field: ModelAttributeColumnOptions): GraphQLType {
+        let type: GraphQLNullableType;
+
         switch((field.type as AbstractDataType).key) {
     
             case DataTypes.INTEGER.toString():
-                return GraphQLInt;
+                type = GraphQLInt;
+                break;
             
             case DataTypes.DATE.toString():
-                return DateTimeScalarType;
+                type = DateTimeScalarType;
+                break;
             
             case DataTypes.STRING.toString():
             default:
-                return GraphQLString;
+                type = GraphQLString;
+                break;
         }
+
+        // check if this type should be nullable
+        if(!field.allowNull) {
+            type = new GraphQLNonNull(type);
+        }
+
+        return type;
     }
     
     public static init(app: Express, root: string) {
