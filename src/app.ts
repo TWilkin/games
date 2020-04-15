@@ -3,6 +3,7 @@ import config from 'config';
 import express from 'express';
 
 import API from './api/api';
+import GraphQLAPI from './api/graphql';
 
 // initialise express with a test route
 const app = express();
@@ -12,6 +13,7 @@ app.get(config.get('express.root'), (_, res) => {
 
 // add the API routes
 API.init(app, config.get('express.root'));
+GraphQLAPI.init(app, config.get('express.root'));
 
 // start listening
 const port: number | undefined = config.get('express.port') as number > 0 ? config.get('express.port') : undefined;
