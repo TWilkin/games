@@ -14,6 +14,9 @@ export default class GraphQLAPI {
     // the sequelize model
     private model: ModelCtor<Model<any, any>>;
 
+    // the tables to include when making a query using sequelize
+    private includes: any;
+
     // the GraphQL type
     private type: GraphQLObjectType;
 
@@ -22,13 +25,21 @@ export default class GraphQLAPI {
 
     constructor(model: ModelCtor<Model<any, any>>) {
         this.model = model;
+
+        // generate the includes for any referenced fields
+        this.includes = {
+            include: Object
+                .values(this.model.associations)
+                .map(association => association.target)
+        };
+
         this.type = new GraphQLObjectType({
             name: model.name,
-            fields: () => GraphQLAPI.generateFields(Object.values(model.rawAttributes)) as GraphQLFieldConfigMap<any, any, any>
+            fields: () => this.generateFields() as GraphQLFieldConfigMap<any, any, any>
         });
         this.input  = new GraphQLInputObjectType({
             name: `${model.name}Input`,
-            fields: () => GraphQLAPI.generateFields(Object.values(model.rawAttributes), true) as GraphQLInputFieldConfigMap
+            fields: () => this.generateFields(true) as GraphQLInputFieldConfigMap
         });
     }
 
@@ -36,7 +47,7 @@ export default class GraphQLAPI {
         const model = this.model;
         query.fields[`Get${model.name}`] = {
             type: new GraphQLList(this.type),
-            resolve: () => model.findAll()
+            resolve: () => model.findAll(this.includes)
         };
     }
 
@@ -80,18 +91,37 @@ export default class GraphQLAPI {
         };
     }
 
-    private static generateFields(fields: ModelAttributeColumnOptions[], isInput=false): 
+    private generateFields(isInput=false): 
             GraphQLFieldConfigMap<any, any, any> | GraphQLInputFieldConfigMap
     {
-        let f = {};
-        fields
+        let fields = {};
+
+        // iterate over the database fields
+        Object.values(this.model.rawAttributes)
             .filter(field => !(isInput && (field.primaryKey || 'updatedAt' === field.field || 'createdAt' === field.field)))
             .forEach(field => {
-                f[field.field as string] = {
-                    type: this.generateType(field)
+                fields[field.field as string] = {
+                    type: GraphQLAPI.generateType(field)
                 };
             });
-        return f;
+        
+        // add the referenced fields
+        if(!isInput) {
+            Object.keys(this.model.associations)
+                .forEach(key => {
+                    // check if this type has been created already
+                    const type = models.find(model => model.model == this.model.associations[key].target);
+                    if(!type) {
+                        throw new Error(`Cannot find GraphQL type for field ${key}`);
+                    }
+
+                    fields[key] = {
+                        type: type.type
+                    }
+                });
+        }
+        
+        return fields;
     }
 
     private static generateType(field: ModelAttributeColumnOptions): GraphQLType {
@@ -123,8 +153,8 @@ export default class GraphQLAPI {
     
     public static init(app: Express, root: string) {
         // create a GraphQL model for each Sequelize model
-        models = Object.values(sequelize.models)
-            .map(model => new GraphQLAPI(model));
+        Object.values(sequelize.models)
+            .forEach(model => models.push(new GraphQLAPI(model)));
 
         // add the queries
         const queries: GraphQLObjectTypeConfig<any, any, any> = {
@@ -140,16 +170,10 @@ export default class GraphQLAPI {
         };
         models.forEach(model => model.appendMutation(mutations));
 
-        // merge the types and inputs
-        const types: any[] = models
-            .map(model => model.input)
-            .concat(models.map(model => model.input));
-
         // generate the schema
         const schema = new GraphQLSchema({
             query: new GraphQLObjectType(queries),
-            mutation: new GraphQLObjectType(mutations),
-            types: types
+            mutation: new GraphQLObjectType(mutations)
         });
 
         // add the GraphQL endpoint
