@@ -45,7 +45,7 @@ describe('GraphQL', () => {
                 expect((response.data as object)[queryName][model.primaryKeyAttribute]).to.be.a('number');
             });
 
-            it('Mutation update', async () => {
+            it('Mutation update with valid id', async () => {
                 let queryName = `Update${model.name}`;
                 let data = {
                     id: 1,
@@ -58,6 +58,19 @@ describe('GraphQL', () => {
                 expect((response.data as object)[queryName]).to.be.not.null;
                 expect((response.data as object)[queryName]).to.not.be.an('array');
                 expect((response.data as object)[queryName][model.primaryKeyAttribute]).to.be.a('number');
+            });
+
+            it('Mutation update with invalid id', async () => {
+                let queryName = `Update${model.name}`;
+                let data = {
+                    id: 3,
+                    input: generateData(model, false, false)
+                };
+                let response = await graphql(schema, generateMutation(model, false), null, null, data);
+                expect(response).to.be.not.null;
+                expect(response.errors).to.be.undefined;
+                expect(response.data).to.be.not.null;
+                expect((response.data as object)[queryName]).to.be.null;
             });
         });
     });
