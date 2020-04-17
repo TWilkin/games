@@ -6,10 +6,13 @@ import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTy
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
 
-// the list of models
-let models: GraphQLAPI[] = [];
-
 export default class GraphQLAPI {
+
+    // the list of models
+    private static models: GraphQLAPI[] = [];
+
+    // the GraphQL schema
+    private static schema: GraphQLSchema;
 
     // the sequelize model
     private model: ModelCtor<Model<any, any>>;
@@ -41,6 +44,10 @@ export default class GraphQLAPI {
             name: `${model.name}Input`,
             fields: () => this.generateFields(true) as GraphQLInputFieldConfigMap
         });
+    }
+
+    public get getModel(): ModelCtor<Model<any, any>> {
+        return this.model;
     }
 
     private appendQuery(query: GraphQLObjectTypeConfig<any, any, any>) {
@@ -110,7 +117,7 @@ export default class GraphQLAPI {
             Object.keys(this.model.associations)
                 .forEach(key => {
                     // check if this type has been created already
-                    const type = models.find(model => model.model == this.model.associations[key].target);
+                    const type = GraphQLAPI.models.find(model => model.model == this.model.associations[key].target);
                     if(!type) {
                         throw new Error(`Cannot find GraphQL type for field ${key}`);
                     }
@@ -151,38 +158,42 @@ export default class GraphQLAPI {
         return type;
     }
     
-    public static init(app: Express, root: string) {
+    public static init(app: Express | null, root: string): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
         Object.values(sequelize.models)
-            .forEach(model => models.push(new GraphQLAPI(model)));
+            .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
 
         // add the queries
         const queries: GraphQLObjectTypeConfig<any, any, any> = {
             name: 'Query',
             fields: {}
         };
-        models.forEach(model => model.appendQuery(queries));
+        GraphQLAPI.models.forEach(model => model.appendQuery(queries));
 
         // add the mutations
         const mutations: GraphQLObjectTypeConfig<any, any, any> = {
             name: 'Mutation',
             fields: {}
         };
-        models.forEach(model => model.appendMutation(mutations));
+        GraphQLAPI.models.forEach(model => model.appendMutation(mutations));
 
         // generate the schema
-        const schema = new GraphQLSchema({
+        GraphQLAPI.schema = new GraphQLSchema({
             query: new GraphQLObjectType(queries),
             mutation: new GraphQLObjectType(mutations)
         });
 
         // add the GraphQL endpoint
-        app.use(
-            `${root}/graphql`.replace('//', '/'),
-            graphqlHTTP({
-                schema: schema,
-                graphiql: true
-            })
-        );
+        if(app) {
+            app.use(
+                `${root}/graphql`.replace('//', '/'),
+                graphqlHTTP({
+                    schema: GraphQLAPI.schema,
+                    graphiql: true
+                })
+            );
+        }
+
+        return GraphQLAPI.schema;
     }
 }

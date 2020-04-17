@@ -22,7 +22,6 @@ function generateType(field: ModelAttributeColumnOptions): any {
     }
 
     switch((field.type as AbstractDataType).key) {
-
         case DataTypes.INTEGER.toString():
             return casual.integer(0);
         
