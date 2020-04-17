@@ -36,7 +36,22 @@ describe('GraphQL', () => {
                 let data = {
                     input: generateData(model, false, false)
                 };
-                let response = await graphql(schema, generateMutation(model), null, null, data);
+                let response = await graphql(schema, generateMutation(model, true), null, null, data);
+                expect(response).to.be.not.null;
+                expect(response.errors).to.be.undefined;
+                expect(response.data).to.be.not.null;
+                expect((response.data as object)[queryName]).to.be.not.null;
+                expect((response.data as object)[queryName]).to.not.be.an('array');
+                expect((response.data as object)[queryName][model.primaryKeyAttribute]).to.be.a('number');
+            });
+
+            it('Mutation update', async () => {
+                let queryName = `Update${model.name}`;
+                let data = {
+                    id: 1,
+                    input: generateData(model, false, false)
+                };
+                let response = await graphql(schema, generateMutation(model, false), null, null, data);
                 expect(response).to.be.not.null;
                 expect(response.errors).to.be.undefined;
                 expect(response.data).to.be.not.null;

@@ -8,9 +8,12 @@ export function generateQuery(model: ModelCtor<Model<any, any>>): string {
     return `query { Get${model.name} { ${fields.join(',')} } }`;
 }
 
-export function generateMutation(model: ModelCtor<Model<any, any>>): string {
-    return `mutation($input: ${model.name}Input!) {
-        Add${model.name}(input: $input) {
+export function generateMutation(model: ModelCtor<Model<any, any>>, isAdd: boolean): string {
+    let method = isAdd ? 'Add' : 'Update';
+    let idParams = isAdd ? '' : '$id: Int!,';
+    let idAssign = isAdd ? '' : 'id: $id,';
+    return `mutation(${idParams} $input: ${model.name}Input!) {
+        ${method}${model.name}(${idAssign} input: $input) {
             ${model.primaryKeyAttribute},
             createdAt,
             updatedAt 
