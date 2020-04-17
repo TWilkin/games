@@ -7,3 +7,13 @@ export function generateQuery(model: ModelCtor<Model<any, any>>): string {
             .map(key => `${key} { createdAt, updatedAt }`));
     return `query { Get${model.name} { ${fields.join(',')} } }`;
 }
+
+export function generateMutation(model: ModelCtor<Model<any, any>>): string {
+    return `mutation($input: ${model.name}Input!) {
+        Add${model.name}(input: $input) {
+            ${model.primaryKeyAttribute},
+            createdAt,
+            updatedAt 
+        }
+    }`
+}
