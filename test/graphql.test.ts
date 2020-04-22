@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { graphql } from 'graphql';
+import { graphql, GraphQLInt } from 'graphql';
 import { sequelizeMockingMocha } from 'sequelize-mocking';
 
 import GraphQLAPI from '../src/api/graphql';
@@ -29,6 +29,19 @@ describe('GraphQL', () => {
                 expect(response.data).to.be.not.null;
                 expect((response.data as object)[queryName]).to.be.not.null;
                 expect((response.data as object)[queryName].length).to.equal(2);
+            });
+
+            it('Query with valid id', async () => {
+                let queryName = `Get${model.name}`;
+                let data = {
+                    id: 1
+                };
+                let response = await graphql(schema, generateQuery(model, { id: GraphQLInt }), null, null, data);
+                expect(response).to.be.not.null;
+                expect(response.errors).to.be.undefined;
+                expect(response.data).to.be.not.null;
+                expect((response.data as object)[queryName]).to.be.not.null;
+                expect((response.data as object)[queryName].length).to.equal(1);
             });
 
             it('Mutation add', async () => {

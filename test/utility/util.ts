@@ -1,11 +1,20 @@
 import { Model, ModelCtor } from 'sequelize';
 
-export function generateQuery(model: ModelCtor<Model<any, any>>): string {
+export function generateQuery(model: ModelCtor<Model<any, any>>, params: any=null): string {
     let fields: string[] = Object.values(model.rawAttributes)
         .map(field => field.field as string)
         .concat(Object.keys(model.associations)
             .map(key => `${key} { createdAt, updatedAt }`));
-    return `query { Get${model.name} { ${fields.join(',')} } }`;
+
+    // add any query parameters if they are set
+    let queryParams = '';
+    let assign = '';
+    if(params) {
+        queryParams = `(${Object.keys(params).map(key => `$${key}: ${params[key].name}`).join(', ')})`;
+        assign = `(${Object.keys(params).map(param => `${param}: $${param}`).join(', ')})`;
+    }
+
+    return `query${queryParams} { Get${model.name}${assign} { ${fields.join(', ')} } }`;
 }
 
 export function generateMutation(model: ModelCtor<Model<any, any>>, isAdd: boolean): string {
@@ -18,5 +27,5 @@ export function generateMutation(model: ModelCtor<Model<any, any>>, isAdd: boole
             createdAt,
             updatedAt 
         }
-    }`
+    }`;
 }

@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType } from 'graphql';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, Includeable } from 'sequelize';
 
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
@@ -18,7 +18,7 @@ export default class GraphQLAPI {
     private model: ModelCtor<Model<any, any>>;
 
     // the tables to include when making a query using sequelize
-    private includes: any;
+    private includes: Includeable[];
 
     // the GraphQL type
     private type: GraphQLObjectType;
@@ -30,11 +30,9 @@ export default class GraphQLAPI {
         this.model = model;
 
         // generate the includes for any referenced fields
-        this.includes = {
-            include: Object
+        this.includes = Object
                 .values(this.model.associations)
-                .map(association => association.target)
-        };
+                .map(association => association.target);
 
         this.type = new GraphQLObjectType({
             name: model.name,
@@ -54,7 +52,28 @@ export default class GraphQLAPI {
         const model = this.model;
         query.fields[`Get${model.name}`] = {
             type: new GraphQLList(this.type),
-            resolve: () => model.findAll(this.includes)
+            args: {
+                id: {
+                    type: GraphQLInt
+                }
+            },
+            resolve: (_: any, args: any) => {
+                let query: FindOptions = {
+                    include: this.includes
+                };
+
+                if(args) {
+                    // replace args.id with the actual name of the field
+                    if(args.id) {
+                        args[model.primaryKeyAttribute] = args.id;
+                        delete args.id;
+                    }
+
+                    query.where = args;
+                }
+                
+                return model.findAll(query);
+            }
         };
     }
 
@@ -69,7 +88,7 @@ export default class GraphQLAPI {
                     type: new GraphQLNonNull(this.input)
                 }
             },
-            resolve: (_, { input }) => model.create(input)
+            resolve: (_: any, { input }) => model.create(input)
         };
 
         // the UpdateX mutation
