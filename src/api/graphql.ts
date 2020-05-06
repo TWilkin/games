@@ -1,6 +1,7 @@
 import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
-import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
+import graphqlFields from 'graphql-fields';
 import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, Includeable } from 'sequelize';
 
 import { sequelize } from '../db';
@@ -69,7 +70,7 @@ export default class GraphQLAPI {
         query.fields[`Get${model.name}`] = {
             type: new GraphQLList(this.type),
             args: args,
-            resolve: (_: any, args: any) => {
+            resolve: (_: any, args: any, __: any, info: GraphQLResolveInfo) => {
                 let query: FindOptions = {
                     include: this.includes
                 };
@@ -83,6 +84,9 @@ export default class GraphQLAPI {
 
                     query.where = args;
                 }
+
+                // restrict the selected columns
+                query.attributes = Object.keys(graphqlFields(info));
                 
                 return model.findAll(query);
             }

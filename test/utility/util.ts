@@ -3,8 +3,8 @@ import { Model, ModelCtor } from 'sequelize';
 export function generateQuery(model: ModelCtor<Model<any, any>>, params: any=null): string {
     let fields: string[] = Object.values(model.rawAttributes)
         .map(field => field.field as string)
-        .concat(Object.keys(model.associations)
-            .map(key => `${key} { createdAt, updatedAt }`));
+        /*.concat(Object.keys(model.associations)
+            .map(key => `${key} { createdAt, updatedAt }`))*/;
 
     // add any query parameters if they are set
     let queryParams = '';
