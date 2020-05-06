@@ -2,7 +2,7 @@ import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, Includeable } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, Includeable, UpdateOptions } from 'sequelize';
 
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
@@ -86,7 +86,10 @@ export default class GraphQLAPI {
                 }
 
                 // restrict the selected columns
-                query.attributes = Object.keys(graphqlFields(info));
+                const options = {
+                    excludedFields: Object.keys(model.associations)
+                };
+                query.attributes = Object.keys(graphqlFields(info, null, options));
                 
                 return model.findAll(query);
             }
@@ -120,7 +123,7 @@ export default class GraphQLAPI {
             },
             resolve: async (_, { id, input }) => {
                 // create the query (assume no composite primary keys)
-                const query: any = { where: { } };
+                const query: UpdateOptions = { where: { } };
                 query.where[model.primaryKeyAttribute] = id;
                 const data = await model.update(input, query);
 
