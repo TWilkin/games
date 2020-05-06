@@ -5,6 +5,7 @@ import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTy
 
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
+import { isQueryable } from './queryable';
 
 export default class GraphQLAPI {
 
@@ -50,13 +51,24 @@ export default class GraphQLAPI {
 
     private appendQuery(query: GraphQLObjectTypeConfig<any, any, any>) {
         const model = this.model;
+
+        // generate the query args with default id and any other queryable column
+        let args = {
+            id: {
+                type: GraphQLInt
+            }
+        };
+        Object.values(this.model.rawAttributes)
+            .filter(field => isQueryable(field))
+            .forEach(field => {
+                args[field.field as string] = {
+                    type: GraphQLAPI.generateType(field, true)
+                };
+            });
+
         query.fields[`Get${model.name}`] = {
             type: new GraphQLList(this.type),
-            args: {
-                id: {
-                    type: GraphQLInt
-                }
-            },
+            args: args,
             resolve: (_: any, args: any) => {
                 let query: FindOptions = {
                     include: this.includes
@@ -150,7 +162,7 @@ export default class GraphQLAPI {
         return fields;
     }
 
-    private static generateType(field: ModelAttributeColumnOptions): GraphQLType {
+    private static generateType(field: ModelAttributeColumnOptions, query=false): GraphQLType {
         let type: GraphQLNullableType;
 
         switch((field.type as AbstractDataType).key) {
@@ -170,7 +182,7 @@ export default class GraphQLAPI {
         }
 
         // check if this type should be nullable
-        if(!field.allowNull) {
+        if(!query && !field.allowNull) {
             type = new GraphQLNonNull(type);
         }
 
