@@ -2,7 +2,7 @@ import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, Includeable, UpdateOptions } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions } from 'sequelize';
 
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
@@ -19,9 +19,6 @@ export default class GraphQLAPI {
     // the sequelize model
     private model: ModelCtor<Model<any, any>>;
 
-    // the tables to include when making a query using sequelize
-    private includes: Includeable[];
-
     // the GraphQL type
     private type: GraphQLObjectType;
 
@@ -30,11 +27,6 @@ export default class GraphQLAPI {
 
     constructor(model: ModelCtor<Model<any, any>>) {
         this.model = model;
-
-        // generate the includes for any referenced fields
-        this.includes = Object
-                .values(this.model.associations)
-                .map(association => association.target);
 
         this.type = new GraphQLObjectType({
             name: model.name,
@@ -71,9 +63,7 @@ export default class GraphQLAPI {
             type: new GraphQLList(this.type),
             args: args,
             resolve: (_: any, args: any, __: any, info: GraphQLResolveInfo) => {
-                let query: FindOptions = {
-                    include: this.includes
-                };
+                let query: FindOptions = this.restrictColumns(info);
 
                 if(args) {
                     // replace args.id with the actual name of the field
@@ -84,12 +74,6 @@ export default class GraphQLAPI {
 
                     query.where = args;
                 }
-
-                // restrict the selected columns
-                const options = {
-                    excludedFields: Object.keys(model.associations)
-                };
-                query.attributes = Object.keys(graphqlFields(info, null, options));
                 
                 return model.findAll(query);
             }
@@ -194,6 +178,45 @@ export default class GraphQLAPI {
         }
 
         return type;
+    }
+
+    private restrictColumns(info: GraphQLResolveInfo): FindOptions {
+        const model = this.model;
+        const result: FindOptions = {
+            include: []
+         };
+
+        // the function to flatten the column and model selection
+        const flatten = function(obj: any, prefix: string): string[] {
+            if(prefix != '') {
+                prefix += '.';
+            }
+
+            return Object.keys(obj)
+                .reduce((acc, key) => {
+                    if(Object.keys(obj[key]).length > 0) {
+                        // as this is a model, we need to include the join too
+                        const joinKey = Object.keys(model.associations)
+                            .find(association => association == key);
+                        if(joinKey) {
+                            const association = model.associations[joinKey];
+                            result.include?.push(association);
+                        }
+
+                        // recursively flatten
+                        return acc.concat(flatten(obj[key], `${prefix}${key}`))
+                    } else {
+                        // add this key
+                        acc.push(`${prefix}${key}`);
+                    }
+
+                    return acc;
+                }, [] as string[]);
+        }
+
+        // find the list of columns
+        result.attributes = flatten(graphqlFields(info), '');
+        return result;
     }
     
     public static init(app: Express | null, root: string): GraphQLSchema {
