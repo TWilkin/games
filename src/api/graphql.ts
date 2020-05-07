@@ -2,7 +2,7 @@ import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions } from 'sequelize';
 
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
@@ -181,41 +181,48 @@ export default class GraphQLAPI {
     }
 
     private restrictColumns(info: GraphQLResolveInfo): FindOptions {
-        const model = this.model;
+        const originalModel = this.model;
         const result: FindOptions = {
             include: []
          };
 
         // the function to flatten the column and model selection
-        const flatten = function(obj: any, prefix: string): string[] {
-            if(prefix != '') {
-                prefix += '.';
-            }
+        const flatten = function(obj: any, prefix: string, parent: IncludeOptions): string[] {
+            const model = parent.model ? parent.model : originalModel;
 
-            return Object.keys(obj)
-                .reduce((acc, key) => {
-                    if(Object.keys(obj[key]).length > 0) {
-                        // as this is a model, we need to include the join too
-                        const joinKey = Object.keys(model.associations)
-                            .find(association => association == key);
-                        if(joinKey) {
-                            const association = model.associations[joinKey];
-                            result.include?.push(association);
+            if(model) {
+                return Object.keys(obj)
+                    .reduce((acc, key) => {
+                        const newKey = prefix == '' ? key : `${prefix}.${key}`;
+
+                        if(Object.keys(obj[key]).length > 0) {
+                            // find the model to join
+                            const joinKey = Object.keys(model.associations)
+                                .find(association => association == key) as string;
+
+                            // add this model to the includes
+                            const newParent: IncludeOptions = {
+                                model: model.associations[joinKey].target,
+                                include: []
+                            };
+                            parent.include?.push(newParent);
+
+                            // recursively flatten
+                            return acc.concat(flatten(obj[key], newKey, newParent));
+                        } else {
+                            // add this key
+                            acc.push(newKey);
                         }
 
-                        // recursively flatten
-                        return acc.concat(flatten(obj[key], `${prefix}${key}`))
-                    } else {
-                        // add this key
-                        acc.push(`${prefix}${key}`);
-                    }
+                        return acc;
+                    }, [] as string[]);
+            }
 
-                    return acc;
-                }, [] as string[]);
-        }
+            return [];
+        };
 
         // find the list of columns
-        result.attributes = flatten(graphqlFields(info), '');
+        result.attributes = flatten(graphqlFields(info), '', result);
         return result;
     }
     
