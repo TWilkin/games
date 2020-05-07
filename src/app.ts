@@ -2,7 +2,6 @@ import { AddressInfo } from 'net';
 import config from 'config';
 import express from 'express';
 
-import API from './api/api';
 import GraphQLAPI from './api/graphql';
 
 // initialise express with a test route
@@ -12,7 +11,6 @@ app.get(config.get('express.root'), (_, res) => {
 });
 
 // add the API routes
-API.init(app, config.get('express.root'));
 GraphQLAPI.init(app, config.get('express.root'));
 
 // start listening
