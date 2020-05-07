@@ -183,46 +183,46 @@ export default class GraphQLAPI {
     private restrictColumns(info: GraphQLResolveInfo): FindOptions {
         const originalModel = this.model;
         const result: FindOptions = {
+            attributes: [],
             include: []
-         };
+        };
 
-        // the function to flatten the column and model selection
-        const flatten = function(obj: any, prefix: string, parent: IncludeOptions): string[] {
-            const model = parent.model ? parent.model : originalModel;
+        // the function to restrict the nested columns
+        const restrictNestedColumns = function(obj: any, current: IncludeOptions) {
+            const model = current.model ? current.model : originalModel;
 
             if(model) {
-                return Object.keys(obj)
-                    .reduce((acc, key) => {
-                        const newKey = prefix == '' ? key : `${prefix}.${key}`;
+                // always add the primary key
+                (current.attributes as string[]).push(model.primaryKeyAttribute);
 
+                // add the keys of this join
+                Object.keys(obj)
+                    .map(key => {
                         if(Object.keys(obj[key]).length > 0) {
                             // find the model to join
                             const joinKey = Object.keys(model.associations)
                                 .find(association => association == key) as string;
 
                             // add this model to the includes
-                            const newParent: IncludeOptions = {
+                            const child: IncludeOptions = {
                                 model: model.associations[joinKey].target,
-                                include: []
+                                include: [],
+                                attributes: []
                             };
-                            parent.include?.push(newParent);
+                            current.include?.push(child);
 
-                            // recursively flatten
-                            return acc.concat(flatten(obj[key], newKey, newParent));
+                            // recursively restrict
+                            restrictNestedColumns(obj[key], child);
                         } else {
-                            // add this key
-                            acc.push(newKey);
+                            // add this field to the attributes
+                            (current.attributes as string[]).push(key);
                         }
-
-                        return acc;
-                    }, [] as string[]);
+                    });
             }
-
-            return [];
         };
 
-        // find the list of columns
-        result.attributes = flatten(graphqlFields(info), '', result);
+        // find the lists of columns and models
+        restrictNestedColumns(graphqlFields(info), result);
         return result;
     }
     
