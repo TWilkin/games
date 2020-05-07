@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { Queryable } from '../api/queryable';
+import { Queryable, Secret } from '../api/decorators';
 import GameCollection from './game_collection';
 import GameCompletion from './game_completion';
 import GamePlayTime from './game_playtime';
@@ -19,6 +19,7 @@ export default class User extends Model<User> {
     @Column(DataType.STRING)
     userName!: string;
 
+    @Secret
     @Column(DataType.STRING)
     password!: string;
 

@@ -1,6 +1,6 @@
 import { AutoIncrement, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { Queryable } from '../api/queryable';
+import { Queryable } from '../api/decorators';
 import GamePlatform from './game_platform';
 import GameSeries from './game_series';
 

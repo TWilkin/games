@@ -1,6 +1,6 @@
 import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { Queryable } from '../api/queryable';
+import { Queryable } from '../api/decorators';
 import GamePlatform from './game_platform';
 import User from './user';
 

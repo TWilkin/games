@@ -1,6 +1,6 @@
 import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { Queryable } from '../api/queryable';
+import { Queryable } from '../api/decorators';
 
 @Table
 export default class Series extends Model<Series> {
