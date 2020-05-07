@@ -1,4 +1,5 @@
-import { AutoIncrement, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import bcrypt from 'bcrypt';
+import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable } from '../api/queryable';
 import GameCollection from './game_collection';
@@ -18,6 +19,12 @@ export default class User extends Model<User> {
     @Column(DataType.STRING)
     userName!: string;
 
+    @Column(DataType.STRING)
+    password!: string;
+
+    @Column(DataType.STRING)
+    email!: string;
+
     @HasMany(() => GameCollection)
     games!: GameCollection[];
 
@@ -26,4 +33,28 @@ export default class User extends Model<User> {
 
     @HasMany(() => GameCompletion)
     completed!: GameCompletion[];
+
+    @BeforeCreate
+    @BeforeUpdate
+    static async hashPassword(instance: User) {
+        instance.password = await bcrypt.hash(instance.password, 10);
+    }
+
+    static async login(userName: string, password: string): Promise<User | null> {
+        // find the user
+        const user = await User.findOne({
+            attributes: [ 'userId', 'password' ],
+            where: { userName: userName }
+        });
+        if(user) {
+            // check the password
+            if(await bcrypt.compare(password, user.password)) {
+                return user;
+            }
+        }
+
+        // return null when the user did not pass authentication
+        return null;
+    }
+
 }
