@@ -145,8 +145,7 @@ export default class GraphQLAPI {
                     }
 
                     fields[key] = {
-                        // TODO find a better way to identify list fields
-                        type: key.endsWith('s') ? new GraphQLList(type.type) : type.type
+                        type: this.model.associations[key].isMultiAssociation ? new GraphQLList(type.type) : type.type
                     };
                 });
         }
