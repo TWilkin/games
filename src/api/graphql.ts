@@ -145,8 +145,9 @@ export default class GraphQLAPI {
                     }
 
                     fields[key] = {
-                        type: type.type
-                    }
+                        // TODO find a better way to identify list fields
+                        type: key.endsWith('s') ? new GraphQLList(type.type) : type.type
+                    };
                 });
         }
         
@@ -170,6 +171,7 @@ export default class GraphQLAPI {
             default:
                 type = GraphQLString;
                 break;
+        
         }
 
         // check if this type should be nullable
