@@ -1,5 +1,6 @@
 import config from 'config';
 import fs from 'fs';
+import { loadFile } from 'sequelize-fixtures';
 import { Sequelize } from 'sequelize-typescript';
 
 // extract the password
@@ -23,4 +24,15 @@ export const sequelize = new Sequelize(
 password = undefined;
 
 // ensure the tables are created
-sequelize.sync();
+sequelize.sync().then(() => {
+    // check for default data to import
+    const dataDir = 'data';
+    if(fs.existsSync(dataDir)) {
+        fs.readdirSync(dataDir)
+            .filter(file => file.endsWith('.json'))
+            .forEach(file => {
+                console.log(`Importing ${file}`)
+                loadFile(`${dataDir}/${file}`, sequelize.models)
+            });
+    }
+});
