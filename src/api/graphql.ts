@@ -133,7 +133,8 @@ export default class GraphQLAPI {
             .filter(field => isInput || !isSecret(field))
             .forEach(field => {
                 fields[field.field as string] = {
-                    type: GraphQLAPI.generateType(field)
+                    type: GraphQLAPI.generateType(field),
+                    defaultValue: field.defaultValue
                 };
             });
         

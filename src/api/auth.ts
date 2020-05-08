@@ -11,8 +11,9 @@ interface AuthenticatedRequest extends Request {
 
     // the user retrieved from the header
     user?: {
-        id: number,
-        exp: number
+        userId: number,
+        userName: string,
+        role: 'admin' | 'user'
     };
 
 }
@@ -44,18 +45,23 @@ export default class Auth {
     private authorise(req: Request<any>, res: Response<any>, next: NextFunction) {
         // check the user is logged in
         const authReq = req as AuthenticatedRequest;
-        if(!authReq.user) {
-            return res.sendStatus(HttpStatus.UNAUTHORIZED)
+        if(authReq.user && authReq.user.userId && authReq.user.role) {
+            console.log(`Authorised ${authReq.user.userName} as ${authReq.user.role}`);
+            return next();
         }
         
-        return next();
+        return res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
     private async authenticate(req: Request<any>, res: Response<any>): Promise<any> {
         const user = await User.authenticate(req.body.userName, req.body.password);
         if(user) {
             const token = jsonwebtoken.sign(
-                { id: user.userId, userName: user.userName },
+                { 
+                    userId: user.userId, 
+                    userName: user.userName,
+                    role: user.role
+                },
                 Auth.getSecret,
                 { expiresIn: '1d' }
             );

@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, Default, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable, Secret } from '../api/decorators';
 import GameCollection from './game_collection';
@@ -26,6 +26,11 @@ export default class User extends Model<User> {
     @Column(DataType.STRING)
     email!: string;
 
+    @Secret
+    @Default('user')
+    @Column(DataType.ENUM('admin', 'user'))
+    role!: 'admin' | 'user';
+
     @HasMany(() => GameCollection)
     games!: GameCollection[];
 
@@ -34,6 +39,10 @@ export default class User extends Model<User> {
 
     @HasMany(() => GameCompletion)
     completed!: GameCompletion[];
+
+    public get isAdmin() {
+        return this.role == 'admin';
+    }
 
     @BeforeCreate
     @BeforeUpdate
@@ -44,7 +53,7 @@ export default class User extends Model<User> {
     public static async authenticate(userName: string, password: string): Promise<User | null> {
         // find the user
         const user = await User.findOne({
-            attributes: [ 'userId', 'password' ],
+            attributes: [ 'userId', 'userName', 'password', 'role' ],
             where: { userName: userName }
         });
         if(user) {
