@@ -3,6 +3,7 @@ import dateformat from 'dateformat';
 import { GraphQLSchema, GraphQLObjectType, GraphQLField, isNonNullType, assertNonNullType, GraphQLInt, GraphQLString } from 'graphql';
 
 import DateTimeScalarType from '../../src/api/datetime';
+import { sequelize } from '../../src/db';
 
 export function generateData(schema: GraphQLSchema, typeName: string): any {
     // find the query from the schema
@@ -16,6 +17,17 @@ export function generateData(schema: GraphQLSchema, typeName: string): any {
         });
 
     return generated;
+}
+
+export function mockContext(role: 'user'|'admin') {
+    return {
+        user: {
+            userId: 1,
+            userName: 'test',
+            role: role
+        },
+        database: sequelize
+    }
 }
 
 function generateType(field: GraphQLField<any, any, any>): any {

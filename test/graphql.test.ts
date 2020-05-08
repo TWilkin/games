@@ -5,7 +5,7 @@ import { sequelizeMockingMocha } from 'sequelize-mocking';
 import GraphQLAPI from '../src/api/graphql';
 import { sequelize } from '../src/db';
 import { generateQuery, generateMutation } from './utility/util';
-import { generateData } from './utility/mock';
+import { generateData, mockContext } from './utility/mock';
 
 // initialise GraphQL
 const schema = GraphQLAPI.init(null, '', null);
@@ -23,7 +23,12 @@ describe('GraphQL', () => {
         describe(model.name, () => {
             it('Query no parameter', async () => {
                 let queryName = `Get${model.name}`;
-                let response = await graphql(schema, generateQuery(schema, model.name));
+                let response = await graphql(
+                    schema, 
+                    generateQuery(schema, model.name),
+                    null,
+                    mockContext('admin')
+                );
                 expect(response).to.be.not.null;
                 expect(response.errors).to.be.undefined;
                 expect(response.data).to.be.not.null;
@@ -40,7 +45,7 @@ describe('GraphQL', () => {
                     schema, 
                     generateQuery(schema, model.name, { id: GraphQLInt }), 
                     null, 
-                    null, 
+                    mockContext('admin'), 
                     data
                 );
                 expect(response).to.be.not.null;
@@ -55,7 +60,13 @@ describe('GraphQL', () => {
                 let data = {
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(schema, generateMutation(model, true), null, null, data);
+                let response = await graphql(
+                    schema, 
+                    generateMutation(model, true), 
+                    null, 
+                    mockContext('admin'),
+                    data
+                );
                 expect(response).to.be.not.null;
                 expect(response.errors).to.be.undefined;
                 expect(response.data).to.be.not.null;
@@ -70,7 +81,13 @@ describe('GraphQL', () => {
                     id: 1,
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(schema, generateMutation(model, false), null, null, data);
+                let response = await graphql(
+                    schema, 
+                    generateMutation(model, false), 
+                    null,
+                    mockContext('admin'), 
+                    data
+                );
                 expect(response).to.be.not.null;
                 expect(response.errors).to.be.undefined;
                 expect(response.data).to.be.not.null;
@@ -85,7 +102,13 @@ describe('GraphQL', () => {
                     id: 3,
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(schema, generateMutation(model, false), null, null, data);
+                let response = await graphql(
+                    schema, 
+                    generateMutation(model, false), 
+                    null, 
+                    mockContext('admin'), 
+                    data
+                );
                 expect(response).to.be.not.null;
                 expect(response.errors).to.be.undefined;
                 expect(response.data).to.be.not.null;
