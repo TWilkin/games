@@ -7,7 +7,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import User from '../models/user';
 
 // interface for the extra property in an authenticated request
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest {
 
     // the user retrieved from the header
     user?: {

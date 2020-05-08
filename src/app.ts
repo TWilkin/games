@@ -23,7 +23,7 @@ app.get(
 );
 
 // add the API routes
-GraphQLAPI.init(app, config.get('express.root'));
+GraphQLAPI.init(app, config.get('express.root'), auth);
 
 // start listening
 const port: number | undefined = config.get('express.port') as number > 0 ? config.get('express.port') : undefined;

@@ -2,11 +2,17 @@ import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions } from 'sequelize';
 
+import Auth, { AuthenticatedRequest } from './auth';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
 import { isQueryable, isSecret } from './decorators';
+import User from '../models/user';
+
+export interface GraphQLContext {
+    user?: User
+};
 
 export default class GraphQLAPI {
 
@@ -91,7 +97,9 @@ export default class GraphQLAPI {
                     type: new GraphQLNonNull(this.input)
                 }
             },
-            resolve: (_: any, { input }) => model.create(input)
+            resolve: (_: any, { input }, context: GraphQLContext) => {
+                return model.create(input, context as CreateOptions);
+            }
         };
 
         // the UpdateX mutation
@@ -231,7 +239,7 @@ export default class GraphQLAPI {
         return result;
     }
     
-    public static init(app: Express | null, root: string): GraphQLSchema {
+    public static init(app: Express | null, root: string, auth: Auth): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
         Object.values(sequelize.models)
             .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
@@ -260,10 +268,14 @@ export default class GraphQLAPI {
         if(app) {
             app.use(
                 `${root}/graphql`.replace('//', '/'),
-                graphqlHTTP({
+                auth.getHandlers,
+                graphqlHTTP((req) => ({
                     schema: GraphQLAPI.schema,
+                    context: {
+                        user: (req as AuthenticatedRequest).user
+                    },
                     graphiql: true
-                })
+                }))
             );
         }
 
