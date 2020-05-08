@@ -41,7 +41,7 @@ export default class User extends Model<User> {
         instance.password = await bcrypt.hash(instance.password, 10);
     }
 
-    static async login(userName: string, password: string): Promise<User | null> {
+    public static async authenticate(userName: string, password: string): Promise<User | null> {
         // find the user
         const user = await User.findOne({
             attributes: [ 'userId', 'password' ],

@@ -6,15 +6,21 @@ import { AddressInfo } from 'net';
 import Auth from './api/auth';
 import GraphQLAPI from './api/graphql';
 
-// initialise express with a test route
+// initialise express
 const app = express();
-app.get(config.get('express.root'), (_, res) => {
-    res.end(config.get('message'));
-});
+app.use(bodyParser.json())
 
 // add authentication middleware
-app.use(bodyParser.json())
-Auth.init(app, config.get('express.root'));
+const auth = Auth.init(app, config.get('express.root'));
+
+// add a protected test route
+app.get(
+    config.get('express.root'), 
+    auth.getHandlers,
+    (_, res) => {
+        res.end(config.get('message'));
+    }
+);
 
 // add the API routes
 GraphQLAPI.init(app, config.get('express.root'));
