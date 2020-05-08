@@ -248,7 +248,7 @@ export default class GraphQLAPI {
         return result;
     }
     
-    public static init(app: Express | null, root: string, auth: Auth): GraphQLSchema {
+    public static init(app: Express | null, root: string, auth: Auth | null): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
         Object.values(sequelize.models)
             .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
@@ -277,7 +277,7 @@ export default class GraphQLAPI {
         if(app) {
             app.use(
                 `${root}/graphql`.replace('//', '/'),
-                auth.getHandlers,
+                auth ? auth.getHandlers : [],
                 graphqlHTTP((req) => ({
                     schema: GraphQLAPI.schema,
                     context: {

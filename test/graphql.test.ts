@@ -8,7 +8,7 @@ import { generateQuery, generateMutation } from './utility/util';
 import { generateData } from './utility/mock';
 
 // initialise GraphQL
-const schema = GraphQLAPI.init(null, '');
+const schema = GraphQLAPI.init(null, '', null);
 
 describe('GraphQL', () => {
 
@@ -23,7 +23,7 @@ describe('GraphQL', () => {
         describe(model.name, () => {
             it('Query no parameter', async () => {
                 let queryName = `Get${model.name}`;
-                let response = await graphql(schema, generateQuery(model));
+                let response = await graphql(schema, generateQuery(schema, model.name));
                 expect(response).to.be.not.null;
                 expect(response.errors).to.be.undefined;
                 expect(response.data).to.be.not.null;
@@ -36,7 +36,13 @@ describe('GraphQL', () => {
                 let data = {
                     id: 1
                 };
-                let response = await graphql(schema, generateQuery(model, { id: GraphQLInt }), null, null, data);
+                let response = await graphql(
+                    schema, 
+                    generateQuery(schema, model.name, { id: GraphQLInt }), 
+                    null, 
+                    null, 
+                    data
+                );
                 expect(response).to.be.not.null;
                 expect(response.errors).to.be.undefined;
                 expect(response.data).to.be.not.null;
@@ -47,7 +53,7 @@ describe('GraphQL', () => {
             it('Mutation add', async () => {
                 let queryName = `Add${model.name}`;
                 let data = {
-                    input: generateData(model, false, false)
+                    input: generateData(schema, model.name)
                 };
                 let response = await graphql(schema, generateMutation(model, true), null, null, data);
                 expect(response).to.be.not.null;
@@ -62,7 +68,7 @@ describe('GraphQL', () => {
                 let queryName = `Update${model.name}`;
                 let data = {
                     id: 1,
-                    input: generateData(model, false, false)
+                    input: generateData(schema, model.name)
                 };
                 let response = await graphql(schema, generateMutation(model, false), null, null, data);
                 expect(response).to.be.not.null;
@@ -77,7 +83,7 @@ describe('GraphQL', () => {
                 let queryName = `Update${model.name}`;
                 let data = {
                     id: 3,
-                    input: generateData(model, false, false)
+                    input: generateData(schema, model.name)
                 };
                 let response = await graphql(schema, generateMutation(model, false), null, null, data);
                 expect(response).to.be.not.null;

@@ -1,35 +1,43 @@
 import casual from 'casual';
 import dateformat from 'dateformat';
-import { Model, ModelCtor, AbstractDataType, DataTypes, ModelAttributeColumnOptions } from 'sequelize';
+import { GraphQLSchema, GraphQLObjectType, GraphQLField, isNonNullType, assertNonNullType, GraphQLInt, GraphQLString } from 'graphql';
 
-export function generateData(model: ModelCtor<Model<any, any>>, includeId=true, includeDates=true): any {
-    let generated = {};
+import DateTimeScalarType from '../../src/api/datetime';
+
+export function generateData(schema: GraphQLSchema, typeName: string): any {
+    // find the query from the schema
+    const type = schema.getType(`${typeName}Input`) as GraphQLObjectType;
 
     // iterate over the model fields
-    Object.values(model.rawAttributes)
-        .filter(field => !field.primaryKey || includeId)
-        .filter(field => includeDates || (field.field != 'createdAt' && field.field != 'updatedAt'))
+    let generated = {};
+    Object.values(type.getFields())
         .forEach((field) => {
-            generated[field.field as string] = generateType(field);
+            generated[field.name] = generateType(field);
         });
 
     return generated;
 }
 
-function generateType(field: ModelAttributeColumnOptions): any {
+function generateType(field: GraphQLField<any, any, any>): any {
     // when generating a foreign key return a known good id
-    if(field.references) {
+    if(field.name.endsWith('Id')) {
         return 1;
     }
 
-    switch((field.type as AbstractDataType).key) {
-        case DataTypes.INTEGER.toString():
+    // unpack non-null types
+    let fieldType = field.type;
+    if(isNonNullType(fieldType)) {
+        fieldType = assertNonNullType(fieldType).ofType;
+    }
+
+    switch(fieldType) {
+        case GraphQLInt:
             return casual.integer(0);
         
-        case DataTypes.DATE.toString():
+        case DateTimeScalarType:
             return dateformat(casual.unix_time * 1000, 'isoUtcDateTime');
         
-        case DataTypes.STRING.toString():
+        case GraphQLString:
         default:
             return casual.string;
     }
