@@ -7,7 +7,7 @@ import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTy
 import Auth, { AuthenticatedRequest } from './auth';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
-import { isQueryable, isSecret } from './decorators';
+import { isInputSecret, isQueryable, isResultSecret } from './decorators';
 import User from '../models/user';
 
 export interface GraphQLContext {
@@ -137,8 +137,8 @@ export default class GraphQLAPI {
         Object.values(this.model.rawAttributes)
             // Input should not include the primary key, updatedAt or createdAt
             .filter(field => !(isInput && (field.primaryKey || 'updatedAt' === field.field || 'createdAt' === field.field)))
-            // secret fields should not be included except in Input fields
-            .filter(field => isInput || !isSecret(field))
+            // don't include if it's a secret for the input or results
+            .filter(field => (isInput && !isInputSecret(field)) || (!isInput && !isResultSecret(field)))
             .forEach(field => {
                 fields[field.field as string] = {
                     type: GraphQLAPI.generateType(field),

@@ -11,7 +11,10 @@ interface ExtendedModelAttributeColumnOptions extends ModelAttributeColumnOption
     queryable?: boolean;
 
     // whether the column should be included in query parameters and query results or not
-    secret?: boolean;
+    secret?: {
+        excludeInput: boolean,
+        excludeResult: boolean
+    };
     
 }
 
@@ -32,9 +35,14 @@ export function Queryable(target: any, propertyName: string): any {
     addMetadata(target, propertyName, 'queryable', true);
 }
 
-// Secret annotation for a model column which indicates this column should not appear in query results
-export function Secret(target: any, propertyName: string): any {
-    addMetadata(target, propertyName, 'secret', true)
+// Secret annotation for a model column which indicates this column should not appear in query results or inputs
+export function Secret(excludeInput=false, excludeResult=true) {
+    return function(target: any, propertyName: string): any {
+        addMetadata(target, propertyName, 'secret', {
+            excludeInput: excludeInput,
+            excludeResult: excludeResult
+        });
+    };
 }
 
 // check whether a model column is queryable
@@ -43,7 +51,12 @@ export function isQueryable(field: ModelAttributeColumnOptions): boolean {
     return columnOptions.queryable && !columnOptions.secret ? true : false;
 }
 
-// check whether a model column is secret
-export function isSecret(field: ModelAttributeColumnOptions): boolean {
-    return (field as ExtendedModelAttributeColumnOptions).secret ? true : false;
+// check whether a model column should be a secret from an Input
+export function isInputSecret(field: ModelAttributeColumnOptions): boolean {
+    return (field as ExtendedModelAttributeColumnOptions).secret?.excludeInput == true;
+}
+
+// check whether a model column should be a secret from query results
+export function isResultSecret(field: ModelAttributeColumnOptions): boolean {
+    return (field as ExtendedModelAttributeColumnOptions).secret?.excludeResult == true;
 }

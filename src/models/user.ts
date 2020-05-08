@@ -19,14 +19,14 @@ export default class User extends Model<User> {
     @Column(DataType.STRING)
     userName!: string;
 
-    @Secret
+    @Secret()
     @Column(DataType.STRING)
     password!: string;
 
     @Column(DataType.STRING)
     email!: string;
 
-    @Secret
+    @Secret(true, true)
     @Default('user')
     @Column(DataType.ENUM('admin', 'user'))
     role!: 'admin' | 'user';
