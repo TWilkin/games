@@ -2,10 +2,10 @@ import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Mode
 
 import { Queryable } from '../api/decorators';
 import GamePlatform from './game_platform';
-import User from './user';
+import { AbstractOwnableModel } from '../util/models';
 
 @Table
-export default class GamePlayTime extends Model<GamePlayTime> {
+export default class GamePlayTime extends AbstractOwnableModel<GamePlayTime> {
 
     @Queryable
     @PrimaryKey
@@ -21,18 +21,11 @@ export default class GamePlayTime extends Model<GamePlayTime> {
     @BelongsTo(() => GamePlatform)
     gamePlatform!: GamePlatform;
 
-    @Queryable
-    @ForeignKey(() => User)
-    @Column(DataType.INTEGER)
-    userId!: number;
-
-    @BelongsTo(() => User)
-    owner!: User;
-
     @Column(DataType.DATE)
     startTime!: Date;
 
     @AllowNull(true)
     @Column(DataType.DATE)
     endTime!: Date;
+
 }

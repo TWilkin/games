@@ -1,11 +1,11 @@
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable } from '../api/decorators';
 import GamePlatform from './game_platform';
-import User from './user';
+import { AbstractOwnableModel } from '../util/models';
 
 @Table
-export default class GameCompletion extends Model<GameCompletion> {
+export default class GameCompletion extends AbstractOwnableModel<GameCompletion> {
 
     @Queryable
     @PrimaryKey
@@ -21,14 +21,7 @@ export default class GameCompletion extends Model<GameCompletion> {
     @BelongsTo(() => GamePlatform)
     gamePlatform!: GamePlatform;
 
-    @Queryable
-    @ForeignKey(() => User)
-    @Column(DataType.INTEGER)
-    userId!: number;
-
-    @BelongsTo(() => User)
-    owner!: User;
-
     @Column(DataType.DATE)
     date!: Date;
+    
 }
