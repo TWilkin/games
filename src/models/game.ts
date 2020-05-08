@@ -1,11 +1,12 @@
-import { AutoIncrement, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, Column, DataType, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable } from '../api/decorators';
 import GamePlatform from './game_platform';
 import GameSeries from './game_series';
+import { AbstractRestrictedModel } from '../util/models';
 
 @Table
-export default class Game extends Model<Game> {
+export default class Game extends AbstractRestrictedModel<Game> {
 
     @Queryable
     @PrimaryKey
@@ -22,4 +23,5 @@ export default class Game extends Model<Game> {
 
     @HasMany(() => GameSeries)
     series!: GameSeries[];
+    
 }

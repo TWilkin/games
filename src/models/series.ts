@@ -1,9 +1,10 @@
-import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, Column, DataType, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable } from '../api/decorators';
+import { AbstractRestrictedModel } from '../util/models';
 
 @Table
-export default class Series extends Model<Series> {
+export default class Series extends AbstractRestrictedModel<Series> {
 
     @Queryable
     @PrimaryKey
@@ -14,4 +15,5 @@ export default class Series extends Model<Series> {
     @Queryable
     @Column(DataType.STRING)
     title!: string;
+    
 }
