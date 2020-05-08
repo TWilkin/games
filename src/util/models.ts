@@ -1,4 +1,4 @@
-import { BeforeCreate, BelongsTo, Column, DataType, ForeignKey, Model } from 'sequelize-typescript';
+import { BeforeCreate, BeforeUpdate, BelongsTo, Column, DataType, ForeignKey, Model } from 'sequelize-typescript';
 
 import { Queryable, Secret } from '../api/decorators';
 import { GraphQLContext } from '../api/graphql';
@@ -21,6 +21,21 @@ export abstract class AbstractOwnableModel<T extends Model<T>> extends Model<T> 
             // add the owner
             instance.userId = context.user.userId;
             return;
+        }
+
+        // not authorised
+        throw new Error('Unauthorised');
+    }
+
+    @BeforeUpdate
+    public static async checkOwner<T extends AbstractOwnableModel<T>>(instance: T, context: GraphQLContext) {
+        if(context && context.user) {
+            // check this is being updated by the owner
+            const model = context.database.models[instance.constructor.name];
+            const existing = await model.findByPk(instance[model.primaryKeyAttribute]);
+            if(existing && (existing as AbstractOwnableModel<T>).userId == context.user.userId) {
+                return;
+            }
         }
 
         // not authorised

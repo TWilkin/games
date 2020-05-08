@@ -2,7 +2,7 @@ import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions, Sequelize } from 'sequelize';
 
 import Auth, { AuthenticatedRequest } from './auth';
 import { sequelize } from '../db';
@@ -11,6 +11,7 @@ import { isInputSecret, isQueryable, isResultSecret } from './decorators';
 import User from '../models/user';
 
 export interface GraphQLContext {
+    database: Sequelize,
     user?: User
 };
 
@@ -272,6 +273,7 @@ export default class GraphQLAPI {
                 graphqlHTTP((req) => ({
                     schema: GraphQLAPI.schema,
                     context: {
+                        database: sequelize,
                         user: (req as AuthenticatedRequest).user
                     },
                     graphiql: true
