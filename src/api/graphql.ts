@@ -15,6 +15,10 @@ export interface GraphQLContext {
     user?: User
 };
 
+export interface GraphQLUpdateOptions extends UpdateOptions {
+    context: GraphQLContext
+};
+
 export default class GraphQLAPI {
 
     // the list of models
@@ -114,9 +118,13 @@ export default class GraphQLAPI {
                     type: new GraphQLNonNull(this.input)
                 }
             },
-            resolve: async (_, { id, input }) => {
+            resolve: async (_, { id, input }, context: GraphQLContext) => {
                 // create the query (assume no composite primary keys)
-                const query: UpdateOptions = { where: { } };
+                const query: GraphQLUpdateOptions = { 
+                    where: { },
+                    individualHooks: true,
+                    context: context
+                };
                 query.where[model.primaryKeyAttribute] = id;
                 const data = await model.update(input, query);
 

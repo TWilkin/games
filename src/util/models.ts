@@ -1,7 +1,7 @@
 import { BeforeCreate, BeforeUpdate, BelongsTo, Column, DataType, ForeignKey, Model } from 'sequelize-typescript';
 
 import { Queryable, Secret } from '../api/decorators';
-import { GraphQLContext } from '../api/graphql';
+import { GraphQLContext, GraphQLUpdateOptions } from '../api/graphql';
 import User from '../models/user';
 
 export abstract class AbstractOwnableModel<T extends Model<T>> extends Model<T> {
@@ -28,7 +28,8 @@ export abstract class AbstractOwnableModel<T extends Model<T>> extends Model<T> 
     }
 
     @BeforeUpdate
-    public static async checkOwner<T extends AbstractOwnableModel<T>>(instance: T, context: GraphQLContext) {
+    public static async checkOwner<T extends AbstractOwnableModel<T>>(instance: T, options: GraphQLUpdateOptions) {
+        const context = options.context;
         if(context && context.user) {
             // check this is being updated by the owner
             const model = context.database.models[instance.constructor.name];
