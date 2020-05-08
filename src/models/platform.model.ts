@@ -1,7 +1,7 @@
 import { AutoIncrement, Column, DataType, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable } from '../api/decorators';
-import { AbstractRestrictedModel } from '../util/models';
+import { AbstractRestrictedModel } from './restrictedmodel';
 
 @Table
 export default class Platform extends AbstractRestrictedModel<Platform> {

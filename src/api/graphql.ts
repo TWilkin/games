@@ -8,7 +8,7 @@ import Auth, { AuthenticatedRequest } from './auth';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
 import { isInputSecret, isQueryable, isResultSecret } from './decorators';
-import User from '../models/user';
+import User from '../models/user.model';
 
 export interface GraphQLContext {
     database: Sequelize,

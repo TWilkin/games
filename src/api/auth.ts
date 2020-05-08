@@ -4,7 +4,7 @@ import jwt from 'express-jwt';
 import HttpStatus from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
 
-import User from '../models/user';
+import User from '../models/user.model';
 
 // interface for the extra property in an authenticated request
 export interface AuthenticatedRequest {

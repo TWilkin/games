@@ -2,10 +2,10 @@ import bcrypt from 'bcrypt';
 import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, Default, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable, Secret } from '../api/decorators';
-import GameCollection from './game_collection';
-import GameCompletion from './game_completion';
-import GamePlayTime from './game_playtime';
-import { AbstractRestrictedModel } from '../util/models';
+import GameCollection from './game_collection.model';
+import GameCompletion from './game_completion.model';
+import GamePlayTime from './game_playtime.model';
+import { AbstractRestrictedModel } from './restrictedmodel';
 
 @Table
 export default class User extends AbstractRestrictedModel<User> {

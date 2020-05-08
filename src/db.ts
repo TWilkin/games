@@ -18,7 +18,7 @@ export const sequelize = new Sequelize(
         host: config.get('database.host'),
         port: config.get('database.port'),
         dialect: 'mysql',
-        modelPaths: [`${__dirname}/models/*.ts`]
+        modelPaths: [`${__dirname}/models/*.model.ts`]
     }
 );
 password = undefined;

@@ -1,8 +1,8 @@
 import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable } from '../api/decorators';
-import GamePlatform from './game_platform';
-import { AbstractOwnableModel } from '../util/models';
+import GamePlatform from './game_platform.model';
+import { AbstractOwnableModel } from './ownablemodel';
 
 @Table
 export default class GamePlayTime extends AbstractOwnableModel<GamePlayTime> {
