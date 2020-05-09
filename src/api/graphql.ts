@@ -126,12 +126,9 @@ export default class GraphQLAPI {
                     context: context
                 };
                 query.where[model.primaryKeyAttribute] = id;
-                const data = await model.update(input, query);
+                await model.update(input, query);
 
-                // if it worked, return the updated data
-                if(data[0] == 0) {
-                    return null;
-                }
+                // return the updated data
                 return model.findByPk(id);
             }
         };

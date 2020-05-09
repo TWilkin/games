@@ -25,7 +25,7 @@ describe('GraphQL', () => {
                     mockContext('admin')
                 );
                 expect(response).to.be.not.null;
-                expect(response.errors).to.be.undefined;
+                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
                 expect((response.data as object)[queryName]).to.be.not.null;
                 expect((response.data as object)[queryName].length).to.equal(2);
@@ -44,7 +44,7 @@ describe('GraphQL', () => {
                     data
                 );
                 expect(response).to.be.not.null;
-                expect(response.errors).to.be.undefined;
+                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
                 expect((response.data as object)[queryName]).to.be.not.null;
                 expect((response.data as object)[queryName].length).to.equal(1);
@@ -63,7 +63,7 @@ describe('GraphQL', () => {
                     data
                 );
                 expect(response).to.be.not.null;
-                expect(response.errors).to.be.undefined;
+                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
                 expect((response.data as object)[queryName]).to.be.not.null;
                 expect((response.data as object)[queryName]).to.not.be.an('array');
@@ -84,7 +84,7 @@ describe('GraphQL', () => {
                     data
                 );
                 expect(response).to.be.not.null;
-                expect(response.errors).to.be.undefined;
+                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
                 expect((response.data as object)[queryName]).to.be.not.null;
                 expect((response.data as object)[queryName]).to.not.be.an('array');
@@ -105,7 +105,7 @@ describe('GraphQL', () => {
                     data
                 );
                 expect(response).to.be.not.null;
-                expect(response.errors).to.be.undefined;
+                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
                 expect((response.data as object)[queryName]).to.be.null;
             });
