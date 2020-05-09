@@ -118,7 +118,7 @@ export default class GraphQLAPI {
                     type: new GraphQLNonNull(this.input)
                 }
             },
-            resolve: async (_, { id, input }, context: GraphQLContext) => {
+            resolve: async (_, { id, input }, context: GraphQLContext, info: GraphQLResolveInfo) => {
                 // create the query (assume no composite primary keys)
                 const query: GraphQLUpdateOptions = { 
                     where: { },
@@ -129,7 +129,7 @@ export default class GraphQLAPI {
                 await model.update(input, query);
 
                 // return the updated data
-                return model.findByPk(id);
+                return model.findByPk(id, this.restrictColumns(info));
             }
         };
     }
