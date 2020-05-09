@@ -1,154 +1,125 @@
 [
     {
         "model": "User",
-        "data": {
-            "userId": 1,
-            "userName": "TestUser1",
-            "password": "password",
-            "email": "user@a.com",
-            "role": "admin"
-        }
-    }, {
-        "model": "User",
-        "data": {
-            "userId": 2,
-            "userName": "TestUser2",
-            "password": "password",
-            "email": "user@b.com",
-            "role": "user"
-        }
+        "data": [
+            {
+                "userId": 1,
+                "userName": "TestUser1",
+                "password": "$2b$10$pFnf12gFYlh4ZhdLo7JRFuDSLMuMQcx/ZExhrC24SYqRUuB06n8MC",
+                "email": "user@a.com",
+                "role": "admin"
+            }, {
+                "userId": 2,
+                "userName": "TestUser2",
+                "password": "$2b$10$pFnf12gFYlh4ZhdLo7JRFuDSLMuMQcx/ZExhrC24SYqRUuB06n8MC",
+                "email": "user@b.com",
+                "role": "user"
+            }
+        ]
     },
-
     {
         "model": "Game",
-        "data": {
-            "gameId": 1,
-            "title": "Test Game 1"
-        }
-    }, {
-        "model": "Game",
-        "data": {
-            "gameId": 2,
-            "title": "Test Game 2"
-        }
-    },
-
-    {
-        "model": "Platform",
-        "data": {
-            "platformId": 1,
-            "name": "Test Platform 1"
-        }
+        "data": [
+            {
+                "gameId": 1,
+                "title": "Test Game 1"
+            }, {
+                "gameId": 2,
+                "title": "Test Game 2"
+            }
+        ]
     }, {
         "model": "Platform",
-        "data": {
-            "platformId": 2,
-            "name": "Test Platform 2"
-        }
-    },
-
-    {
-        "model": "Series",
-        "data": {
-            "seriesId": 1,
-            "title": "Test Series 1"
-        }
+        "data": [
+            {
+                "platformId": 1,
+                "name": "Test Platform 1"
+            }, {
+                "platformId": 2,
+                "name": "Test Platform 2"
+            }
+        ]
     }, {
         "model": "Series",
-        "data": {
-            "seriesId": 2,
-            "title": "Test Series 2"
-        }
-    },
-
-    {
+        "data": [
+            {
+                "seriesId": 1,
+                "title": "Test Series 1"
+            }, {
+                "seriesId": 2,
+                "title": "Test Series 2"
+            }
+        ]
+    }, {
         "model": "GamePlatform",
-        "data": {
-            "gamePlatformId": 1,
-            "gameId": 1,
-            "platformId": 1,
-            "alias": "Test Alias"
-        }
-    },
-    {
-        "model": "GamePlatform",
-        "data": {
-            "gamePlatformId": 2,
-            "gameId": 2,
-            "platformId": 2,
-            "alias": null
-        }
-    },
-
-    {
+        "data": [
+            {
+                "gamePlatformId": 1,
+                "gameId": 1,
+                "platformId": 1,
+                "alias": "Test Alias"
+            }, {
+                "gamePlatformId": 2,
+                "gameId": 2,
+                "platformId": 2,
+                "alias": null
+            }
+        ]
+    }, {
         "model": "GamePlayTime",
-        "data": {
-            "gamePlayTimeId": 1,
-            "gamePlatformId": 1,
-            "startTime": "2020-04-06T13:53:00Z",
-            "endTime": "2020-04-06T14:53:00Z"
-        }
-    },
-    {
-        "model": "GamePlayTime",
-        "data": {
-            "gamePlayTimeId": 2,
-            "gamePlatformId": 2,
-            "startTime": "2020-04-07T13:53:00Z",
-            "endTime": null
-        }
-    },
-
-    {
+        "data": [
+            {
+                "gamePlayTimeId": 1,
+                "gamePlatformId": 1,
+                "startTime": "2020-04-06T13:53:00Z",
+                "endTime": "2020-04-06T14:53:00Z"
+            }, {
+                "gamePlayTimeId": 2,
+                "gamePlatformId": 2,
+                "startTime": "2020-04-07T13:53:00Z",
+                "endTime": null
+            }
+        ]
+    }, {
         "model": "GameCollection",
-        "data": {
-            "gameCollectionId": 1,
-            "gamePlatformId": 1,
-            "userId": 1
-        }
-    },
-    {
-        "model": "GameCollection",
-        "data": {
-            "gameCollectionId": 2,
-            "gamePlatformId": 2,
-            "userId": 2
-        }
-    },
-
-    {
+        "data": [
+            {
+                "gameCollectionId": 1,
+                "gamePlatformId": 1,
+                "userId": 1
+            }, {
+                "gameCollectionId": 2,
+                "gamePlatformId": 2,
+                "userId": 2
+            }
+        ]
+    }, {
         "model": "GameCompletion",
-        "data": {
-            "gameCompletionId": 1,
-            "gamePlatformId": 1,
-            "userId": 1,
-            "date": "2020-04-07T14:54:00Z"
-        }
-    },
-    {
-        "model": "GameCompletion",
-        "data": {
-            "gameCompletionId": 2,
-            "gamePlatformId": 2,
-            "userId": 2,
-            "date": "2020-04-07T13:54:00Z"
-        }
-    },
-
-    {
+        "data": [
+            {
+                "gameCompletionId": 1,
+                "gamePlatformId": 1,
+                "userId": 1,
+                "date": "2020-04-07T14:54:00Z"
+            }, {
+                "gameCompletionId": 2,
+                "gamePlatformId": 2,
+                "userId": 2,
+                "date": "2020-04-07T13:54:00Z"
+            }
+        ]
+    }, {
         "model": "GameSeries",
-        "data": {
-            "gameSeriesId": 1,
-            "gameId": 1,
-            "seriesId": 1
-        }
-    },
-    {
-        "model": "GameSeries",
-        "data": {
-            "gameSeriesId": 2,
-            "gameId": 2,
-            "seriesId": 2
-        }
+        "data": [
+            {
+                "gameSeriesId": 1,
+                "gameId": 1,
+                "seriesId": 1
+            }, {
+                "gameSeriesId": 2,
+                "gameId": 2,
+                "seriesId": 2
+            }
+        ]
     }
 ]

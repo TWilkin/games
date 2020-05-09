@@ -71,12 +71,12 @@ export function mockSequelize() {
         const file = await readFile(`${__dirname}/../data.json`);
         const data = JSON.parse(file.toString());
 
-        // import the test data into the database
+        // import the test data into the database without hooks
         return Promise.all(
-            data.map(record => {
-                const model = sequelize.models[record.model];
-                return model.create(record.data);
-            })
+            data.map(entry => {
+                    const model = sequelize.models[entry.model];
+                    return model.bulkCreate(entry.data, { individualHooks: false });
+                })
         );
     });
 
