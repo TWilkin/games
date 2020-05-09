@@ -11,7 +11,7 @@
   "main": "src/start.js",
   "scripts": {
     "start": "node src/start.js",
-    "test": "nyc mocha -r ts-node/register test/**/*.test.ts"
+    "test": "NODE_CONFIG_ENV=test nyc mocha -r ts-node/register test/**/*.test.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
