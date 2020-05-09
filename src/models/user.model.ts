@@ -2,9 +2,9 @@ import bcrypt from 'bcrypt';
 import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, Default, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable, Secret } from '../api/decorators';
-import GameCollection from './game_collection.model';
+/*import GameCollection from './game_collection.model';
 import GameCompletion from './game_completion.model';
-import GamePlayTime from './game_playtime.model';
+import GamePlayTime from './game_playtime.model';*/
 import { AbstractRestrictedModel } from './restrictedmodel';
 
 @Table
@@ -32,14 +32,14 @@ export default class User extends AbstractRestrictedModel<User> {
     @Column(DataType.ENUM('admin', 'user'))
     role!: 'admin' | 'user';
 
-    @HasMany(() => GameCollection)
+    /*@HasMany(() => GameCollection)
     games!: GameCollection[];
 
     @HasMany(() => GamePlayTime)
     playTime!: GamePlayTime[];
 
     @HasMany(() => GameCompletion)
-    completed!: GameCompletion[];
+    completed!: GameCompletion[];*/
 
     public get isAdmin() {
         return this.role == 'admin';
