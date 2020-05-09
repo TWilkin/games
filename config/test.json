@@ -1,5 +1,6 @@
 {
     "database": {
-        "dialect": "sqlite"
+        "dialect": "sqlite",
+        "data": null
     }
 }

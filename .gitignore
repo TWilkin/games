@@ -2,6 +2,6 @@
 config/*.txt
 config/development.json
 config/production.json
-data/
+data.json
 node_modules
 npm-debug.log

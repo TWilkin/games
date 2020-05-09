@@ -11,7 +11,8 @@
         "schema": "games",
         "user": "games",
         "password_file": null,
-        "password": "password"
+        "password": "password",
+        "data": "data.json"
     },
     
     "message": "Hello World!",

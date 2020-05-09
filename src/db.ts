@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { loadFile } from 'sequelize-fixtures';
 import { Sequelize } from 'sequelize-typescript';
 
 import Configuration from './config';
@@ -16,13 +15,16 @@ export const sequelize = new Sequelize(
 // ensure the tables are created
 sequelize.sync().then(() => {
     // check for default data to import
-    const dataDir = 'data';
-    if(fs.existsSync(dataDir)) {
-        fs.readdirSync(dataDir)
-            .filter(file => file.endsWith('.json'))
-            .forEach(file => {
-                console.log(`Importing ${file}`)
-                loadFile(`${dataDir}/${file}`, sequelize.models)
-            });
+    const file = Configuration.getDatabaseData
+    if(file && fs.existsSync(file)) {
+        console.log(`Importing ${file}`);
+        const content = fs.readFileSync(file);
+        const data = JSON.parse(content.toString());
+
+        // import the test data into the database without hooks
+        data.forEach(entry => {
+            const model = sequelize.models[entry.model];
+            model.bulkCreate(entry.data, { individualHooks: false });
+        });
     }
 });

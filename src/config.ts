@@ -3,6 +3,10 @@ import fs from 'fs';
 
 export default class Configuration {
 
+    public static get getDatabaseData(): string | null {
+        return config.get('database.data');
+    }
+
     public static get getDatabaseURI(): string {
         const dialect = config.get('database.dialect');
         if(dialect == 'sqlite') {
