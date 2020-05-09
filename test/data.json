@@ -71,11 +71,13 @@
             {
                 "gamePlayTimeId": 1,
                 "gamePlatformId": 1,
+                "userId": 1,
                 "startTime": "2020-04-06T13:53:00Z",
                 "endTime": "2020-04-06T14:53:00Z"
             }, {
                 "gamePlayTimeId": 2,
                 "gamePlatformId": 2,
+                "userId": 2,
                 "startTime": "2020-04-07T13:53:00Z",
                 "endTime": null
             }
