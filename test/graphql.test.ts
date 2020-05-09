@@ -1,22 +1,17 @@
 import { expect } from 'chai';
 import { graphql, GraphQLInt } from 'graphql';
-import { sequelizeMockingMocha } from 'sequelize-mocking';
 
 import GraphQLAPI from '../src/api/graphql';
 import { sequelize } from '../src/db';
 import { generateQuery, generateMutation } from './utility/util';
-import { generateData, mockContext } from './utility/mock';
+import { generateData, mockContext, mockSequelize } from './utility/mock';
 
 // initialise GraphQL
 const schema = GraphQLAPI.init(null, '', null);
 
 describe('GraphQL', () => {
 
-    sequelizeMockingMocha(
-        sequelize,
-        `${__dirname}/data.json`,
-        { logging: false }
-    );
+    mockSequelize();
 
     // repeat the tests for each model
     Object.values(sequelize.models).forEach((model) => {

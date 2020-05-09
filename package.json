@@ -50,7 +50,7 @@
     "chai": "^4.2.0",
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
-    "sequelize-mocking": "^2.0.1"
+    "sqlite3": "^4.2.0"
   },
   "nyc": {
     "all": true,

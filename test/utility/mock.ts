@@ -1,9 +1,14 @@
 import casual from 'casual';
 import dateformat from 'dateformat';
+import fs from 'fs';
 import { GraphQLSchema, GraphQLObjectType, GraphQLField, isNonNullType, assertNonNullType, GraphQLInt, GraphQLString } from 'graphql';
+import util from 'util';
 
 import DateTimeScalarType from '../../src/api/datetime';
 import { sequelize } from '../../src/db';
+
+// allow reading of files using await
+const readFile = util.promisify(fs.readFile);
 
 export function generateData(schema: GraphQLSchema, typeName: string): any {
     // find the query from the schema
@@ -53,4 +58,30 @@ function generateType(field: GraphQLField<any, any, any>): any {
         default:
             return casual.string;
     }
+}
+
+export function mockSequelize() {
+    before(() => {
+        // ensure that sequelize has finished initialising before starting
+        return sequelize.sync({ force: true });
+    });
+    
+    beforeEach(async () => {
+        // read the test data from file
+        const file = await readFile(`${__dirname}/../data.json`);
+        const data = JSON.parse(file.toString());
+
+        // import the test data into the database
+        return Promise.all(
+            data.map(record => {
+                const model = sequelize.models[record.model];
+                return model.create(record.data);
+            })
+        );
+    });
+
+    afterEach(() => {
+        // truncate the table to remove any modified records
+        return sequelize.sync({ force: true });
+    });
 }
