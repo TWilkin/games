@@ -12,7 +12,7 @@
         "user": "games",
         "password_file": null,
         "password": "password",
-        "data": "data.json"
+        "data": null
     },
     
     "message": "Hello World!",

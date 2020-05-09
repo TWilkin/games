@@ -1,0 +1,10 @@
+{
+    "express": {
+        "port": 3000
+    },
+
+    "database": {
+        "dialect": "sqlite",
+        "data": "data.json"
+    }
+}
