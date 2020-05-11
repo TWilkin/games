@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "NODE_CONFIG_ENV=dev npm start",
     "start": "node src/start.js",
-    "test": "NODE_CONFIG_ENV=test nyc mocha -r ts-node/register test/**/*.test.ts"
+    "test": "NODE_CONFIG_ENV=test nyc mocha -r ts-node/register -r test/utility/mocha.ts test/**/*.test.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",

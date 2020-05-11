@@ -1,13 +1,10 @@
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { expect } from 'chai';
 
 import { mockContext, mockSequelize } from './utility/mock';
 
 import { GraphQLUpdateOptions } from '../src/api/graphql';
 import { AbstractOwnableModel } from '../src/models/ownablemodel';
 import GameCollection from '../src/models/game_collection.model';
-
-chai.use(chaiAsPromised);
 
 describe('Ownable Model', () => {
 
