@@ -33,7 +33,7 @@ export function generateData(schema: GraphQLSchema, typeName: string): any {
     return generated;
 }
 
-export function mockContext(role: 'user'|'admin', userName='test', userId=1) {
+export function mockContext(role: 'user'|'admin', userId=1, userName='test') {
     let user = new User();
     user.userId = userId;
     user.userName = userName;
