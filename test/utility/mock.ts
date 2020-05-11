@@ -10,6 +10,14 @@ import { sequelize } from '../../src/db';
 // allow reading of files using await
 const readFile = util.promisify(fs.readFile);
 
+// interface for the test data format
+export interface TestData {
+    model: string,
+    data: {
+        [key: string]: any
+    }[]
+};
+
 export function generateData(schema: GraphQLSchema, typeName: string): any {
     // find the query from the schema
     const type = schema.getType(`${typeName}Input`) as GraphQLObjectType;
@@ -68,8 +76,7 @@ export function mockSequelize() {
     
     beforeEach(async () => {
         // read the test data from file
-        const file = await readFile(`${__dirname}/../data.json`);
-        const data = JSON.parse(file.toString());
+        const data = await loadData();
 
         // import the test data into the database without hooks
         return Promise.all(
@@ -84,4 +91,10 @@ export function mockSequelize() {
         // truncate the table to remove any modified records
         return sequelize.sync({ force: true });
     });
+}
+
+export async function loadData(filter: string | null=null): Promise<TestData[]> {
+    // read the test data from file
+    const file = await readFile(`${__dirname}/../data.json`);
+    return JSON.parse(file.toString()) as TestData[];
 }
