@@ -6,6 +6,7 @@ import util from 'util';
 
 import DateTimeScalarType from '../../src/api/datetime';
 import { sequelize } from '../../src/db';
+import User from '../../src/models/user.model';
 
 // allow reading of files using await
 const readFile = util.promisify(fs.readFile);
@@ -32,15 +33,16 @@ export function generateData(schema: GraphQLSchema, typeName: string): any {
     return generated;
 }
 
-export function mockContext(role: 'user'|'admin') {
+export function mockContext(role: 'user'|'admin', userName='test', userId=1) {
+    let user = new User();
+    user.userId = userId;
+    user.userName = userName;
+    user.role = role;
+
     return {
-        user: {
-            userId: 1,
-            userName: 'test',
-            role: role
-        },
+        user: user,
         database: sequelize
-    }
+    };
 }
 
 function generateType(field: GraphQLField<any, any, any>): any {

@@ -1,3 +1,4 @@
+import { plainToClass } from 'class-transformer';
 import config from 'config';
 import { Express, Request, RequestHandler, Response, NextFunction } from 'express';
 import jwt from 'express-jwt';
@@ -47,6 +48,10 @@ export default class Auth {
         const authReq = req as AuthenticatedRequest;
         if(authReq.user && authReq.user.userId && authReq.user.role) {
             console.log(`Authorised ${authReq.user.userName} as ${authReq.user.role}`);
+
+            // ensure the user is a User type
+            authReq.user = plainToClass(User, authReq.user);
+
             return next();
         }
         
