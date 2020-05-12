@@ -17,5 +17,7 @@
     
     "message": "Hello World!",
 
-    "jwt_secret": "secret"
+    "jwt": {
+        "secret": "secret"
+    }
 }

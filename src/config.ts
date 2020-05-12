@@ -1,6 +1,12 @@
 import config from 'config';
 import fs from 'fs';
 
+// the interface for the Express configuration
+interface ExpressConfiguration {
+    root: string;
+    port?: number;
+}
+
 export default class Configuration {
 
     public static get getDatabaseData(): string | null {
@@ -29,6 +35,21 @@ export default class Configuration {
 
         // otherwise return it directly
         return config.get('database.password');
+    }
+
+    public static get getExpress(): ExpressConfiguration {
+        return {
+            root: config.get('express.root'),
+            port: config.get('express.port') as number > 0 ? config.get('express.port') : undefined
+        };
+    }
+
+    public static get getJWTSecret(): string {
+        return config.get('jwt.secret');
+    }
+
+    public static get getMessage(): string {
+        return config.get('message');
     }
 
 }

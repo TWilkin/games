@@ -5,6 +5,7 @@ import graphqlFields from 'graphql-fields';
 import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions, Sequelize } from 'sequelize';
 
 import Auth, { AuthenticatedRequest } from './auth';
+import Configuration from '../config';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
 import { isInputSecret, isQueryable, isResultSecret } from './decorators';
@@ -245,7 +246,7 @@ export default class GraphQLAPI {
         return result;
     }
     
-    public static init(app: Express | null, root: string, auth: Auth | null): GraphQLSchema {
+    public static init(app: Express | null, auth: Auth | null): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
         Object.values(sequelize.models)
             .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
@@ -273,7 +274,7 @@ export default class GraphQLAPI {
         // add the GraphQL endpoint
         if(app) {
             app.use(
-                `${root}/graphql`.replace('//', '/'),
+                `${Configuration.getExpress.root}/graphql`.replace('//', '/'),
                 auth ? auth.getHandlers : [],
                 graphqlHTTP((req) => ({
                     schema: GraphQLAPI.schema,

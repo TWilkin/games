@@ -7,7 +7,7 @@ import { generateQuery, generateMutation } from './utility/util';
 import { generateData, mockContext, mockSequelize } from './utility/mock';
 
 // initialise GraphQL
-const schema = GraphQLAPI.init(null, '', null);
+const schema = GraphQLAPI.init(null, null);
 
 describe('GraphQL', () => {
 

@@ -1,10 +1,10 @@
 import { plainToClass } from 'class-transformer';
-import config from 'config';
 import { Express, Request, RequestHandler, Response, NextFunction } from 'express';
 import jwt from 'express-jwt';
 import HttpStatus from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
 
+import Configuration from '../config';
 import User from '../models/user.model';
 
 // interface for the extra property in an authenticated request
@@ -26,7 +26,7 @@ export default class Auth {
 
     constructor() {
         this.handler = jwt({
-            secret: Auth.getSecret,
+            secret: Configuration.getJWTSecret,
             credentialsRequired: true,
             requestProperty: 'user'
         });
@@ -37,10 +37,6 @@ export default class Auth {
             this.handler,
             this.authorise
         ];
-    }
-
-    private static get getSecret(): string {
-        return config.get('jwt_secret');
     }
 
     private authorise(req: Request<any>, res: Response<any>, next: NextFunction) {
@@ -67,7 +63,7 @@ export default class Auth {
                     userName: user.userName,
                     role: user.role
                 },
-                Auth.getSecret,
+                Configuration.getJWTSecret,
                 { expiresIn: '1d' }
             );
             res.status(HttpStatus.OK);
@@ -78,12 +74,12 @@ export default class Auth {
         }
     }
 
-    public static init(app: Express, root: string): Auth {
+    public static init(app: Express): Auth {
         const auth = new Auth();
 
         // add the login route
         app.post(
-            `${root}/login`.replace('//', '/'),
+            `${Configuration.getExpress.root}/login`.replace('//', '/'),
             auth.authenticate
         );
 
