@@ -7,6 +7,12 @@ interface ExpressConfiguration {
     port?: number;
 }
 
+// the interface for the Auth configuration
+interface AuthConfiguration {
+    secret: string;
+    secureCookie: boolean;
+}
+
 export default class Configuration {
 
     public static get getDatabaseData(): string | null {
@@ -44,8 +50,11 @@ export default class Configuration {
         };
     }
 
-    public static get getJWTSecret(): string {
-        return config.get('jwt.secret');
+    public static get getAuth(): AuthConfiguration {
+        return {
+            secret: config.get('auth.secret'),
+            secureCookie: config.get('auth.secure_cookie')
+        };
     }
 
     public static get getMessage(): string {

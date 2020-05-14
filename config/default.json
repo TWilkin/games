@@ -17,7 +17,8 @@
     
     "message": "Hello World!",
 
-    "jwt": {
-        "secret": "secret"
+    "auth": {
+        "secret": "secret",
+        "secure_cookie": false
     }
 }
