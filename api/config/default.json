@@ -1,6 +1,6 @@
 {
     "express": {
-        "root": "/",
+        "root": "/api",
         "port": -1
     },
 

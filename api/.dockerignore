@@ -1,8 +1,6 @@
+.nyc_output
 config/development.json
 config/production.json
-config/*.txt
 Dockerfile
-docker-compose.yml
+node_modules
 npm-debug.log
-.gitignore
-.nyc_output
