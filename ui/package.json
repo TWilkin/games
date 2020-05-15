@@ -11,11 +11,13 @@
   "dependencies": {
     "http-status-codes": "^1.4.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
+    "@types/react-router-dom": "^5.1.5",
     "@types/webpack": "^4.41.13",
     "source-map-loader": "^0.2.4",
     "ts-loader": "^7.0.4",
