@@ -1,6 +1,6 @@
 import { AutoIncrement, Column, DataType, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { Queryable } from '../api/decorators';
+import { Queryable, Sortable } from '../api/decorators';
 import GamePlatform from './game_platform.model';
 import GameSeries from './game_series.model';
 import { AbstractRestrictedModel } from './restrictedmodel';
@@ -15,6 +15,7 @@ export default class Game extends AbstractRestrictedModel<Game> {
     gameId!: number;
 
     @Queryable
+    @Sortable
     @Column(DataType.STRING)
     title!: string;
 

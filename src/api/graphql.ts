@@ -8,7 +8,8 @@ import Auth, { AuthenticatedRequest } from './auth';
 import Configuration from '../config';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
-import { isInputSecret, isQueryable, isResultSecret } from './decorators';
+import { isInputSecret, isQueryable, isResultSecret, isSortable } from './decorators';
+import sortBy from '../models/sortable';
 import User from '../models/user.model';
 
 export interface GraphQLContext {
@@ -74,7 +75,7 @@ export default class GraphQLAPI {
         query.fields[`Get${model.name}`] = {
             type: new GraphQLList(this.type),
             args: args,
-            resolve: (_: any, args: any, __: any, info: GraphQLResolveInfo) => {
+            resolve: async (_: any, args: any, __: any, info: GraphQLResolveInfo) => {
                 let query: FindOptions = this.restrictColumns(info);
 
                 if(args) {
@@ -87,7 +88,16 @@ export default class GraphQLAPI {
                     query.where = args;
                 }
                 
-                return model.findAll(query);
+                let result = await model.findAll(query);
+
+                // check if there is a sorting column
+                const sortColumn = Object.values(model.rawAttributes)
+                    .find(field => isSortable(field));
+                if(sortColumn) {
+                    result = result.sort(sortBy(sortColumn.field as string))
+                }
+
+                return result
             }
         };
     }

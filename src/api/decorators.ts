@@ -15,6 +15,9 @@ interface ExtendedModelAttributeColumnOptions extends ModelAttributeColumnOption
         excludeInput: boolean,
         excludeResult: boolean
     };
+
+    // whether a column should be the sort column
+    sortable?: boolean;
     
 }
 
@@ -45,6 +48,11 @@ export function Secret(excludeInput=false, excludeResult=true) {
     };
 }
 
+// Sortable annotation for a model column which indicates the column should be used for sorting after query
+export function Sortable(target: any, propertyName: string): any {
+    addMetadata(target, propertyName, 'sortable', true);
+}
+
 // check whether a model column is queryable
 export function isQueryable(field: ModelAttributeColumnOptions): boolean {
     const columnOptions = field as ExtendedModelAttributeColumnOptions
@@ -59,4 +67,10 @@ export function isInputSecret(field: ModelAttributeColumnOptions): boolean {
 // check whether a model column should be a secret from query results
 export function isResultSecret(field: ModelAttributeColumnOptions): boolean {
     return (field as ExtendedModelAttributeColumnOptions).secret?.excludeResult == true;
+}
+
+// check whether a model column is sortable
+export function isSortable(field: ModelAttributeColumnOptions): boolean {
+    const columnOptions = field as ExtendedModelAttributeColumnOptions
+    return (field as ExtendedModelAttributeColumnOptions).sortable == true;
 }
