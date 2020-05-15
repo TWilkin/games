@@ -3,20 +3,16 @@ import { AutoIncrement, Column, DataType, HasMany, PrimaryKey, Table } from 'seq
 import { Queryable } from '../api/decorators';
 import GamePlatform from './game_platform.model';
 import GameSeries from './game_series.model';
-import { AbstractRestrictedModel } from './restrictedmodel';
+import { AbstractSortableModel } from './sortable';
 
 @Table
-export default class Game extends AbstractRestrictedModel<Game> {
+export default class Game extends AbstractSortableModel<Game> {
 
     @Queryable
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
     gameId!: number;
-
-    @Queryable
-    @Column(DataType.STRING)
-    title!: string;
 
     @HasMany(() => GamePlatform)
     platforms!: GamePlatform[];
