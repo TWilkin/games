@@ -34,6 +34,16 @@ services:
     secrets:
       - db_password
 
+  ui:
+    build: ./ui
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      network:
+        ipv4_address: 172.20.0.4
+
 networks:
   network:
     ipam:

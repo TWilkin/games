@@ -1,7 +1,6 @@
 .gitignore
 .nyc_output
-config/development.json
-config/production.json
+dist/
 Dockerfile
 node_modules
 npm-debug.log
