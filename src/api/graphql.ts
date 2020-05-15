@@ -2,11 +2,23 @@ import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions, Sequelize } from 'sequelize';
 
+import Auth, { AuthenticatedRequest } from './auth';
+import Configuration from '../config';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
-import { isQueryable } from './queryable';
+import { isInputSecret, isQueryable, isResultSecret } from './decorators';
+import User from '../models/user.model';
+
+export interface GraphQLContext {
+    database: Sequelize,
+    user?: User
+};
+
+export interface GraphQLUpdateOptions extends UpdateOptions {
+    context: GraphQLContext
+};
 
 export default class GraphQLAPI {
 
@@ -91,7 +103,9 @@ export default class GraphQLAPI {
                     type: new GraphQLNonNull(this.input)
                 }
             },
-            resolve: (_: any, { input }) => model.create(input)
+            resolve: (_: any, { input }, context: GraphQLContext) => {
+                return model.create(input, context as CreateOptions);
+            }
         };
 
         // the UpdateX mutation
@@ -105,17 +119,18 @@ export default class GraphQLAPI {
                     type: new GraphQLNonNull(this.input)
                 }
             },
-            resolve: async (_, { id, input }) => {
+            resolve: async (_, { id, input }, context: GraphQLContext, info: GraphQLResolveInfo) => {
                 // create the query (assume no composite primary keys)
-                const query: UpdateOptions = { where: { } };
+                const query: GraphQLUpdateOptions = { 
+                    where: { },
+                    individualHooks: true,
+                    context: context
+                };
                 query.where[model.primaryKeyAttribute] = id;
-                const data = await model.update(input, query);
+                await model.update(input, query);
 
-                // if it worked, return the updated data
-                if(data[0] == 0) {
-                    return null;
-                }
-                return model.findByPk(id);
+                // return the updated data
+                return model.findByPk(id, this.restrictColumns(info));
             }
         };
     }
@@ -127,10 +142,14 @@ export default class GraphQLAPI {
 
         // iterate over the database fields
         Object.values(this.model.rawAttributes)
+            // Input should not include the primary key, updatedAt or createdAt
             .filter(field => !(isInput && (field.primaryKey || 'updatedAt' === field.field || 'createdAt' === field.field)))
+            // don't include if it's a secret for the input or results
+            .filter(field => (isInput && !isInputSecret(field)) || (!isInput && !isResultSecret(field)))
             .forEach(field => {
                 fields[field.field as string] = {
-                    type: GraphQLAPI.generateType(field)
+                    type: GraphQLAPI.generateType(field),
+                    defaultValue: field.defaultValue
                 };
             });
         
@@ -227,7 +246,7 @@ export default class GraphQLAPI {
         return result;
     }
     
-    public static init(app: Express | null, root: string): GraphQLSchema {
+    public static init(app: Express | null, auth: Auth | null): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
         Object.values(sequelize.models)
             .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
@@ -255,11 +274,16 @@ export default class GraphQLAPI {
         // add the GraphQL endpoint
         if(app) {
             app.use(
-                `${root}/graphql`.replace('//', '/'),
-                graphqlHTTP({
+                `${Configuration.getExpress.root}/graphql`.replace('//', '/'),
+                auth ? auth.getHandlers : [],
+                graphqlHTTP((req) => ({
                     schema: GraphQLAPI.schema,
+                    context: {
+                        database: sequelize,
+                        user: (req as AuthenticatedRequest).user
+                    },
                     graphiql: true
-                })
+                }))
             );
         }
 

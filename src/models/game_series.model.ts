@@ -1,11 +1,12 @@
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { Queryable } from '../api/queryable';
-import Game from './game';
-import Series from './series';
+import { Queryable } from '../api/decorators';
+import Game from './game.model';
+import Series from './series.model';
+import { AbstractRestrictedModel } from './restrictedmodel';
 
 @Table
-export default class GameSeries extends Model<GameSeries> {
+export default class GameSeries extends AbstractRestrictedModel<GameSeries> {
 
     @Queryable
     @PrimaryKey
@@ -28,4 +29,5 @@ export default class GameSeries extends Model<GameSeries> {
 
     @BelongsTo(() => Series)
     series!: Series;
+    
 }

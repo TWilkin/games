@@ -1,10 +1,29 @@
+import { GraphQLSchema, GraphQLObjectType, isScalarType, isNonNullType, isListType, assertNonNullType, assertListType } from 'graphql';
 import { Model, ModelCtor } from 'sequelize';
 
-export function generateQuery(model: ModelCtor<Model<any, any>>, params: any=null): string {
-    let fields: string[] = Object.values(model.rawAttributes)
-        .map(field => field.field as string)
-        .concat(Object.keys(model.associations)
-            .map(key => `${key} { createdAt, updatedAt }`));
+export function generateQuery(schema: GraphQLSchema, typeName: string, params: any=null): string {
+    // find the query from the schema
+    const type = schema.getType(typeName) as GraphQLObjectType;
+
+    // extract the schema type fields
+    let fields: string[] = Object.values(type.getFields())
+        .map(field => {
+            let fieldType = field.type;
+
+            // unpack non-null and list types
+            if(isNonNullType(fieldType)) {
+                fieldType = assertNonNullType(fieldType).ofType;
+            }
+            if(isListType(fieldType)) {
+                fieldType = assertListType(fieldType).ofType;
+            }
+
+            // if it's a nested element add the sub-fields
+            if(!isScalarType(fieldType)) {
+                return `${field.name} { createdAt, updatedAt }`
+            }
+            return field.name
+        });
 
     // add any query parameters if they are set
     let queryParams = '';
@@ -14,7 +33,7 @@ export function generateQuery(model: ModelCtor<Model<any, any>>, params: any=nul
         assign = `(${Object.keys(params).map(param => `${param}: $${param}`).join(', ')})`;
     }
 
-    return `query${queryParams} { Get${model.name}${assign} { ${fields.join(', ')} } }`;
+    return `query${queryParams} { Get${typeName}${assign} { ${fields.join(', ')} } }`;
 }
 
 export function generateMutation(model: ModelCtor<Model<any, any>>, isAdd: boolean): string {

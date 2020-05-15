@@ -1,11 +1,12 @@
-import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, PrimaryKey, Table } from 'sequelize-typescript';
 
-import { Queryable } from '../api/queryable';
-import Game from './game';
-import Platform from './platform';
+import { Queryable } from '../api/decorators';
+import Game from './game.model';
+import Platform from './platform.model';
+import { AbstractRestrictedModel } from './restrictedmodel';
 
 @Table
-export default class GamePlatform extends Model<GamePlatform> {
+export default class GamePlatform extends AbstractRestrictedModel<GamePlatform> {
 
     @Queryable
     @PrimaryKey
@@ -33,4 +34,5 @@ export default class GamePlatform extends Model<GamePlatform> {
     @AllowNull(true)
     @Column(DataType.STRING)
     alias!: string;
+    
 }

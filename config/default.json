@@ -5,13 +5,20 @@
     },
 
     "database": {
+        "dialect": "mysql",
         "host": "localhost",
         "port": 3306,
         "schema": "games",
         "user": "games",
         "password_file": null,
-        "password": "password"
+        "password": "password",
+        "data": null
     },
     
-    "message": "Hello World!"
+    "message": "Hello World!",
+
+    "auth": {
+        "secret": "secret",
+        "secure_cookie": false
+    }
 }

@@ -1,9 +1,8 @@
 FROM node:13.8-stretch AS build-image
 
-
 # install the application
 WORKDIR /usr/src/app
-COPY ./package*.json .
+COPY ./package*.json ./
 RUN npm install --no-production
 COPY . .
 

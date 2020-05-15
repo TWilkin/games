@@ -1,21 +1,32 @@
-import { AddressInfo } from 'net';
-import config from 'config';
+import bodyParser from 'body-parser';
 import express from 'express';
+import { AddressInfo } from 'net';
 
+import Auth from './api/auth';
+import Configuration from './config';
 import GraphQLAPI from './api/graphql';
 
-// initialise express with a test route
+// initialise express
 const app = express();
-app.get(config.get('express.root'), (_, res) => {
-    res.end(config.get('message'));
-});
+app.use(bodyParser.json())
+
+// add authentication middleware
+const auth = Auth.init(app);
+
+// add a protected test route
+app.get(
+    Configuration.getExpress.root, 
+    auth.getHandlers,
+    (_, res) => {
+        res.end(Configuration.getMessage);
+    }
+);
 
 // add the API routes
-GraphQLAPI.init(app, config.get('express.root'));
+GraphQLAPI.init(app, auth);
 
 // start listening
-const port: number | undefined = config.get('express.port') as number > 0 ? config.get('express.port') : undefined;
-let server = app.listen(port, () => {
+let server = app.listen(Configuration.getExpress.port, () => {
     const { address, port } = server.address() as AddressInfo;
-    console.log('Listening on http://%s:%s%s', address, port, config.get('express.root'));
+    console.log('Listening on http://%s:%s%s', address, port, Configuration.getExpress.root);
 });
