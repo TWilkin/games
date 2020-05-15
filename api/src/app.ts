@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import { AddressInfo } from 'net';
 
@@ -8,7 +9,12 @@ import GraphQLAPI from './api/graphql';
 
 // initialise express
 const app = express();
-app.use(bodyParser.json())
+app.use(cors({ 
+    origin: true,
+    methods: 'POST',
+    allowedHeaders: ['Authorization', 'Content-Type', 'Cookie']
+}));
+app.use(bodyParser.json());
 
 // add authentication middleware
 const auth = Auth.init(app);
