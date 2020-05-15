@@ -1,7 +1,4 @@
-import { Column, DataType, Model } from 'sequelize-typescript';
-
-import { Queryable } from '../api/decorators';
-import { AbstractRestrictedModel } from './restrictedmodel';
+import { Model } from 'sequelize-typescript';
 
 // the list of Roman numerals and their values
 const romanNumerals = {
@@ -14,78 +11,70 @@ const romanNumerals = {
     'M': 1000
 };
 
-export abstract class AbstractSortableModel<T extends Model<T>> 
-        extends AbstractRestrictedModel<T>
-{
+export function convertSortValue(value: string): string {
+    // always use upper case for simplicity
+    let sort = value.toUpperCase();
 
-    @Queryable
-    @Column(DataType.STRING)
-    title!: string;
+    // filter any symbols
+    sort = sort.replace(/[^0-9A-Z ]/, '');
 
-    public get sortTitle(): string {
-        // always use upper case for simplicity
-        let sortTitle = this.title.toUpperCase();
-
-        // filter any symbols
-        sortTitle = sortTitle.replace(/[^0-9A-Z ]/, '');
-
-        // check for 'A ...' and 'The ...'
-        if(sortTitle.startsWith('A ')) {
-            sortTitle = sortTitle.substring(2) + ', A';
-        } else if(sortTitle.startsWith('THE ')) {
-            sortTitle = sortTitle.substring(4) + ', THE';
-        }
-
-        const split = sortTitle.split(' ');
-        sortTitle = split
-            // convert roman numerals into numbers
-            .map(word => this.convertNumeral(word))
-            .map(word => {
-                // if we have a number, pad it with 0s
-                let num = parseInt(word);
-                if(num) {
-                    return word.padStart(10, '0');
-                }
-
-                return word;
-            })
-            .join(' ');
-
-        return sortTitle;
+    // check for 'A ...' and 'The ...'
+    if(sort.startsWith('A ')) {
+        sort = sort.substring(2) + ', A';
+    } else if(sort.startsWith('THE ')) {
+        sort = sort.substring(4) + ', THE';
     }
 
-    public static sort<T extends AbstractSortableModel<T>>(input1: T, input2: T): number {
-        const title1 = input1.sortTitle;
-        const title2 = input2.sortTitle;
+    const split = sort.split(' ');
+    sort = split
+        // convert roman numerals into numbers
+        .map(word => convertNumeral(word))
+        .map(word => {
+            // if we have a number, pad it with 0s
+            let num = parseInt(word);
+            if(num) {
+                return word.padStart(10, '0');
+            }
+
+            return word;
+        })
+        .join(' ');
+
+    return sort;
+}
+
+export default function sortBy(column: string) {
+    return function(input1: object, input2: object): number {
+        const value1 = convertSortValue(input1[column]);
+        const value2 = convertSortValue(input2[column]);
         
-        if(title1 > title2) {
+        if(value1 > value2) {
             return 1;
-        } else if(title1 < title2) {
+        } else if(value1 < value2) {
             return -1;
         }
         return 0;
     }
+}
 
-    private convertNumeral(numeral: string): string {
-        if(numeral.match(/^[IVXLCDM]+$/)) {
-            let number = 0;
-            let last = 'I';
-            for(let i = numeral.length - 1; i >= 0; i--) {
-                // if the previous value was larger we know it's a 4 or 9
-                if(romanNumerals[last] > romanNumerals[numeral[i]]) {
-                    number -= romanNumerals[numeral[i]];
-                } else {
-                    number += romanNumerals[numeral[i]];
-                }
-
-                // store the last numeral to handle 4 and 9
-                last = numeral[i];
+function convertNumeral(numeral: string): string {
+    if(numeral.match(/^[IVXLCDM]+$/)) {
+        let number = 0;
+        let last = 'I';
+        for(let i = numeral.length - 1; i >= 0; i--) {
+            // if the previous value was larger we know it's a 4 or 9
+            if(romanNumerals[last] > romanNumerals[numeral[i]]) {
+                number -= romanNumerals[numeral[i]];
+            } else {
+                number += romanNumerals[numeral[i]];
             }
-            return number.toString();
-        }
 
-        // not a roman numeral
-        return numeral;
+            // store the last numeral to handle 4 and 9
+            last = numeral[i];
+        }
+        return number.toString();
     }
 
+    // not a roman numeral
+    return numeral;
 }

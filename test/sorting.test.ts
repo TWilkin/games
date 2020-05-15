@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import Game from '../src/models/game.model';
-import { AbstractSortableModel } from '../src/models/sortable';
+import sortBy, { convertSortValue } from '../src/models/sortable';
 
 // the list of games to test
 const games = [
@@ -16,17 +16,15 @@ const games = [
 
 describe('Sorting', () => {
 
-    describe('sortTitle', () => {
+    describe('convertSortValue', () => {
         games.forEach(test => {
             it(`${test[0]} == ${test[1]}`, () => {
-                const game = new Game();
-                game.title = test[0];
-                expect(game.sortTitle).to.equal(test[1]);
+                expect(convertSortValue(test[0])).to.equal(test[1]);
             });
         });
     });
 
-    it('sort', () => {
+    it('sortBy', () => {
         // shuffle the array
         const shuffled = games.map(test => {
             const game = new Game();
@@ -39,7 +37,7 @@ describe('Sorting', () => {
         }
 
         // test the sorting returned the original order
-        const sorted = shuffled.sort(AbstractSortableModel.sort);
+        const sorted = shuffled.sort(sortBy('title'));
         sorted.forEach((game, index) => expect(game.title).to.equal(games[index][0]));
     });
 
