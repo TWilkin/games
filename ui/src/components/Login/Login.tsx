@@ -18,16 +18,19 @@ export default class Login extends Component<CommonProps, LoginState> {
             userName: '',
             password: ''
         };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    private handleChange = (event: FormEvent<HTMLInputElement>) => {
+    private handleChange(event: FormEvent<HTMLInputElement>) {
         const { name, value } = event.currentTarget;
         this.setState({
             [name]: value
         });
-    };
+    }
 
-    private handleSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
+    private async handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault();
         
         // attempt the login
