@@ -21,3 +21,6 @@ export const sequelize = new Sequelize(
     }
 );
 password = undefined;
+
+// ensure the tables are created
+sequelize.sync();
