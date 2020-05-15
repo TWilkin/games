@@ -2,12 +2,13 @@ import casual from 'casual';
 import dateformat from 'dateformat';
 import { Model, ModelCtor, AbstractDataType, DataTypes, ModelAttributeColumnOptions } from 'sequelize';
 
-export function generateData(model: ModelCtor<Model<any, any>>, includeId=true): any {
+export function generateData(model: ModelCtor<Model<any, any>>, includeId=true, includeDates=true): any {
     let generated = {};
 
     // iterate over the model fields
     Object.values(model.rawAttributes)
         .filter(field => !field.primaryKey || includeId)
+        .filter(field => includeDates || (field.field != 'createdAt' && field.field != 'updatedAt'))
         .forEach((field) => {
             generated[field.field as string] = generateType(field);
         });
@@ -22,7 +23,6 @@ function generateType(field: ModelAttributeColumnOptions): any {
     }
 
     switch((field.type as AbstractDataType).key) {
-
         case DataTypes.INTEGER.toString():
             return casual.integer(0);
         

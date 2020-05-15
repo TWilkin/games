@@ -1,16 +1,19 @@
 import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
+import { Queryable } from '../api/queryable';
 import Game from './game';
 import Platform from './platform';
 
 @Table
 export default class GamePlatform extends Model<GamePlatform> {
 
+    @Queryable
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
     gamePlatformId!: number;
 
+    @Queryable
     @ForeignKey(() => Game)
     @Column(DataType.INTEGER)
     gameId!: number;
@@ -18,6 +21,7 @@ export default class GamePlatform extends Model<GamePlatform> {
     @BelongsTo(() => Game)
     game!: Game;
 
+    @Queryable
     @ForeignKey(() => Platform)
     @Column(DataType.INTEGER)
     platformId!: number;
@@ -25,6 +29,7 @@ export default class GamePlatform extends Model<GamePlatform> {
     @BelongsTo(() => Platform)
     platform!: Platform;
 
+    @Queryable
     @AllowNull(true)
     @Column(DataType.STRING)
     alias!: string;
