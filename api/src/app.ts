@@ -13,15 +13,6 @@ app.use(bodyParser.json())
 // add authentication middleware
 const auth = Auth.init(app);
 
-// add a protected test route
-app.get(
-    Configuration.getExpress.root, 
-    auth.getHandlers,
-    (_, res) => {
-        res.end(Configuration.getMessage);
-    }
-);
-
 // add the API routes
 GraphQLAPI.init(app, auth);
 
