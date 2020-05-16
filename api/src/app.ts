@@ -12,7 +12,8 @@ const app = express();
 app.use(cors({ 
     origin: true,
     methods: 'POST',
-    allowedHeaders: ['Authorization', 'Content-Type', 'Cookie']
+    allowedHeaders: ['Authorization', 'Content-Type', 'Cookie'],
+    credentials: true
 }));
 app.use(bodyParser.json());
 
