@@ -2,20 +2,37 @@ import HttpStatus, { getStatusText } from 'http-status-codes';
 
 import { Model } from './models';
 
+const fragments = {
+    'Game': 'fragment GameFields on Game { gameId, title }',
+    'GameCollection': 'fragment GameCollectionFields on GameCollection { gameCollectionId, gamePlatform { ...GamePlatformFields } }',
+    'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, game { ...GameFields }, platform { ...PlatformFields } }',
+    'Platform': 'fragment PlatformFields on Platform { platformId, name }'
+};
+
 export const queries: { [name: string]: Query} = {
     'GameCollection': {
         name: 'GetGameCollection',
-        query: 'query($userId: Int) { GetGameCollection(userId: $userId) { gameCollectionId, gamePlatform { game { gameId, title }, platform { platformId, name } } } }'
+        query: 'query($userId: Int) { GetGameCollection(userId: $userId) { ...GameCollectionFields } }',
+        fragments: [
+            fragments['Game'],
+            fragments['GameCollection'],
+            fragments['GamePlatform'],
+            fragments['Platform']
+        ]
     },
-    'GameDetails': {
+    'Game': {
         name: 'GetGame',
-        query: 'query($gameId: Int) { GetGame(gameId: $gameId) { gameId, title } }'
+        query: 'query($gameId: Int) { GetGame(gameId: $gameId) { ...GameFields } }',
+        fragments: [
+            fragments['Game']
+        ]
     }
 };
 
 export interface Query {
     name: string;
     query: string;
+    fragments: string[];
 }
 
 export default async function query<T extends Model>(apiUrl: string, query: Query, variables={}): Promise<T[]> {
@@ -26,7 +43,7 @@ export default async function query<T extends Model>(apiUrl: string, query: Quer
             'Content-Type': 'application/json'
         }),
         body: JSON.stringify({
-            'query': query.query,
+            'query': `${query.query} ${query.fragments.join(' ')}`,
             'variables': variables
         })
     });

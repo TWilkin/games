@@ -64,7 +64,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     private async loadGame(gameId: number) {
         try {
             const args = { gameId: gameId };
-            const data: Game[] = await query(this.props.apiUrl, queries['GameDetails'], args);
+            const data: Game[] = await query(this.props.apiUrl, queries['Game'], args);
             this.setState({
                 game: data && data.length >= 1 ? data[0] : undefined
             });
