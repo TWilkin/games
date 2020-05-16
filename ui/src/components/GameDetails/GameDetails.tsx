@@ -1,20 +1,18 @@
 import React, { Component } from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import query, { queries } from '../../graphql';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { Game } from '../../models';
 
 interface GameDetailsMatch {
-    gameId: string
+    gameId: string;
 }
 
 interface GameDetailsProps extends APIProps, RouteComponentProps<GameDetailsMatch> { }
 
 interface GameDetailsState {
-    game?: {
-        gameId: number,
-        title: string
-    }
+    game?: Game;
 }
 
 class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
@@ -66,7 +64,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     private async loadGame(gameId: number) {
         try {
             const args = { gameId: gameId };
-            const data = await query(this.props.apiUrl, queries['GameDetails'], args);
+            const data: Game[] = await query(this.props.apiUrl, queries['GameDetails'], args);
             this.setState({
                 game: data && data.length >= 1 ? data[0] : undefined
             });

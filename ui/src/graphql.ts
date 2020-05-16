@@ -1,5 +1,7 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 
+import { Model } from './models';
+
 export const queries: { [name: string]: Query} = {
     'GameDetails': {
         name: 'GetGame',
@@ -12,7 +14,7 @@ export interface Query {
     query: string;
 }
 
-export default async function query(apiUrl: string, query: Query, variables={}): Promise<any[]> {
+export default async function query<T extends Model>(apiUrl: string, query: Query, variables={}): Promise<T[]> {
     const response = await fetch(`${apiUrl}/graphql`, {
         method: 'POST',
         credentials: 'include',
