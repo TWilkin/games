@@ -56,11 +56,7 @@ export default class App extends Component<AppProps, AppState> {
                 {this.redirect()}
 
                 <div>
-                    <nav>
-                        <ul>
-                            <li><Link to='/collection'>My Collection</Link></li>
-                        </ul>
-                    </nav>
+                    {this.renderNavigation()}
                     <hr />
                 
                     <Switch>
@@ -84,6 +80,29 @@ export default class App extends Component<AppProps, AppState> {
                 </div>
             </BrowserRouter>
         );
+    }
+
+    private renderNavigation() {
+        let elements: JSX.Element;
+        if(this.state.unauthorised) {
+            elements = (
+                <li><Link to='/login'>Login</Link></li>
+            );
+        } else {
+            elements = (
+                <li><Link to='/collection'>My Collection</Link></li>
+            );
+        }
+
+        return (
+            <div className='menu'>
+                <nav>
+                    <ul>
+                        {elements}
+                    </ul>
+                </nav>
+            </div>
+        )
     }
 
     private redirect() {
