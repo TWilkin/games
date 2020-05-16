@@ -23,3 +23,9 @@ export interface Platform extends Model {
     platformId: number;
     name: string;
 };
+
+export interface User extends Model {
+    userId: number;
+    userName: string;
+    role: string;
+};
