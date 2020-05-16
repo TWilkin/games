@@ -56,7 +56,7 @@ export function Sortable(target: any, propertyName: string): any {
 // check whether a model column is queryable
 export function isQueryable(field: ModelAttributeColumnOptions): boolean {
     const columnOptions = field as ExtendedModelAttributeColumnOptions
-    return columnOptions.queryable && !columnOptions.secret ? true : false;
+    return columnOptions.queryable && !columnOptions.secret?.excludeResult ? true : false;
 }
 
 // check whether a model column should be a secret from an Input
