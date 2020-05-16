@@ -2,6 +2,7 @@ import HttpStatus, { getStatusText } from 'http-status-codes';
 import React, { Component } from 'react';
 import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
 
+import Collection from '../Collection/Collection';
 import GameDetails from '../GameDetails/GameDetails';
 import Login from '../Login/Login';
 
@@ -49,8 +50,7 @@ export default class App extends Component<AppProps, AppState> {
                 <div>
                     <nav>
                         <ul>
-                            <li><Link to='/game/1'>Game 1</Link></li>
-                            <li><Link to='/game/2'>Game 2</Link></li>
+                            <li><Link to='/collection'>My Collection</Link></li>
                         </ul>
                     </nav>
                     <hr />
@@ -61,6 +61,11 @@ export default class App extends Component<AppProps, AppState> {
                                 apiUrl={apiUrl}
                                 onError={this.onError}
                                 onLogin={this.onLogin} />
+                        </Route>
+                        <Route path='/collection'>
+                            <Collection
+                                apiUrl={apiUrl}
+                                onError={this.onError} />
                         </Route>
                         <Route path='/game/:gameId'>
                             <GameDetails 

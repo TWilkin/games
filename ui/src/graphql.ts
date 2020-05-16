@@ -3,6 +3,10 @@ import HttpStatus, { getStatusText } from 'http-status-codes';
 import { Model } from './models';
 
 export const queries: { [name: string]: Query} = {
+    'MyCollection': {
+        name: 'GetGameCollection',
+        query: 'query { GetGameCollection { gameCollectionId, gamePlatform { game { gameId, title }, platform { platformId, name } } } }'
+    },
     'GameDetails': {
         name: 'GetGame',
         query: 'query($gameId: Int) { GetGame(gameId: $gameId) { gameId, title } }'
