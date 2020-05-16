@@ -1,3 +1,5 @@
+export type Models = 'Game' | 'GameCollection' | 'GamePlatform' | 'Platform' | 'User';
+
 export interface Model {
     createdAt: Date;
     updatedAt: Date;
