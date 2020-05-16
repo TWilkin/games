@@ -1,7 +1,11 @@
 import HttpStatus from 'http-status-codes';
 import React, { Component, FormEvent } from 'react';
 
-import { CommonProps } from '../common';
+import { APIProps } from '../common';
+
+interface LoginProps extends APIProps {
+    onLogin: () => void;
+}
 
 interface LoginState {
     userName?: string;
@@ -9,9 +13,9 @@ interface LoginState {
     success?: boolean;
 }
 
-export default class Login extends Component<CommonProps, LoginState> {
+export default class Login extends Component<LoginProps, LoginState> {
 
-    constructor(props: CommonProps) {
+    constructor(props: LoginProps) {
         super(props);
 
         this.state = {
@@ -37,6 +41,7 @@ export default class Login extends Component<CommonProps, LoginState> {
         try {
             const result = await fetch(`${this.props.apiUrl}/login`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 }),
@@ -45,7 +50,10 @@ export default class Login extends Component<CommonProps, LoginState> {
                     password: this.state.password
                 })
             });
-            this.setState({ success: result.status == HttpStatus.OK });
+            if(result.status == HttpStatus.OK) {
+                this.setState({ success: true });
+                this.props.onLogin();
+            }
         } catch(e) {
             this.setState({ success: false });
         }
