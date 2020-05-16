@@ -66,7 +66,7 @@ export default class App extends Component<AppProps, AppState> {
                                 onError={this.onError}
                                 onLogin={this.onLogin} />
                         </Route>
-                        <Route path='/collection'>
+                        <Route path='/user/:userId/collection'>
                             <Collection
                                 apiUrl={apiUrl}
                                 onError={this.onError} />
@@ -90,7 +90,7 @@ export default class App extends Component<AppProps, AppState> {
             );
         } else {
             elements = (
-                <li><Link to='/collection'>My Collection</Link></li>
+                <li><Link to={`/user/${this.state.user.userId}/collection`}>My Collection</Link></li>
             );
         }
 

@@ -3,9 +3,9 @@ import HttpStatus, { getStatusText } from 'http-status-codes';
 import { Model } from './models';
 
 export const queries: { [name: string]: Query} = {
-    'MyCollection': {
+    'GameCollection': {
         name: 'GetGameCollection',
-        query: 'query { GetGameCollection { gameCollectionId, gamePlatform { game { gameId, title }, platform { platformId, name } } } }'
+        query: 'query($userId: Int) { GetGameCollection(userId: $userId) { gameCollectionId, gamePlatform { game { gameId, title }, platform { platformId, name } } } }'
     },
     'GameDetails': {
         name: 'GetGame',
