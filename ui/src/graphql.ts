@@ -3,7 +3,7 @@ import HttpStatus, { getStatusText } from 'http-status-codes';
 export const queries: { [name: string]: Query} = {
     'GameDetails': {
         name: 'GetGame',
-        query: 'query { GetGame { title } }'
+        query: 'query($gameId: Int) { GetGame(gameId: $gameId) { gameId, title } }'
     }
 };
 
@@ -12,7 +12,7 @@ export interface Query {
     query: string;
 }
 
-export default async function query(apiUrl: string, query: Query): Promise<any[]> {
+export default async function query(apiUrl: string, query: Query, variables={}): Promise<any[]> {
     const response = await fetch(`${apiUrl}/graphql`, {
         method: 'POST',
         credentials: 'include',
@@ -20,7 +20,8 @@ export default async function query(apiUrl: string, query: Query): Promise<any[]
             'Content-Type': 'application/json'
         }),
         body: JSON.stringify({
-            'query': query.query
+            'query': query.query,
+            'variables': variables
         })
     });
 

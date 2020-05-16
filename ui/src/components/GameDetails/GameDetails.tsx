@@ -2,31 +2,41 @@ import React, { Component } from 'react';
 
 import { APIProps } from '../common';
 import query, { queries } from '../../graphql';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-interface GameState {
+interface GameDetailsMatch {
+    gameId: string
+}
+
+interface GameDetailsProps extends APIProps, RouteComponentProps<GameDetailsMatch> { }
+
+interface GameDetailsState {
     game?: {
+        gameId: number,
         title: string
     }
 }
 
-export default class Game extends Component<APIProps, GameState> {
+class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
 
-    constructor(props: APIProps) {
+    constructor(props: GameDetailsProps) {
         super(props);
 
         this.state = {
-            game: null
+            game: undefined
         };
     }
 
-    public async componentDidMount() {
-        try {
-            const data = await query(this.props.apiUrl, queries['GameDetails']);
-            this.setState({
-                game: data && data.length > 1 ? data[0] : undefined
-            });
-        } catch(error) {
-            this.props.onError(error);
+    public componentDidMount() {
+        const gameId = parseInt(this.props.match.params.gameId);
+        this.loadGame(gameId);
+    }
+
+    public componentDidUpdate() {
+        // if the id has changed, load the new data
+        const gameId = parseInt(this.props.match.params.gameId);
+        if(this.state.game.gameId != gameId) {
+            this.loadGame(gameId);
         }
     }
 
@@ -53,4 +63,18 @@ export default class Game extends Component<APIProps, GameState> {
         );
     }
 
+    private async loadGame(gameId: number) {
+        try {
+            const args = { gameId: gameId };
+            const data = await query(this.props.apiUrl, queries['GameDetails'], args);
+            this.setState({
+                game: data && data.length >= 1 ? data[0] : undefined
+            });
+        } catch(error) {
+            this.props.onError(error);
+        }
+    }
+
 }
+
+export default withRouter(GameDetails);

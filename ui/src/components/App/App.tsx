@@ -49,8 +49,8 @@ export default class App extends Component<AppProps, AppState> {
                 <div>
                     <nav>
                         <ul>
-                            <li><Link to='/login'>Login</Link></li>
-                            <li><Link to='/game'>Game</Link></li>
+                            <li><Link to='/game/1'>Game 1</Link></li>
+                            <li><Link to='/game/2'>Game 2</Link></li>
                         </ul>
                     </nav>
                     <hr />
@@ -62,10 +62,10 @@ export default class App extends Component<AppProps, AppState> {
                                 onError={this.onError}
                                 onLogin={this.onLogin} />
                         </Route>
-                        <Route path='/game'>
+                        <Route path='/game/:gameId'>
                             <GameDetails 
                                 apiUrl={apiUrl}
-                                onError={this.onError} />
+                                onError={this.onError}  />
                         </Route>
                     </Switch>
                 </div>
