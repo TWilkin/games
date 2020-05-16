@@ -33,7 +33,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     public componentDidUpdate() {
         // if the id has changed, load the new data
         const gameId = parseInt(this.props.match.params.gameId);
-        if(this.state.game.gameId != gameId) {
+        if(this.state.game && this.state.game.gameId != gameId) {
             this.loadGame(gameId);
         }
     }
