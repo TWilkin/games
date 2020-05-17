@@ -24,6 +24,7 @@ export default class GamePlayTime extends AbstractOwnableModel<GamePlayTime> {
     @Column(DataType.DATE)
     startTime!: Date;
 
+    @Queryable
     @AllowNull(true)
     @Column(DataType.DATE)
     endTime!: Date;

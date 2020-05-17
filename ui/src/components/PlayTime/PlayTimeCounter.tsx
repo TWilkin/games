@@ -33,8 +33,9 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         // check if there is started playtime for this game
         try {
             const args = {
-                // TODO search where endTime is null and for the logged in user
-                gamePlatformId: this.props.gamePlatformId
+                // TODO add query for current user
+                gamePlatformId: this.props.gamePlatformId,
+                endTime: null as Date
             };
             const data: GamePlayTime[] = await query(this.props.apiUrl, queries['GamePlayTime'], args);
 
@@ -42,8 +43,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
             if(data && data.length > 0) {
                 // find the latest startTime
                 const latest = data.reduce((latest, current) => {
-                    if(!latest 
-                        || (!current.endTime && latest.startTime < current.startTime))
+                    if(!latest || latest.startTime < current.startTime)
                     {
                         return current;
                     }
