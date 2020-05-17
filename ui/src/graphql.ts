@@ -38,7 +38,7 @@ export const queries: { [name in Models]: Query | null} = {
     },
     'GamePlayTime': {
         name: 'GetGamePlayTime',
-        query: 'query($gamePlatformId: Int) { GetGamePlayTime(gamePlatformId: $gamePlatformId) { ...GamePlatformFields } }',
+        query: 'query($gamePlatformId: Int) { GetGamePlayTime(gamePlatformId: $gamePlatformId) { ...GamePlayTimeFields } }',
         fragments: [ 'GamePlayTime' ]
     },
     'Platform': null,

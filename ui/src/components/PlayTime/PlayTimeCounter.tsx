@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { APIProps } from '../common';
 import { GamePlayTime } from '../../models';
-import { mutate, mutations } from '../../graphql';
+import query, { mutate, mutations, queries } from '../../graphql';
 
 interface PlayTimeCounterProps extends APIProps {
     gamePlatformId: number;
@@ -29,6 +29,37 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         this.onStop = this.onStop.bind(this);
     }
 
+    public async componentDidMount() {
+        // check if there is started playtime for this game
+        try {
+            const args = {
+                // TODO search where endTime is null and for the logged in user
+                gamePlatformId: this.props.gamePlatformId
+            };
+            const data: GamePlayTime[] = await query(this.props.apiUrl, queries['GamePlayTime'], args);
+
+            // if we have records
+            if(data && data.length > 0) {
+                // find the latest startTime
+                const latest = data.reduce((latest, current) => {
+                    if(!latest 
+                        || (!current.endTime && latest.startTime < current.startTime))
+                    {
+                        return current;
+                    }
+                    return latest;
+                }, null);
+
+                // set that as the current timer
+                if(latest) {
+                    this.start(latest);
+                }
+            }
+        } catch(error) {
+            this.props.onError(error);
+        }
+    }
+
     private async onStart(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         event.preventDefault();
         
@@ -44,16 +75,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
 
             // check the add worked
             if(data) {
-                // update the state and start the counter
-                this.setState({ 
-                    gamePlayTime: data,
-                    counter: 0,
-                    timer: setInterval(() => {
-                        this.setState({
-                            counter: this.state.counter + 1
-                        });
-                    }, 1000)
-                });
+                this.start(data);
             }
         } catch(error) {
             this.props.onError(error);
@@ -129,6 +151,19 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                 <span>{this.timeSince()}</span>
             );
         }
+    }
+
+    private start(gamePlayTime: GamePlayTime) {
+        // update the state and start the counter
+        this.setState({ 
+            gamePlayTime: gamePlayTime,
+            counter: 0,
+            timer: setInterval(() => {
+                this.setState({
+                    counter: this.state.counter + 1
+                });
+            }, 1000)
+        });
     }
 
     private timeSince(): string {
