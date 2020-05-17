@@ -54,10 +54,12 @@ class Collection extends Component<CollectionProps, CollectionState> {
                     {this.state.collection.map(entry => {
                         return(
                             <div key={entry.gameCollectionId}>
-                                <strong>Title:</strong>
-                                <Link to={`/game/${entry.gamePlatform.game.gameId}`}>
-                                    {entry.gamePlatform.game.title}
+                                <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
+                                    +
                                 </Link>
+
+                                <strong>Title:</strong>
+                                {entry.gamePlatform.game.title}
                                 <br />
 
                                 <strong>Platform:</strong>

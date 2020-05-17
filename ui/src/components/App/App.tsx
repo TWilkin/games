@@ -71,7 +71,7 @@ export default class App extends Component<AppProps, AppState> {
                                 apiUrl={apiUrl}
                                 onError={this.onError} />
                         </Route>
-                        <Route path='/game/:gameId'>
+                        <Route path='/game/:gamePlatformId'>
                             <GameDetails 
                                 apiUrl={apiUrl}
                                 onError={this.onError}  />

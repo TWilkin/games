@@ -26,7 +26,15 @@ export const queries: { [name in Models]: Query | null} = {
             'Platform'
         ]
     },
-    'GamePlatform': null,
+    'GamePlatform': {
+        name: 'GetGamePlatform',
+        query: 'query($gamePlatformId: Int) { GetGamePlatform(gamePlatformId: $gamePlatformId) { ...GamePlatformFields } }',
+        fragments: [
+            'Game',
+            'GamePlatform',
+            'Platform'
+        ]
+    },
     'Platform': null,
     'User': null
 };

@@ -3,16 +3,16 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import query, { queries } from '../../graphql';
-import { Game } from '../../models';
+import { GamePlatform } from '../../models';
 
 interface GameDetailsMatch {
-    gameId: string;
+    gamePlatformId: string;
 }
 
 interface GameDetailsProps extends APIProps, RouteComponentProps<GameDetailsMatch> { }
 
 interface GameDetailsState {
-    game?: Game;
+    gamePlatform?: GamePlatform;
 }
 
 class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
@@ -21,20 +21,20 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
         super(props);
 
         this.state = {
-            game: undefined
+            gamePlatform: undefined
         };
     }
 
     public componentDidMount() {
-        const gameId = parseInt(this.props.match.params.gameId);
-        this.loadGame(gameId);
+        const gamePlatformId = parseInt(this.props.match.params.gamePlatformId);
+        this.load(gamePlatformId);
     }
 
     public componentDidUpdate() {
         // if the id has changed, load the new data
-        const gameId = parseInt(this.props.match.params.gameId);
-        if(this.state.game && this.state.game.gameId != gameId) {
-            this.loadGame(gameId);
+        const gamePlatformId = parseInt(this.props.match.params.gamePlatformId);
+        if(this.state.gamePlatform && this.state.gamePlatform.gamePlatformId != gamePlatformId) {
+            this.load(gamePlatformId);
         }
     }
 
@@ -47,11 +47,11 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     }
 
     private renderGame() {
-        if(this.state.game) {
+        if(this.state.gamePlatform) {
             return (
                 <div className='game'>
                     <strong>Title: </strong>
-                    {this.state.game.title}
+                    {this.state.gamePlatform.game.title}
                 </div>
             );
         }
@@ -61,12 +61,12 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
         );
     }
 
-    private async loadGame(gameId: number) {
+    private async load(gamePlatformId: number) {
         try {
-            const args = { gameId: gameId };
-            const data: Game[] = await query(this.props.apiUrl, queries['Game'], args);
+            const args = { gamePlatformId: gamePlatformId };
+            const data: GamePlatform[] = await query(this.props.apiUrl, queries['GamePlatform'], args);
             this.setState({
-                game: data && data.length >= 1 ? data[0] : undefined
+                gamePlatform: data && data.length >= 1 ? data[0] : undefined
             });
         } catch(error) {
             this.props.onError(error);
