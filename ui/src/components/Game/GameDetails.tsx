@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { APIProps } from '../common';
+import GameSummary from './GameSummary';
 import query, { queries } from '../../graphql';
 import { GamePlatform } from '../../models';
 
@@ -39,25 +40,16 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     }
 
     public render() {
-        return (
-            <div>
-                {this.renderGame()}
-            </div>
-        );
-    }
+        let game: JSX.Element;
 
-    private renderGame() {
         if(this.state.gamePlatform) {
-            return (
-                <div className='game'>
-                    <strong>Title: </strong>
-                    {this.state.gamePlatform.game.title}
-                </div>
-            );
-        }
+            game = <GameSummary gamePlatform={this.state.gamePlatform} />;
+        } else {
+            game = <p>Game not found)</p>;
+        };
 
         return (
-            <div className='game'>Game not found</div>
+            <div className='game'>{game}</div>
         );
     }
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 
 import { APIProps } from '../common';
+import GameSummary from '../Game/GameSummary';
 import query, { queries } from '../../graphql';
 import { GameCollection } from '../../models';
 
@@ -55,16 +56,8 @@ class Collection extends Component<CollectionProps, CollectionState> {
                         return(
                             <div key={entry.gameCollectionId}>
                                 <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
-                                    +
+                                    <GameSummary gamePlatform={entry.gamePlatform} />
                                 </Link>
-
-                                <strong>Title:</strong>
-                                {entry.gamePlatform.game.title}
-                                <br />
-
-                                <strong>Platform:</strong>
-                                {entry.gamePlatform.platform.name}
-                                <br />
                             </div>
                         );
                     })}

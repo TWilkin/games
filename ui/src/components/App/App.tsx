@@ -5,7 +5,7 @@ import Cookies from 'react-cookies';
 import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
 
 import Collection from '../Collection/Collection';
-import GameDetails from '../GameDetails/GameDetails';
+import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
 
@@ -121,4 +121,4 @@ export default class App extends Component<AppProps, AppState> {
         return null;
     }
 
-}
+};
