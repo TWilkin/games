@@ -5,6 +5,7 @@ import { APIProps } from '../common';
 import GameSummary from './GameSummary';
 import query, { queries } from '../../graphql';
 import { GamePlatform } from '../../models';
+import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 
 interface GameDetailsMatch {
     gamePlatformId: string;
@@ -40,16 +41,24 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     }
 
     public render() {
-        let game: JSX.Element;
+        let content: JSX.Element;
 
         if(this.state.gamePlatform) {
-            game = <GameSummary gamePlatform={this.state.gamePlatform} />;
+            content = (
+                <div>
+                    <GameSummary gamePlatform={this.state.gamePlatform} />
+                    <PlayTimeCounter 
+                        apiUrl={this.props.apiUrl}
+                        onError={this.props.onError}
+                        gamePlatformId={this.state.gamePlatform.gamePlatformId} />
+                </div>                
+            );
         } else {
-            game = <p>Game not found)</p>;
+            content = <p>Game not found)</p>;
         };
 
         return (
-            <div className='game'>{game}</div>
+            <div className='game'>{content}</div>
         );
     }
 

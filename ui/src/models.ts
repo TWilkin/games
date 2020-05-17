@@ -1,9 +1,9 @@
-export type Models = 'Game' | 'GameCollection' | 'GamePlatform' | 'Platform' | 'User';
+export type Models = 'Game' | 'GameCollection' | 'GamePlatform' | 'GamePlayTime' | 'Platform' | 'User';
 
 export interface Model {
     createdAt: Date;
     updatedAt: Date;
-};
+};  
 
 export interface Game extends Model {
     gameId: number;
@@ -19,6 +19,13 @@ export interface GamePlatform extends Model {
     gamePlatformId: number;
     game: Game;
     platform: Platform;
+};
+
+export interface GamePlayTime extends Model {
+    gamePlayTimeId: number;
+    gamePlatform: GamePlatform;
+    startTime: number;
+    endTime?: number;
 };
 
 export interface Platform extends Model {

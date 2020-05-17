@@ -6,6 +6,7 @@ const fragments: { [name in Models]: string } = {
     'Game': 'fragment GameFields on Game { gameId, title }',
     'GameCollection': 'fragment GameCollectionFields on GameCollection { gameCollectionId, gamePlatform { ...GamePlatformFields } }',
     'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, game { ...GameFields }, platform { ...PlatformFields } }',
+    'GamePlayTime': 'fragment GamePlayTimeFields on GamePlayTime { gamePlayTimeId, gamePlatformId, startTime, endTime }',
     'Platform': 'fragment PlatformFields on Platform { platformId, name }',
     'User': 'fragment UserFields on User { userId, userName }'
 };
@@ -35,8 +36,30 @@ export const queries: { [name in Models]: Query | null} = {
             'Platform'
         ]
     },
+    'GamePlayTime': {
+        name: 'GetGamePlayTime',
+        query: 'query($gamePlatformId: Int) { GetGamePlayTime(gamePlatformId: $gamePlatformId) { ...GamePlatformFields } }',
+        fragments: [ 'GamePlayTime' ]
+    },
     'Platform': null,
     'User': null
+};
+
+export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = {
+    'add': {
+        'GamePlayTime': {
+            name: 'AddGamePlayTime',
+            query: 'mutation($input: GamePlayTimeInput!) { AddGamePlayTime(input: $input) { ...GamePlayTimeFields } }',
+            fragments: [ 'GamePlayTime' ]
+        }
+    },
+    'update': {
+        'GamePlayTime': {
+            name: 'UpdateGamePlayTime',
+            query: 'mutation($id: Int!, $input: GamePlayTimeInput!) { UpdateGamePlayTime(id: $id, input: $input) { ...GamePlayTimeFields } }',
+            fragments: [ 'GamePlayTime' ]
+        }
+    }
 };
 
 interface Query {
@@ -45,7 +68,7 @@ interface Query {
     fragments: Models[];
 }
 
-export default async function query<T extends Model>(apiUrl: string, query: Query, variables={}): Promise<T[]> {
+async function graphql(apiUrl: string, query: Query, variables: object): Promise<any> {
     const response = await fetch(`${apiUrl}/graphql`, {
         method: 'POST',
         credentials: 'include',
@@ -71,4 +94,12 @@ export default async function query<T extends Model>(apiUrl: string, query: Quer
 
     // extract the response for the executed query
     return data.data[query.name];
+}
+
+export default function query<T extends Model>(apiUrl: string, query: Query, variables={}): Promise<T[]> {
+    return graphql(apiUrl, query, variables);
+};
+
+export function mutate<T extends Model>(apiUrl: string, mutation: Query, variables: object): Promise<T> {
+    return graphql(apiUrl, mutation, variables);
 };
