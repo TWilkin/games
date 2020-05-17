@@ -5,6 +5,7 @@ import Cookies from 'react-cookies';
 import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
 
 import Collection from '../Collection/Collection';
+import { APISettings } from '../common';
 import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
@@ -62,19 +63,14 @@ export default class App extends Component<AppProps, AppState> {
                     <Switch>
                         <Route path='/login'>
                             <Login 
-                                apiUrl={apiUrl}
-                                onError={this.onError}
+                                api={this.getAPISettings}
                                 onLogin={this.onLogin} />
                         </Route>
                         <Route path='/user/:userId/collection'>
-                            <Collection
-                                apiUrl={apiUrl}
-                                onError={this.onError} />
+                            <Collection api={this.getAPISettings} />
                         </Route>
                         <Route path='/game/:gamePlatformId'>
-                            <GameDetails 
-                                apiUrl={apiUrl}
-                                onError={this.onError}  />
+                            <GameDetails api={this.getAPISettings} />
                         </Route>
                     </Switch>
                 </div>
@@ -119,6 +115,14 @@ export default class App extends Component<AppProps, AppState> {
         }
 
         return null;
+    }
+
+    private get getAPISettings(): APISettings {
+        return {
+            url: apiUrl,
+            user: this.state.user,
+            onError: this.onError
+        };
     }
 
 };

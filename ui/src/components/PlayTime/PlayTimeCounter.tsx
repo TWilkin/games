@@ -37,7 +37,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                 gamePlatformId: this.props.gamePlatformId,
                 endTime: null as Date
             };
-            const data: GamePlayTime[] = await query(this.props.apiUrl, queries['GamePlayTime'], args);
+            const data: GamePlayTime[] = await query(this.props.api.url, queries['GamePlayTime'], args);
 
             // if we have records
             if(data && data.length > 0) {
@@ -56,7 +56,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                 }
             }
         } catch(error) {
-            this.props.onError(error);
+            this.props.api.onError(error);
         }
     }
 
@@ -71,14 +71,14 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                     startTime: Date.now()
                 }
             };
-            const data: GamePlayTime = await mutate(this.props.apiUrl, mutations['add']['GamePlayTime'], args);
+            const data: GamePlayTime = await mutate(this.props.api.url, mutations['add']['GamePlayTime'], args);
 
             // check the add worked
             if(data) {
                 this.start(data);
             }
         } catch(error) {
-            this.props.onError(error);
+            this.props.api.onError(error);
         }
     }
 
@@ -97,7 +97,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                     endTime: Date.now()
                 }
             };
-            const data: GamePlayTime = await mutate(this.props.apiUrl, mutations['update']['GamePlayTime'], args);
+            const data: GamePlayTime = await mutate(this.props.api.url, mutations['update']['GamePlayTime'], args);
 
             // check the update worked
             if(data) {
@@ -108,7 +108,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                 });
             }
         } catch(error) {
-            this.props.onError(error);
+            this.props.api.onError(error);
         }
     }
 

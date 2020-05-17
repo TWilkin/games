@@ -48,8 +48,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                 <div>
                     <GameSummary gamePlatform={this.state.gamePlatform} />
                     <PlayTimeCounter 
-                        apiUrl={this.props.apiUrl}
-                        onError={this.props.onError}
+                        api={this.props.api}
                         gamePlatformId={this.state.gamePlatform.gamePlatformId} />
                 </div>                
             );
@@ -65,12 +64,12 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     private async load(gamePlatformId: number) {
         try {
             const args = { gamePlatformId: gamePlatformId };
-            const data: GamePlatform[] = await query(this.props.apiUrl, queries['GamePlatform'], args);
+            const data: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
             this.setState({
                 gamePlatform: data && data.length >= 1 ? data[0] : undefined
             });
         } catch(error) {
-            this.props.onError(error);
+            this.props.api.onError(error);
         }
     }
 

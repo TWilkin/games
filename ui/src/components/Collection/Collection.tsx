@@ -75,13 +75,13 @@ class Collection extends Component<CollectionProps, CollectionState> {
             const args = {
                 userId: userId
             };
-            const data: GameCollection[] = await query(this.props.apiUrl, queries['GameCollection'], args);
+            const data: GameCollection[] = await query(this.props.api.url, queries['GameCollection'], args);
             this.setState({
                 userId: userId,
                 collection: data
             });
         } catch(error) {
-            this.props.onError(error);
+            this.props.api.onError(error);
         }
     }
 

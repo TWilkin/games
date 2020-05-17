@@ -39,7 +39,7 @@ export default class Login extends Component<LoginProps, LoginState> {
         
         // attempt the login
         try {
-            const result = await fetch(`${this.props.apiUrl}/login`, {
+            const result = await fetch(`${this.props.api.url}/login`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: new Headers({
