@@ -1,4 +1,3 @@
-.gitignore
 .nyc_output
 config/development.json
 config/production.json

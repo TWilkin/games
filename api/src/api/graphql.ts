@@ -2,7 +2,7 @@ import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
 import graphqlFields from 'graphql-fields';
-import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions, Sequelize } from 'sequelize';
+import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions, Sequelize, Includeable } from 'sequelize';
 
 import Auth, { AuthenticatedRequest } from './auth';
 import Configuration from '../config';
@@ -91,13 +91,12 @@ export default class GraphQLAPI {
                 let result = await model.findAll(query);
 
                 // check if there is a sorting column
-                const sortColumn = Object.values(model.rawAttributes)
-                    .find(field => isSortable(field));
+                const sortColumn = this.findSortColumn(query.include);
                 if(sortColumn) {
-                    result = result.sort(sortBy(sortColumn.field as string))
+                    result = result.sort(sortBy(sortColumn));
                 }
 
-                return result
+                return result;
             }
         };
     }
@@ -254,6 +253,32 @@ export default class GraphQLAPI {
         // find the lists of columns and models
         restrictNestedColumns(graphqlFields(info), result);
         return result;
+    }
+
+    private findSortColumn(includeable: Includeable[] | undefined, model: ModelCtor<any>=this.model, prefix: string | undefined=undefined) {
+        // first check this model's fields
+        let column = Object.values(model.rawAttributes)
+            .find(field => isSortable(field));
+        let columnName = column ? column.field : undefined;
+        
+        // next check recursively in any query includes
+        if(!columnName) {
+            includeable?.every(include => {
+                const options = include as IncludeOptions;
+                columnName = this.findSortColumn(
+                    options.include, 
+                    options.model as ModelCtor<any>,
+                    !prefix ? options.as : prefix + '.' + options.as
+                );
+
+                return columnName == undefined;
+            });
+        }
+
+        if(columnName) {
+            return !prefix ? columnName : prefix + '.' + columnName;
+        }
+        return undefined;
     }
     
     public static init(app: Express | null, auth: Auth | null): GraphQLSchema {

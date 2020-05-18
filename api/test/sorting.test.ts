@@ -1,6 +1,8 @@
 import { expect } from 'chai';
+import { Model } from 'sequelize-typescript';
 
 import Game from '../src/models/game.model';
+import GamePlatform from '../src/models/game_platform.model';
 import sortBy, { convertSortValue } from '../src/models/sortable';
 
 // the list of games to test
@@ -25,20 +27,39 @@ describe('Sorting', () => {
     });
 
     it('sortBy', () => {
-        // shuffle the array
-        const shuffled = games.map(test => {
+        const data = games.map(test => {
             const game = new Game();
             game.title = test[0];
             return game;
         });
-        for(let i = 0; i < shuffled.length; i++) {
-            const j = Math.floor(Math.random() * i);
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-
+        const sorted = shuffleAndSort(data, 'title');
+        
         // test the sorting returned the original order
-        const sorted = shuffled.sort(sortBy('title'));
         sorted.forEach((game, index) => expect(game.title).to.equal(games[index][0]));
     });
 
+    it('sortBy in join', () => {
+        const data = games.map(test => {
+            const platform = new GamePlatform();
+            platform.game = new Game();
+            platform.game.title = test[0];
+            return platform;
+        });
+        const sorted = shuffleAndSort(data, 'game.title');
+
+        // test the sorting returned the original order
+        sorted.forEach((platform, index) => expect(platform.game.title).to.equal(games[index][0]));
+    });
+
 });
+
+function shuffleAndSort<T extends Model<T>>(data: T[], column: string) {
+    // shuffle the data
+    for(let i = 0; i < data.length; i++) {
+        const j = Math.floor(Math.random() * i);
+        [data[i], data[j]] = [data[j], data[i]];
+    }
+
+    // sort the data by the sort column
+    return data.sort(sortBy(column));
+}
