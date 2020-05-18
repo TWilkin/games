@@ -71,6 +71,5 @@ export function isResultSecret(field: ModelAttributeColumnOptions): boolean {
 
 // check whether a model column is sortable
 export function isSortable(field: ModelAttributeColumnOptions): boolean {
-    const columnOptions = field as ExtendedModelAttributeColumnOptions
     return (field as ExtendedModelAttributeColumnOptions).sortable == true;
 }
