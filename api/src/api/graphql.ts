@@ -260,6 +260,9 @@ export default class GraphQLAPI {
         let column = Object.values(model.rawAttributes)
             .find(field => isSortable(field));
         let columnName = column ? column.field : undefined;
+        if(columnName && prefix) {
+            columnName = `${prefix}.${columnName}`;
+        }
         
         // next check recursively in any query includes
         if(!columnName) {
@@ -268,17 +271,14 @@ export default class GraphQLAPI {
                 columnName = this.findSortColumn(
                     options.include, 
                     options.model as ModelCtor<any>,
-                    !prefix ? options.as : prefix + '.' + options.as
+                    !prefix ? options.as : `${prefix}.${options.as}`
                 );
 
                 return columnName == undefined;
             });
         }
 
-        if(columnName) {
-            return !prefix ? columnName : prefix + '.' + columnName;
-        }
-        return undefined;
+        return columnName;
     }
     
     public static init(app: Express | null, auth: Auth | null): GraphQLSchema {

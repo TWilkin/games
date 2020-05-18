@@ -53,7 +53,7 @@ export default function sortBy(column: string) {
     // function to extract the key from the base object
     const extract = function(input: object): string | null {
         const column = columnKeys
-            .reduce((result, key) => result[key], input);
+            .reduce((result, key) => result ? result[key] : null, input);
         return column ? column.toString() : null;
     };
 
