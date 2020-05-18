@@ -9,6 +9,7 @@ import { APISettings } from '../common';
 import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
+import GameList from '../Game/GameList';
 
 const apiUrl = 'http://localhost:3000/api';
 
@@ -66,8 +67,13 @@ export default class App extends Component<AppProps, AppState> {
                                 api={this.getAPISettings}
                                 onLogin={this.onLogin} />
                         </Route>
+                        
                         <Route path='/user/:userId/collection'>
                             <Collection api={this.getAPISettings} />
+                        </Route>
+
+                        <Route path='/games'>
+                            <GameList api={this.getAPISettings} />
                         </Route>
                         <Route path='/game/:gamePlatformId'>
                             <GameDetails api={this.getAPISettings} />
@@ -94,6 +100,7 @@ export default class App extends Component<AppProps, AppState> {
             <div className='menu'>
                 <nav>
                     <ul>
+                    <li><Link to='/games'>Games</Link></li>
                         {elements}
                     </ul>
                 </nav>

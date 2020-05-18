@@ -43,6 +43,7 @@ class Collection extends Component<CollectionProps, CollectionState> {
     public render() {
         return (
             <div className='collection'>
+                <h1>My Collection</h1>
                 {this.renderCollection()}
             </div>
         )
