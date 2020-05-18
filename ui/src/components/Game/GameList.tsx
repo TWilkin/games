@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
 import query, { queries } from '../../graphql';
 import { GamePlatform } from '../../models';
+import PlatformFilter from '../Platform/PlatformFilter';
 
 interface GameListState {
     games?: GamePlatform[];
@@ -18,23 +19,22 @@ export default class GameList extends Component<APIProps, GameListState> {
         this.state = {
             games: undefined
         };
+
+        this.onPlatformSelect = this.onPlatformSelect.bind(this);
     }
 
-    public async componentDidMount() {
-        try {
-            const data: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform']);
-            this.setState({
-                games: data
-            });
-        } catch(error) {
-            this.props.api.onError(error);
-        }
+    public onPlatformSelect(platformId: number) {
+        this.load(platformId);
     }
 
     public render() {
         return (
             <div className='games'>
                 <h1>All Games</h1>
+                <PlatformFilter
+                    api={this.props.api}
+                    onSelect={this.onPlatformSelect} />
+                <br />
                 {this.renderGames()}
             </div>
         )
@@ -60,6 +60,20 @@ export default class GameList extends Component<APIProps, GameListState> {
         return (
             <div>No games found</div>
         )
+    }
+
+    private async load(platformId: number) {
+        try {
+            const args = {
+                platformId: platformId
+            };
+            const data: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
+            this.setState({
+                games: data
+            });
+        } catch(error) {
+            this.props.api.onError(error);
+        }
     }
 
 };

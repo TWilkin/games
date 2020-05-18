@@ -29,7 +29,7 @@ export const queries: { [name in Models]: Query | null} = {
     },
     'GamePlatform': {
         name: 'GetGamePlatform',
-        query: 'query($gamePlatformId: Int) { GetGamePlatform(gamePlatformId: $gamePlatformId) { ...GamePlatformFields } }',
+        query: 'query($gamePlatformId: Int, $platformId: Int) { GetGamePlatform(gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GamePlatformFields } }',
         fragments: [
             'Game',
             'GamePlatform',
@@ -41,7 +41,11 @@ export const queries: { [name in Models]: Query | null} = {
         query: 'query($gamePlatformId: Int, $userId: Int, $endTime: DateTime) { GetGamePlayTime(gamePlatformId: $gamePlatformId, userId: $userId, endTime: $endTime) { ...GamePlayTimeFields } }',
         fragments: [ 'GamePlayTime' ]
     },
-    'Platform': null,
+    'Platform': {
+        name: 'GetPlatform',
+        query: 'query { GetPlatform { ...PlatformFields } }',
+        fragments: [ 'Platform' ]
+    },
     'User': null
 };
 
