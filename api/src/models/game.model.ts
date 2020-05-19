@@ -26,7 +26,7 @@ export default class Game extends AbstractRestrictedModel<Game> {
     @HasMany(() => GameSeries)
     series!: GameSeries[];
 
-    @HasMany(() => GameCompilation, 'gameId')
+    @HasMany(() => GameCompilation, 'primaryGameId')
     includes!: GameCompilation[];
 
     @HasMany(() => GameCompilation, 'includedGameId')

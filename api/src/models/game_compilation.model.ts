@@ -16,10 +16,10 @@ export default class GameCompilation extends AbstractRestrictedModel<GameCompila
     @Queryable
     @ForeignKey(() => Game)
     @Column(DataType.INTEGER)
-    gameId!: number;
+    primaryGameId!: number;
 
-    @BelongsTo(() => Game, 'gameId')
-    game!: Game;
+    @BelongsTo(() => Game, 'primaryGameId')
+    primary!: Game;
 
     @Queryable
     @ForeignKey(() => Game)

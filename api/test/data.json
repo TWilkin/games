@@ -55,11 +55,11 @@
         "data": [
             {
                 "gameCompilationId": 1,
-                "gameId": 1,
+                "primaryGameId": 1,
                 "includedGameId": 2
             }, {
                 "gameCompilationId": 2,
-                "gameId": 2,
+                "primaryGameId": 2,
                 "includedGameId": 1
             }
         ]
