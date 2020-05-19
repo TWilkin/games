@@ -235,6 +235,7 @@ export default class GraphQLAPI {
                             // add this model to the includes
                             const child: IncludeOptions = {
                                 model: model.associations[joinKey].target,
+                                as: model.associations[joinKey].as,
                                 include: [],
                                 attributes: []
                             };
