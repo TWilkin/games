@@ -1,6 +1,7 @@
 import { AutoIncrement, Column, DataType, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable, Sortable } from '../api/decorators';
+import GameCompilation from './game_compilation.model';
 import GamePlatform from './game_platform.model';
 import GameSeries from './game_series.model';
 import { AbstractRestrictedModel } from './restrictedmodel';
@@ -24,5 +25,11 @@ export default class Game extends AbstractRestrictedModel<Game> {
 
     @HasMany(() => GameSeries)
     series!: GameSeries[];
+
+    @HasMany(() => GameCompilation, 'gameId')
+    includes!: GameCompilation[];
+
+    @HasMany(() => GameCompilation, 'includedGameId')
+    includedIn!: GameCompilation[];
     
 }

@@ -84,6 +84,7 @@
             {
                 "gamePlayTimeId": 1,
                 "gamePlatformId": 1,
+                "gameCompilationId": 1,
                 "userId": 1,
                 "startTime": "2020-04-06T13:53:00Z",
                 "endTime": "2020-04-06T14:53:00Z"
