@@ -1,5 +1,3 @@
-import { Model } from 'sequelize-typescript';
-
 // the list of Roman numerals and their values
 const romanNumerals = {
     'I': 1,
@@ -11,7 +9,12 @@ const romanNumerals = {
     'M': 1000
 };
 
-export function convertSortValue(value: string): string {
+export function convertSortValue(value: string | null): string | null {
+    // check for null
+    if(!value) {
+        return null;
+    }
+
     // always use upper case for simplicity
     let sort = value.toUpperCase();
 
@@ -44,16 +47,32 @@ export function convertSortValue(value: string): string {
 }
 
 export default function sortBy(column: string) {
+    // split the column into the nested field names
+    const columnKeys = column.split('.');
+
+    // function to extract the key from the base object
+    const extract = function(input: object): string | null {
+        const column = columnKeys
+            .reduce((result, key) => result ? result[key] : null, input);
+        return column ? column.toString() : null;
+    };
+
     return function(input1: object, input2: object): number {
-        const value1 = convertSortValue(input1[column]);
-        const value2 = convertSortValue(input2[column]);
+        const value1 = convertSortValue(extract(input1));
+        const value2 = convertSortValue(extract(input2));
         
-        if(value1 > value2) {
-            return 1;
-        } else if(value1 < value2) {
+        if(value1 == value2) {
+            return 0;
+        }
+
+        if(value1 == null) {
             return -1;
         }
-        return 0;
+        if(value2 == null) {
+            return 1;
+        }
+        
+        return value1 > value2 ? 1 : -1;
     }
 }
 

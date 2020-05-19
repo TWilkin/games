@@ -1,7 +1,8 @@
-.nyc_output
-config/*.txt
-config/development.json
-config/production.json
-data.json
-node_modules
-npm-debug.log
+api/config/*.txt
+api/config/development.json
+api/config/production.json
+api/data.json
+config
+**/.nyc_output
+**/node_modules
+**/npm-debug.log

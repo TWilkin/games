@@ -9,7 +9,7 @@ COPY . .
 # run the tests, then clean up
 RUN npm test \
     && npm prune --production \
-    && rm -r ./test
+    && rm -r ./test ./config/test.json
 
 # start the node application
 FROM node:13.8-stretch AS run-image
