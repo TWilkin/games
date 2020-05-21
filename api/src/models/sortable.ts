@@ -18,6 +18,9 @@ export function convertSortValue(value: string | null): string | null {
     // always use upper case for simplicity
     let sort = value.toUpperCase();
 
+    // replace certain symbols
+    sort = sort.replace(/&/, 'AND');
+
     // filter any symbols
     sort = sort.replace(/[^0-9A-Z ]/, '');
 
