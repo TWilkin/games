@@ -39,4 +39,7 @@ export default class GamePlayTime extends AbstractOwnableModel<GamePlayTime> {
     @Column(DataType.DATE)
     endTime!: Date;
 
+    @Column(DataType.BOOLEAN)
+    demo!: boolean;
+
 }
