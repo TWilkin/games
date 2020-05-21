@@ -17,6 +17,7 @@ export interface GameCollection extends Model {
 
 export interface GamePlatform extends Model {
     gamePlatformId: number;
+    alias?: string;
     game: Game;
     platform: Platform;
 };

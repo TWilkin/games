@@ -5,7 +5,7 @@ import { Model, Models } from './models';
 const fragments: { [name in Models]: string } = {
     'Game': 'fragment GameFields on Game { gameId, title }',
     'GameCollection': 'fragment GameCollectionFields on GameCollection { gameCollectionId, gamePlatform { ...GamePlatformFields } }',
-    'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, game { ...GameFields }, platform { ...PlatformFields } }',
+    'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, alias, game { ...GameFields }, platform { ...PlatformFields } }',
     'GamePlayTime': 'fragment GamePlayTimeFields on GamePlayTime { gamePlayTimeId, gamePlatformId, startTime, endTime }',
     'Platform': 'fragment PlatformFields on Platform { platformId, name }',
     'User': 'fragment UserFields on User { userId, userName }'
