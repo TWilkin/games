@@ -13,6 +13,7 @@ const games = [
     ['Final Fantasy IX', 'FINAL FANTASY 0000000009'],
     ['The Legend of Zelda', 'LEGEND OF ZELDA, THE'],
     ['Metal Gear Ac!d', 'METAL GEAR ACD'],
+    ['Ōkami', 'OKAMI'],
     ['Sonic & Knuckles', 'SONIC AND KNUCKLES'],
     ['WipeOut 2097', 'WIPEOUT 0000002097']
 ]
