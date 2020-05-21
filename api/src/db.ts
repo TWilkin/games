@@ -3,6 +3,11 @@ import { Sequelize } from 'sequelize-typescript';
 
 import Configuration from './config';
 
+interface ImportModel {
+    model: string;
+    data: object[];
+}
+
 // create the db connection
 export const sequelize = new Sequelize(
     Configuration.getDatabaseURI,
@@ -13,18 +18,18 @@ export const sequelize = new Sequelize(
 );
 
 // ensure the tables are created
-sequelize.sync().then(() => {
+sequelize.sync().then(async () => {
     // check for default data to import
     const file = Configuration.getDatabaseData
     if(file && fs.existsSync(file)) {
         console.log(`Importing ${file}`);
         const content = fs.readFileSync(file);
-        const data = JSON.parse(content.toString());
+        const data: ImportModel[] = JSON.parse(content.toString());
 
         // import the test data into the database without hooks
-        data.forEach(entry => {
+        for(let entry of data) {
             const model = sequelize.models[entry.model];
-            model.bulkCreate(entry.data, { individualHooks: false });
-        });
+            await model.bulkCreate(entry.data, { individualHooks: false });
+        }
     }
 });
