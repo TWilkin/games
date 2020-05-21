@@ -15,11 +15,14 @@ export function convertSortValue(value: string | null): string | null {
         return null;
     }
 
+    // replace accents and diacritics
+    let sort = value.normalize('NFD');
+
     // always use upper case for simplicity
-    let sort = value.toUpperCase();
+    sort = sort.toUpperCase();
 
     // replace certain symbols
-    sort = sort.replace(/&/, 'AND');
+    sort = sort.replace(/&|\+/, 'AND');
 
     // filter any symbols
     sort = sort.replace(/[^0-9A-Z ]/, '');
