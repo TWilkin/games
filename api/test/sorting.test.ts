@@ -12,6 +12,7 @@ const games = [
     ['Final Fantasy VIII', 'FINAL FANTASY 0000000008'],
     ['Final Fantasy IX', 'FINAL FANTASY 0000000009'],
     ['The Legend of Zelda', 'LEGEND OF ZELDA, THE'],
+    ['Mario + Rabbids Kingdom Battle', 'MARIO AND RABBIDS KINGDOM BATTLE'],
     ['Metal Gear Ac!d', 'METAL GEAR ACD'],
     ['Ōkami', 'OKAMI'],
     ['Sonic & Knuckles', 'SONIC AND KNUCKLES'],
