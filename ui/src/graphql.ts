@@ -5,8 +5,9 @@ import { Model, Models } from './models';
 const fragments: { [name in Models]: string } = {
     'Game': 'fragment GameFields on Game { gameId, title }',
     'GameCollection': 'fragment GameCollectionFields on GameCollection { gameCollectionId, gamePlatform { ...GamePlatformFields } }',
+    'GameCompilation': 'fragment GameCompilationFields on GameCompilation { gameCompilationId, primary { ...GameFields }, included { ...GameFields } }',
     'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, alias, game { ...GameFields }, platform { ...PlatformFields } }',
-    'GamePlayTime': 'fragment GamePlayTimeFields on GamePlayTime { gamePlayTimeId, gamePlatformId, startTime, endTime }',
+    'GamePlayTime': 'fragment GamePlayTimeFields on GamePlayTime { gamePlayTimeId, gamePlatformId, gameCompilationId, demo, startTime, endTime }',
     'Platform': 'fragment PlatformFields on Platform { platformId, name }',
     'User': 'fragment UserFields on User { userId, userName }'
 };
@@ -25,6 +26,14 @@ export const queries: { [name in Models]: Query | null} = {
             'GameCollection',
             'GamePlatform',
             'Platform'
+        ]
+    },
+    'GameCompilation': {
+        name: 'GetGameCompilation',
+        query: 'query($primaryGameId: Int) { GetGameCompilation(primaryGameId: $primaryGameId) { ...GameCompilationFields } }',
+        fragments: [
+            'Game',
+            'GameCompilation'
         ]
     },
     'GamePlatform': {

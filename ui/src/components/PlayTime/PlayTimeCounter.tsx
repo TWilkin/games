@@ -1,17 +1,21 @@
-import React, { Component } from 'react';
+import React, { ChangeEvent, Component, FormEvent } from 'react';
 
 import { APIProps } from '../common';
-import { GamePlayTime } from '../../models';
+import { GamePlatform, GamePlayTime } from '../../models';
 import query, { mutate, mutations, queries } from '../../graphql';
+import ModalDialog from '../ModalDialog/ModalDialog';
 
 interface PlayTimeCounterProps extends APIProps {
-    gamePlatformId: number;
+    gamePlatform: GamePlatform;
 }
 
 interface PlayTimeCounterState {
     gamePlayTime?: GamePlayTime;
+    gameCompilationId?: number;
+    demo?: boolean;
     counter?: number;
     timer?: NodeJS.Timeout;
+    compilationDialogVisible?: boolean;
 }
 
 export default class PlayTimeCounter extends Component<PlayTimeCounterProps, PlayTimeCounterState> {
@@ -21,19 +25,25 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
 
         this.state = {
             gamePlayTime: null,
+            gameCompilationId: null,
+            demo: null,
             counter: 0,
-            timer: null
+            timer: null,
+            compilationDialogVisible: false
         };
 
+        this.onCompilationSelect = this.onCompilationSelect.bind(this);
+        this.onDemoChange = this.onDemoChange.bind(this);
+        this.onDialogClose = this.onDialogClose.bind(this);
         this.onStart = this.onStart.bind(this);
         this.onStop = this.onStop.bind(this);
     }
 
     public async componentDidMount() {
-        // check if there is started playtime for this game
+        // check if there is playtime already for this game
         try {
             const args = {
-                gamePlatformId: this.props.gamePlatformId,
+                gamePlatformId: this.props.gamePlatform.gamePlatformId,
                 userId: this.props.api.user.userId,
                 endTime: null as Date
             };
@@ -60,26 +70,42 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         }
     }
 
-    private async onStart(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    private onCompilationSelect(event: FormEvent<HTMLSelectElement>) {
         event.preventDefault();
-        
-        try {
-            // create the new playtime in the API
-            const args = {
-                input: {
-                    gamePlatformId: this.props.gamePlatformId,
-                    startTime: Date.now()
-                }
-            };
-            const data: GamePlayTime = await mutate(this.props.api.url, mutations['add']['GamePlayTime'], args);
 
-            // check the add worked
-            if(data) {
-                this.start(data);
-            }
-        } catch(error) {
-            this.props.api.onError(error);
+        let gameCompilationId = parseInt(event.currentTarget.value);
+        if(gameCompilationId == -1) {
+            gameCompilationId = null;
         }
+        this.setState({
+            gameCompilationId: gameCompilationId
+        });
+    }
+
+    private onDemoChange(event: ChangeEvent<HTMLInputElement>) {
+        event.preventDefault();
+
+        this.setState({
+            demo: event.target.checked
+        });
+    }
+
+    private onDialogClose(cancelled: boolean) {
+        if(!cancelled) {
+            this.startCounter();
+        }
+        this.setState({
+            compilationDialogVisible: false
+        });
+    }
+
+    private onStart(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        event.preventDefault();
+
+        // show dialog
+        this.setState({
+            compilationDialogVisible: true
+        });
     }
 
     private async onStop(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -93,6 +119,8 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
             const args = {
                 id: this.state.gamePlayTime.gamePlayTimeId,
                 input: {
+                    gameCompilationId: this.state.gameCompilationId,
+                    demo: this.state.demo,
                     startTime: this.state.gamePlayTime.startTime,
                     endTime: Date.now()
                 }
@@ -103,6 +131,8 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
             if(data) {
                 this.setState({ 
                     gamePlayTime: null,
+                    gameCompilationId: null,
+                    demo: null,
                     counter: 0,
                     timer: null
                 });
@@ -117,6 +147,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
             <div className='playTimeCounter'>
                 {this.renderTimer()}
                 {this.renderStart()}
+                {this.renderStartDialog()}
                 {this.renderStop()}
             </div>
         );
@@ -129,6 +160,43 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                 <button type='button' onClick={this.onStart}>
                     Start Play Counter
                 </button>
+            );
+        }
+    }
+
+    private renderStartDialog() {
+        return (
+            <ModalDialog
+                    submit='Start'
+                    cancel='Cancel'
+                    visible={this.state.compilationDialogVisible}
+                    onClose={this.onDialogClose}>
+                {this.renderCompilationSelect()}
+                <br />
+                <label>Demo? 
+                    <input type='checkbox' value='Demo' onChange={this.onDemoChange} />
+                </label>
+            </ModalDialog>
+        );
+    }
+
+    private renderCompilationSelect() {
+        if(this.props.gamePlatform.game.includes 
+                && this.props.gamePlatform.game.includes.length > 0)
+        {
+            return (
+                <select onChange={this.onCompilationSelect} defaultValue='-1'>
+                    <option key='-1' value='-1'>-</option>
+                    {this.props.gamePlatform.game.includes.map(compilation => {
+                        return (
+                            <option 
+                                    key={compilation.gameCompilationId} 
+                                    value={compilation.gameCompilationId}>
+                                {compilation.included.title}
+                            </option>
+                        );
+                    })}
+                </select>
             );
         }
     }
@@ -153,10 +221,34 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         }
     }
 
+    private async startCounter() {
+        try {
+            // create the new playtime in the API
+            const args = {
+                input: {
+                    gamePlatformId: this.props.gamePlatform.gamePlatformId,
+                    gameCompilationId: this.state.gameCompilationId,
+                    demo: this.state.demo,
+                    startTime: Date.now()
+                }
+            };
+            const data: GamePlayTime = await mutate(this.props.api.url, mutations['add']['GamePlayTime'], args);
+
+            // check the add worked
+            if(data) {
+                this.start(data);
+            }
+        } catch(error) {
+            this.props.api.onError(error);
+        }
+    }
+
     private start(gamePlayTime: GamePlayTime) {
         // update the state and start the counter
         this.setState({ 
             gamePlayTime: gamePlayTime,
+            gameCompilationId: gamePlayTime.gameCompilationId,
+            demo: gamePlayTime.demo,
             counter: 0,
             timer: setInterval(() => {
                 this.setState({

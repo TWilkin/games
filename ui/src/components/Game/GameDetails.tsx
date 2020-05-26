@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { APIProps } from '../common';
 import GameSummary from './GameSummary';
 import query, { queries } from '../../graphql';
-import { GamePlatform } from '../../models';
+import { GameCompilation, GamePlatform } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 
 interface GameDetailsMatch {
@@ -49,7 +49,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                     <GameSummary gamePlatform={this.state.gamePlatform} />
                     <PlayTimeCounter 
                         api={this.props.api}
-                        gamePlatformId={this.state.gamePlatform.gamePlatformId} />
+                        gamePlatform={this.state.gamePlatform} />
                 </div>                
             );
         } else {
@@ -63,10 +63,20 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
 
     private async load(gamePlatformId: number) {
         try {
-            const args = { gamePlatformId: gamePlatformId };
-            const data: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
+            // load the gamePlatform
+            let args: object = { gamePlatformId: gamePlatformId };
+            const games: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
+
+            // load the compilations (if any)
+            if(games && games.length >= 1) {
+                args = { primaryGameId: games[0].game.gameId };
+                const compilations: GameCompilation[] = await query(this.props.api.url, queries['GameCompilation'], args);
+                games[0].game.includes = compilations;
+            }
+
+            // store the game
             this.setState({
-                gamePlatform: data && data.length >= 1 ? data[0] : undefined
+                gamePlatform: games && games.length >= 1 ? games[0] : undefined
             });
         } catch(error) {
             this.props.api.onError(error);
