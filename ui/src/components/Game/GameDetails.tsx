@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { APIProps } from '../common';
+import EditButton from '../Admin/EditButton';
 import GameSummary from './GameSummary';
 import query, { queries, mutate, mutations } from '../../graphql';
 import { GameCollection, GameCompilation, GamePlatform } from '../../models';
@@ -76,6 +77,10 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                     <PlayTimeCounter 
                         api={this.props.api}
                         gamePlatform={this.state.gamePlatform} />
+                    <EditButton 
+                        api={this.props.api}
+                        type='game' 
+                        id={this.state.gamePlatform.gamePlatformId} />
                 </div>                
             );
         } else {
