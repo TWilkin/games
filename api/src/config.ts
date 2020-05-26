@@ -57,8 +57,4 @@ export default class Configuration {
         };
     }
 
-    public static get getMessage(): string {
-        return config.get('message');
-    }
-
 }

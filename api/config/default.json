@@ -14,8 +14,6 @@
         "password": "password",
         "data": null
     },
-    
-    "message": "Hello World!",
 
     "auth": {
         "secret": "secret",
