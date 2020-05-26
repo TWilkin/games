@@ -20,7 +20,7 @@ export const queries: { [name in Models]: Query | null} = {
     },
     'GameCollection': {
         name: 'GetGameCollection',
-        query: 'query($userId: Int) { GetGameCollection(userId: $userId) { ...GameCollectionFields } }',
+        query: 'query($userId: Int, $gamePlatformId: Int) { GetGameCollection(userId: $userId, gamePlatformId: $gamePlatformId) { ...GameCollectionFields } }',
         fragments: [
             'Game',
             'GameCollection',
@@ -60,6 +60,16 @@ export const queries: { [name in Models]: Query | null} = {
 
 export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = {
     'add': {
+        'GameCollection': {
+            name: 'AddGameCollection',
+            query: 'mutation($input: GameCollectionInput!) { AddGameCollection(input: $input) { ...GameCollectionFields } }',
+            fragments: [
+                'Game',
+                'GameCollection',
+                'GamePlatform',
+                'Platform'
+            ]
+        },
         'GamePlayTime': {
             name: 'AddGamePlayTime',
             query: 'mutation($input: GamePlayTimeInput!) { AddGamePlayTime(input: $input) { ...GamePlayTimeFields } }',

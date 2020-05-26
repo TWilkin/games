@@ -3,8 +3,8 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import GameSummary from './GameSummary';
-import query, { queries } from '../../graphql';
-import { GameCompilation, GamePlatform } from '../../models';
+import query, { queries, mutate, mutations } from '../../graphql';
+import { GameCollection, GameCompilation, GamePlatform } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 
 interface GameDetailsMatch {
@@ -15,6 +15,7 @@ interface GameDetailsProps extends APIProps, RouteComponentProps<GameDetailsMatc
 
 interface GameDetailsState {
     gamePlatform?: GamePlatform;
+    gameCollectionId?: number;
 }
 
 class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
@@ -23,8 +24,11 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
         super(props);
 
         this.state = {
-            gamePlatform: undefined
+            gamePlatform: undefined,
+            gameCollectionId: undefined
         };
+
+        this.onAddToCollectionClick = this.onAddToCollectionClick.bind(this);
     }
 
     public componentDidMount() {
@@ -40,6 +44,27 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
         }
     }
 
+    private async onAddToCollectionClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        event.preventDefault();
+
+        // add to the user's collection
+        try {
+            const args = {
+                input: {
+                    gamePlatformId: this.state.gamePlatform.gamePlatformId
+                }
+            };
+            const data: GameCollection = await mutate(this.props.api.url, mutations['add']['GameCollection'], args);
+            if(data) {
+                this.setState({
+                    gameCollectionId: data.gameCollectionId
+                });
+            }
+        } catch(error) {
+            this.props.api.onError(error);
+        }
+    }
+
     public render() {
         let content: JSX.Element;
 
@@ -47,6 +72,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
             content = (
                 <div>
                     <GameSummary gamePlatform={this.state.gamePlatform} />
+                    {this.renderInCollection()}
                     <PlayTimeCounter 
                         api={this.props.api}
                         gamePlatform={this.state.gamePlatform} />
@@ -61,14 +87,29 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
         );
     }
 
+    private renderInCollection() {
+        if(this.state.gameCollectionId) {
+            return (
+                <p>In Collection</p>
+            )
+        }
+
+        return (
+            <button onClick={this.onAddToCollectionClick}>
+                Add to Collection
+            </button>
+        );
+    }
+
     private async load(gamePlatformId: number) {
         try {
             // load the gamePlatform
             let args: object = { gamePlatformId: gamePlatformId };
             const games: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
+            const game = games && games.length >= 1 ? games[0] : undefined;
 
             // load the compilations (if any)
-            if(games && games.length >= 1) {
+            if(game) {
                 args = { primaryGameId: games[0].game.gameId };
                 const compilations: GameCompilation[] = await query(this.props.api.url, queries['GameCompilation'], args);
                 games[0].game.includes = compilations;
@@ -76,8 +117,22 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
 
             // store the game
             this.setState({
-                gamePlatform: games && games.length >= 1 ? games[0] : undefined
+                gamePlatform: game
             });
+
+            // check if this game in out collection
+            if(game) {
+                args = {
+                    gamePlatformId: gamePlatformId,
+                    userId: this.props.api.user.userId
+                };
+                const collection: GameCollection[] = await query(this.props.api.url, queries['GameCollection'], args);
+                if(collection && collection.length >= 1) {
+                    this.setState({
+                        gameCollectionId: collection[0].gameCollectionId
+                    });
+                }
+            }
         } catch(error) {
             this.props.api.onError(error);
         }
