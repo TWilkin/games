@@ -1,9 +1,6 @@
 export type Models = 'Game' | 'GameCollection' | 'GameCompilation' | 'GamePlatform' | 'GamePlayTime' | 'Platform' | 'User';
 
-export interface Model {
-    createdAt: Date;
-    updatedAt: Date;
-};  
+export interface Model { };  
 
 export interface Game extends Model {
     gameId: number;

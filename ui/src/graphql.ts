@@ -38,7 +38,7 @@ export const queries: { [name in Models]: Query | null} = {
     },
     'GamePlatform': {
         name: 'GetGamePlatform',
-        query: 'query($gamePlatformId: Int, $platformId: Int) { GetGamePlatform(gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GamePlatformFields } }',
+        query: 'query($gamePlatformId: Int, $platformId: Int, $gameId: Int) { GetGamePlatform(gamePlatformId: $gamePlatformId, platformId: $platformId, gameId: $gameId) { ...GamePlatformFields } }',
         fragments: [
             'Game',
             'GamePlatform',
@@ -60,6 +60,11 @@ export const queries: { [name in Models]: Query | null} = {
 
 export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = {
     'add': {
+        'Game': {
+            name: 'AddGame',
+            query: 'mutation($input: GameInput!) { AddGame(input: $input) { ...GameFields } }',
+            fragments: queries['Game'].fragments
+        },
         'GameCollection': {
             name: 'AddGameCollection',
             query: 'mutation($input: GameCollectionInput!) { AddGameCollection(input: $input) { ...GameCollectionFields } }',
@@ -70,6 +75,11 @@ export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = 
                 'Platform'
             ]
         },
+        'GamePlatform': {
+            name: 'AddGamePlatform',
+            query: 'mutation($input: GamePlatformInput!) { AddGamePlatform(input: $input) { ...GamePlatformFields } }',
+            fragments: queries['GamePlatform'].fragments
+        },
         'GamePlayTime': {
             name: 'AddGamePlayTime',
             query: 'mutation($input: GamePlayTimeInput!) { AddGamePlayTime(input: $input) { ...GamePlayTimeFields } }',
@@ -77,6 +87,16 @@ export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = 
         }
     },
     'update': {
+        'Game': {
+            name: 'UpdateGame',
+            query: 'mutation($id: Int!, $input: GameInput!) { UpdateGame(id: $id, input: $input) { ...GameFields } }',
+            fragments: queries['Game'].fragments
+        },
+        'GamePlatform': {
+            name: 'UpdateGamePlatform',
+            query: 'mutation($id: Int!, $input: GamePlatformInput!) { UpdateGamePlatform(id: $id, input: $input) { ...GamePlatformFields } }',
+            fragments: queries['GamePlatform'].fragments
+        },
         'GamePlayTime': {
             name: 'UpdateGamePlayTime',
             query: 'mutation($id: Int!, $input: GamePlayTimeInput!) { UpdateGamePlayTime(id: $id, input: $input) { ...GamePlayTimeFields } }',

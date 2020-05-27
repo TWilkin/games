@@ -80,7 +80,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                     <EditButton 
                         api={this.props.api}
                         type='game' 
-                        id={this.state.gamePlatform.gamePlatformId} />
+                        id={this.state.gamePlatform.game.gameId} />
                 </div>                
             );
         } else {

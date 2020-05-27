@@ -127,7 +127,7 @@ export default class App extends Component<AppProps, AppState> {
                 <Route path='/game/create' key='gameCreate'>
                     <GameForm api={this.getAPISettings} />
                 </Route>,
-                <Route path='/game/:gamePlatformId/edit' key='gameEdit'>
+                <Route path='/game/:gameId/edit' key='gameEdit'>
                     <GameForm api={this.getAPISettings} />
                 </Route>
             ];
