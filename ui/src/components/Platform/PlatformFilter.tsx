@@ -5,7 +5,7 @@ import query, { queries } from '../../graphql';
 import { Platform } from '../../models';
 
 interface PlatformFilterProps extends APIProps {
-    onSelect: (platformId: number) => void;
+    onSelect: (platform: Platform) => void;
 }
 
 interface PlatformFilterState {
@@ -29,7 +29,9 @@ export default class PlatformFilter extends Component<PlatformFilterProps, Platf
 
         const platformId = parseInt(event.currentTarget.value);
         if(platformId != -1) {
-            this.props.onSelect(platformId);
+            const platform = this.state.platforms
+                    .find(platform => platform.platformId == platformId);
+            this.props.onSelect(platform);
         }
     }
 

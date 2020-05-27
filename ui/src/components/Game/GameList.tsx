@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
 import query, { queries } from '../../graphql';
-import { GamePlatform } from '../../models';
+import { GamePlatform, Platform } from '../../models';
 import PlatformFilter from '../Platform/PlatformFilter';
 
 interface GameListState {
@@ -23,8 +23,8 @@ export default class GameList extends Component<APIProps, GameListState> {
         this.onPlatformSelect = this.onPlatformSelect.bind(this);
     }
 
-    public onPlatformSelect(platformId: number) {
-        this.load(platformId);
+    public onPlatformSelect(platform: Platform) {
+        this.load(platform.platformId);
     }
 
     public render() {

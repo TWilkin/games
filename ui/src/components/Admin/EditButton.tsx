@@ -17,7 +17,7 @@ export default class EditButton extends Component<EditButtonProps> {
     public render() {
         if(this.props.api.user.role == 'admin') {
             return (
-                <Link to={`/${this.props.type}/${this.props.id}/editform`}>
+                <Link to={`/${this.props.type}/${this.props.id}/edit`}>
                     Edit
                 </Link>
             )

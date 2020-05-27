@@ -1,0 +1,11 @@
+.button {
+    color: grey;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.button:hover,
+.button:focus {
+    cursor: pointer;
+    color: black;
+}

@@ -7,9 +7,10 @@ import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
 import Collection from '../Collection/Collection';
 import { APISettings } from '../common';
 import GameDetails from '../Game/GameDetails';
+import GameForm from '../Game/GameForm';
+import GameList from '../Game/GameList';
 import Login from '../Login/Login';
 import { User } from '../../models';
-import GameList from '../Game/GameList';
 
 const apiUrl = 'http://localhost:3000/api';
 
@@ -62,6 +63,8 @@ export default class App extends Component<AppProps, AppState> {
                     <hr />
                 
                     <Switch>
+                        {this.renderAdminForms()}
+
                         <Route path='/login'>
                             <Login 
                                 api={this.getAPISettings}
@@ -100,12 +103,35 @@ export default class App extends Component<AppProps, AppState> {
             <div className='menu'>
                 <nav>
                     <ul>
-                    <li><Link to='/games'>Games</Link></li>
+                        <li><Link to='/games'>Games</Link></li>
                         {elements}
+                        {this.renderAdminNavigation()}
                     </ul>
                 </nav>
             </div>
         )
+    }
+
+    private renderAdminNavigation() {
+        if(this.state.user && this.state.user.role == 'admin') {
+            return [
+                <hr key='hr' />,
+                <li key='gameCreate'><Link to='/game/create'>Add Game</Link></li>
+            ];
+        }
+    }
+
+    private renderAdminForms() {
+        if(this.state.user && this.state.user.role == 'admin') {
+            return [
+                <Route path='/game/create' key='gameCreate'>
+                    <GameForm api={this.getAPISettings} />
+                </Route>,
+                <Route path='/game/:gamePlatformId/edit' key='gameEdit'>
+                    <GameForm api={this.getAPISettings} />
+                </Route>
+            ];
+        }
     }
 
     private redirect() {
