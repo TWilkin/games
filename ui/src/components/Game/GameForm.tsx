@@ -60,7 +60,7 @@ class GameForm extends Component<GameFormProps, GameFormState> {
 
         // update the game platform
         const platforms = this.state.platforms;
-        const platform = platforms.find(platform => platform.platformId = platformId);
+        const platform = platforms.find(platform => platform.platformId == platformId);
         if(platform) {
             platform.alias = event.currentTarget.value;
 
