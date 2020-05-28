@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, Default, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable, Secret } from '../api/decorators';
