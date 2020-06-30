@@ -35,7 +35,7 @@
     "dateformat": "^3.0.3",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
-    "express-jwt": "^5.3.3",
+    "express-jwt": "^6.0.0",
     "graphql": "^14.4.1",
     "graphql-fields": "^2.0.3",
     "http-status-codes": "^1.4.0",
