@@ -1,7 +1,7 @@
 import casual from 'casual';
 import dateformat from 'dateformat';
 import fs from 'fs';
-import { GraphQLSchema, GraphQLObjectType, GraphQLField, isNonNullType, assertNonNullType, GraphQLInt, GraphQLString } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLField, isNonNullType, assertNonNullType, GraphQLInt, GraphQLString, GraphQLBoolean } from 'graphql';
 import util from 'util';
 
 import DateTimeScalarType from '../../src/api/datetime';
@@ -58,6 +58,9 @@ function generateType(field: GraphQLField<any, any, any>): any {
     }
 
     switch(fieldType) {
+        case GraphQLBoolean:
+            return casual.boolean;
+            
         case GraphQLInt:
             return casual.integer(0);
         

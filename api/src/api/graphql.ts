@@ -1,6 +1,6 @@
 import { Express } from 'express';
 import graphqlHTTP from 'express-graphql';
-import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFieldConfigMap, GraphQLObjectTypeConfig, GraphQLList, GraphQLInputObjectType, GraphQLInputFieldConfigMap, GraphQLNonNull, GraphQLNullableType, GraphQLType, GraphQLResolveInfo, GraphQLBoolean } from 'graphql';
 import graphqlFields from 'graphql-fields';
 import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions, Sequelize, Includeable } from 'sequelize';
 
@@ -185,6 +185,10 @@ export default class GraphQLAPI {
         let type: GraphQLNullableType;
 
         switch((field.type as AbstractDataType).key) {
+
+            case DataTypes.BOOLEAN.toString():
+                type = GraphQLBoolean;
+                break;
     
             case DataTypes.INTEGER.toString():
                 type = GraphQLInt;

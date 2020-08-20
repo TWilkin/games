@@ -4,5 +4,6 @@ api/config/production.json
 api/data.json
 config
 **/.nyc_output
+**/dist
 **/node_modules
 **/npm-debug.log

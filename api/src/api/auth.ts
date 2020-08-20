@@ -97,7 +97,7 @@ export default class Auth {
                     token, 
                     {
                         secure: Configuration.getAuth.secureCookie,
-                        httpOnly: true,
+                        httpOnly: false,
                         sameSite: true
                     }
                 )
