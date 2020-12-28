@@ -2,6 +2,7 @@ api/config/*.txt
 api/config/development.json
 api/config/production.json
 api/data.json
+buildx.toml
 config
 **/.nyc_output
 **/dist

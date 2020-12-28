@@ -1,4 +1,4 @@
-FROM node:13.8-alpine AS build-image
+FROM node:14.15-alpine AS build-image
 
 # install the application
 WORKDIR /usr/src/app

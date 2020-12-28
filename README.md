@@ -13,7 +13,21 @@ The application consists of two services:
 * The API backend which connects to the database behind GraphQL.
 * The React UI frontend which allows easy use of the API for end-users.
 
+### With Docker
+
+To check-out and build the code on your development environment using docker and buildx (for AMD64 and ARM containers). Remember to change the `REGISTRY` variable to the IP address/hostname of your local docker repository:
+
+```bash
+git clone https://github.com/TWilkin/games.git
+cd games
+export REGISTRY=myregistry.home:5000
+./buildx.sh
+```
+
+### Without Docker
+
 To check-out and build the code on your development environment:
+
 ```bash
 git clone https://github.com/TWilkin/games.git
 cd games/api

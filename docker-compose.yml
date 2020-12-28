@@ -10,9 +10,12 @@ services:
       - POSTGRES_PASSWORD_FILE=/var/run/secrets/db_password
     secrets:
       - db_password
+    volumes:
+      - /var/lib/docker-volumes/games/postgres/data:/var/lib/postgresql/data/pgdata
   
   api:
     build: ./api
+    image: ${REGISTRY}/games/api:0.0.1
     ports:
       - "3000:3000"
     depends_on:
@@ -29,6 +32,7 @@ services:
 
   ui:
     build: ./ui
+    image: ${REGISTRY}/games/ui:0.0.1
     ports:
       - "80:80"
     depends_on:
