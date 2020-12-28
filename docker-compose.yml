@@ -1,54 +1,40 @@
 version: "3.3"
 
 services:
-  mysql:
-    image: mysql:8.0
-    expose:
-      - '3306'
+  db:
+    image: postgres:13.0-alpine
     environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=games
-      - MYSQL_USER=games
-      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-    networks:
-      network:
-        ipv4_address: 172.20.0.2
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=games
+      - POSTGRES_USER=games
+      - POSTGRES_PASSWORD_FILE=/var/run/secrets/db_password
     secrets:
       - db_password
+    volumes:
+      - /var/lib/docker-volumes/games/postgres/data:/var/lib/postgresql/data/pgdata
   
   api:
     build: ./api
-    ports:
-      - "3000:3000"
+    image: ${REGISTRY}/games/api:0.0.1
     depends_on:
-      - mysql
+      - db
     environment:
       - NODE_CONFIG_ENV=docker
-      - MYSQL_HOST=mysql
-      - MYSQL_DATABASE=games
-      - MYSQL_USER=games
-      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-    networks:
-      network:
-        ipv4_address: 172.20.0.3
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=games
+      - DB_USER=games
+      - DB_PASSWORD_FILE=/var/run/secrets/db_password
     secrets:
       - db_password
 
   ui:
     build: ./ui
+    image: ${REGISTRY}/games/ui:0.0.1
     ports:
       - "80:80"
     depends_on:
       - api
-    networks:
-      network:
-        ipv4_address: 172.20.0.4
-
-networks:
-  network:
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
 
 secrets:
   db_password:

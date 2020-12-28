@@ -1,8 +1,9 @@
 {
     "database": {
-        "host": "MYSQL_HOST",
-        "schema": "MYSQL_DATABASE",
-        "user": "MYSQL_USER",
-        "password_file": "MYSQL_PASSWORD_FILE"
+        "host": "DB_HOST",
+        "port": "DB_PORT",
+        "schema": "DB_DATABASE",
+        "user": "DB_USER",
+        "password_file": "DB_PASSWORD_FILE"
     }
 }

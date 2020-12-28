@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import './ModalDialog.css';
-
 interface ModalDialogProps {
     submit: string;
     cancel: string;
