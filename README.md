@@ -65,7 +65,7 @@ docker-compose build
 docker-compose up
 ```
 
-### Without Dokcer
+### Without Docker
 
 The application can also be deployed without using Docker. Simply copy the API `src` directory into your web host's published node hosting directory. A configuration file will be needed containing the database configuration and credentials, see [default.json](https://github.com/TWilkin/games/blob/master/api/config/default.json) as an example.
 
