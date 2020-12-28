@@ -1,7 +1,7 @@
 {
-  "name": "games",
+  "name": "games-api",
   "version": "0.0.1",
-  "description": "Video game collection browser and time logging service.",
+  "description": "Video game collection browser and time logging service (API).",
   "author": "TWilkin",
   "repository": {
     "type": "git",
