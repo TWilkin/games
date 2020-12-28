@@ -11,7 +11,7 @@ import Login from '../Login/Login';
 import { User } from '../../models';
 import GameList from '../Game/GameList';
 
-const apiUrl = 'http://localhost:3000/api';
+const apiUrl = `${window.location.origin}/api`;
 
 type AppProps = {};
 

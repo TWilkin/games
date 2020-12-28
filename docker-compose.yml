@@ -16,8 +16,6 @@ services:
   api:
     build: ./api
     image: ${REGISTRY}/games/api:0.0.1
-    ports:
-      - "3000:3000"
     depends_on:
       - db
     environment:
