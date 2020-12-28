@@ -25,6 +25,8 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/webpack": "^4.41.13",
     "css-loader": "^3.5.3",
+    "sass": "^1.30.0",
+    "sass-loader": "^10.1.0",
     "source-map-loader": "^0.2.4",
     "style-loader": "^1.2.1",
     "ts-loader": "^7.0.4",
