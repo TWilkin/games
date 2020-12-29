@@ -12,17 +12,16 @@ interface PlayTimeListProps {
 
 export default class PlayTimeList extends Component<PlayTimeListProps> {
     render() {
-        let content: JSX.Element;
+        let content = <></>;
 
         if(this.props.playTime?.length > 0) {
             content = <SortableTable<GamePlayTime>
                 title='Play Time'
                 headings={['Start', 'End', 'For', 'Demo']}
+                sortColumns={['startTime', 'endTime', null, 'demo']}
                 data={this.props.playTime}
                 row={this.renderCells}
                 />
-        } else {
-            content = <></>;
         }
 
         return <div className='playTime'>{content}</div>;
