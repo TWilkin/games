@@ -1,3 +1,5 @@
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import Moment from 'react-moment';
 import { GamePlayTime } from '../../models';
@@ -14,14 +16,20 @@ export default class PlayTimeList extends Component<PlayTimeListProps> {
             content = (
                 <table>
                     <tr>
+                        <th colSpan={3}>Play Time</th>
+                    </tr>
+
+                    <tr>
                         <th>Start</th>
                         <th>End</th>
+                        <th>Demo</th>
                     </tr>
 
                     {this.props.playTime.map(playTime => (
                         <tr>
                             <td><Moment date={playTime.startTime} format='L LT' /></td>
                             <td><Moment date={playTime.endTime} format='L LT' /></td>
+                            <td>{playTime.demo ? <FontAwesomeIcon icon={faCheckCircle} /> : null}</td>
                         </tr>
                     ))}
                 </table>
