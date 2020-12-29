@@ -26,11 +26,13 @@ export default class PlayTimeList extends Component<PlayTimeListProps> {
                     </tr>
 
                     {this.props.playTime.map(playTime => (
-                        <tr>
-                            <td><Moment date={playTime.startTime} format='L LT' /></td>
-                            <td><Moment date={playTime.endTime} format='L LT' /></td>
-                            <td>{playTime.demo ? <FontAwesomeIcon icon={faCheckCircle} /> : null}</td>
-                        </tr>
+                        playTime?.endTime ? (
+                            <tr>
+                                <td><Moment date={playTime.startTime} format='L LT' /></td>
+                                <td><Moment date={playTime.endTime} format='L LT' /></td>
+                                <td>{playTime.demo ? <FontAwesomeIcon icon={faCheckCircle} /> : null}</td>
+                            </tr>
+                        ) : null
                     ))}
                 </table>
             );
