@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { plainToClass } from 'class-transformer';
 
 import { loadData, mockSequelize } from './utility/mock';
 import User from '../src/models/user.model';
@@ -11,7 +10,14 @@ describe('User model', () => {
         users = (await loadData())
             .filter(entry => entry.model == 'User')
             .map(entry => entry.data)[0]
-            .map(data => plainToClass(User, data));
+            .map(data => {
+                let user = new User();
+                user.userId = data.userId;
+                user.userName = data.userName;
+                user.password = data.password;
+                user.role = data.role;
+                return user;
+            });
     });
 
     mockSequelize();

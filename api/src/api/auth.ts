@@ -1,4 +1,3 @@
-import { plainToClass } from 'class-transformer';
 import cookieParser from 'cookie-parser';
 import { Express, Request, RequestHandler, Response, NextFunction } from 'express';
 import jwt from 'express-jwt';
@@ -69,7 +68,10 @@ export default class Auth {
             console.log(`Authorised ${authReq.user.userName} as ${authReq.user.role}`);
 
             // ensure the user is a User type
-            authReq.user = plainToClass(User, authReq.user);
+            let user = new User();
+            user.userId = authReq.user.userId;
+            user.userName = authReq.user.userName;
+            user.role = authReq.user.role;
 
             return next();
         }
