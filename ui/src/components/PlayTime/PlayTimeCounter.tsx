@@ -12,7 +12,7 @@ interface PlayTimeCounterProps extends APIProps {
 interface PlayTimeCounterState {
     gamePlayTime?: GamePlayTime;
     gameCompilationId?: number;
-    demo?: boolean;
+    demo: boolean;
     counter?: number;
     timer?: NodeJS.Timeout;
     compilationDialogVisible?: boolean;
@@ -26,7 +26,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         this.state = {
             gamePlayTime: null,
             gameCompilationId: null,
-            demo: null,
+            demo: false,
             counter: 0,
             timer: null,
             compilationDialogVisible: false

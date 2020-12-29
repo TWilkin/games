@@ -1,5 +1,6 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
+import moment from 'moment';
 import React, { Component } from 'react';
 import Cookies from 'react-cookies';
 import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
@@ -10,6 +11,8 @@ import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
 import GameList from '../Game/GameList';
+
+moment.locale('en-GB');
 
 const apiUrl = `${window.location.origin}/api`;
 
