@@ -4,8 +4,9 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { APIProps } from '../common';
 import GameSummary from './GameSummary';
 import query, { queries, mutate, mutations } from '../../graphql';
-import { GameCollection, GameCompilation, GamePlatform } from '../../models';
+import { GameCollection, GameCompilation, GamePlatform, GamePlayTime } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
+import PlayTimeList from '../PlayTime/PlayTimeList';
 
 interface GameDetailsMatch {
     gamePlatformId: string;
@@ -16,6 +17,7 @@ interface GameDetailsProps extends APIProps, RouteComponentProps<GameDetailsMatc
 interface GameDetailsState {
     gamePlatform?: GamePlatform;
     gameCollectionId?: number;
+    gamePlayTime?: GamePlayTime[];
 }
 
 class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
@@ -76,10 +78,11 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                     <PlayTimeCounter 
                         api={this.props.api}
                         gamePlatform={this.state.gamePlatform} />
+                    <PlayTimeList playTime={this.state.gamePlayTime} />
                 </div>                
             );
         } else {
-            content = <p>Game not found)</p>;
+            content = <p>Game not found</p>;
         };
 
         return (
@@ -120,7 +123,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                 gamePlatform: game
             });
 
-            // check if this game in out collection
+            // check if this game in the user's collection
             if(game) {
                 args = {
                     gamePlatformId: gamePlatformId,
@@ -130,6 +133,22 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                 if(collection && collection.length >= 1) {
                     this.setState({
                         gameCollectionId: collection[0].gameCollectionId
+                    });
+                }
+            }
+
+            // load the playtime
+            if(game) {
+                args = {
+                    gamePlatformId: gamePlatformId,
+                    userId: this.props.api.user.userId
+                };
+
+                const playtime: GamePlayTime[] = await query(this.props.api.url, queries['GamePlayTime'], args);
+
+                if(playtime?.length >= 1) {
+                    this.setState({
+                        gamePlayTime: playtime
                     });
                 }
             }

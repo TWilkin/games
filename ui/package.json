@@ -16,9 +16,11 @@
   "dependencies": {
     "http-status-codes": "^1.4.0",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
     "react": "^16.13.1",
     "react-cookies": "^0.1.1",
     "react-dom": "^16.13.1",
+    "react-moment": "^1.1.1",
     "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
