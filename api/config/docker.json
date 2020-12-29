@@ -2,6 +2,10 @@
     "express": {
         "port": 3000
     },
+
+    "database": {
+        "dialect": "postgres"
+    },
     
     "message": "Hello Docker!"
 }

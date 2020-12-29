@@ -21,10 +21,9 @@
     color: grey;
     font-size: 1.2em;
     font-weight: bold;
-}
 
-.modal-close:hover,
-.modal-close:focus {
-    cursor: pointer;
-    color: black;
+    &:hover, &:focus {
+        cursor: pointer;
+        color: black;
+    }
 }

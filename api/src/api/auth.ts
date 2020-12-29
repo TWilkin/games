@@ -35,7 +35,8 @@ export default class Auth {
             secret: Configuration.getAuth.secret,
             credentialsRequired: true,
             requestProperty: 'user',
-            getToken: this.getToken
+            getToken: this.getToken,
+            algorithms: ['HS256']
         });
     }
 

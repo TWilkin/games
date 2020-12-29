@@ -36,7 +36,7 @@ export default class Configuration {
     private static getDatabasePassword(): string {
         // check if it's in a file (e.g. docker)
         if(config.get('database.password_file')) {
-            return fs.readFileSync(config.get('database.password_file')).toString();
+            return fs.readFileSync(config.get('database.password_file')).toString().trim();
         }
 
         // otherwise return it directly
