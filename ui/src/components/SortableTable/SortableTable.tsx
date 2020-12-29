@@ -88,10 +88,8 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
     }
 
     private sort(field1: T, field2: T) {
-        const key = this.state.sortBy as keyof T;
-
-        let str1 = field1[key]?.toString();
-        let str2 = field2[key]?.toString();
+        let str1 = field1[this.state.sortBy]?.toString();
+        let str2 = field2[this.state.sortBy]?.toString();
 
         let order = str1 == str2 ? 0 : str1 < str2 ? -1 : 1;
 
