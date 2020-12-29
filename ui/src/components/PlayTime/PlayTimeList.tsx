@@ -16,12 +16,13 @@ export default class PlayTimeList extends Component<PlayTimeListProps> {
             content = (
                 <table>
                     <tr>
-                        <th colSpan={3}>Play Time</th>
+                        <th colSpan={4}>Play Time</th>
                     </tr>
 
                     <tr>
                         <th>Start</th>
                         <th>End</th>
+                        <th>For</th>
                         <th>Demo</th>
                     </tr>
 
@@ -30,6 +31,7 @@ export default class PlayTimeList extends Component<PlayTimeListProps> {
                             <tr>
                                 <td><Moment date={playTime.startTime} format='L LT' /></td>
                                 <td><Moment date={playTime.endTime} format='L LT' /></td>
+                                <td><Moment duration={playTime.startTime} date={playTime.endTime} format='hh:mm:ss' /></td>
                                 <td>{playTime.demo ? <FontAwesomeIcon icon={faCheckCircle} /> : null}</td>
                             </tr>
                         ) : null
