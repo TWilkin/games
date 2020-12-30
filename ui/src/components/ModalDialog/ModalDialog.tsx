@@ -27,26 +27,22 @@ export default class ModalDialog extends Component<ModalDialogProps> {
     }
 
     public render() {
-        if(this.props.visible) {
-            return (
-                <div className='modal'>
-                    <div className='modal-content'>
-                        <span className='modal-close' onClick={this.onCancel}>&times;</span>
-                        {this.props.children}
-                        <div className='controls'>
-                            <button onClick={this.onSubmit}>
-                                {this.props.submit}
-                            </button>
-                            <button onClick={this.onCancel}>
-                                {this.props.cancel}
-                            </button>
-                        </div>
+        return this.props.visible && (
+            <div className='modal'>
+                <div className='modal-content'>
+                    <span className='modal-close' onClick={this.onCancel}>&times;</span>
+                    {this.props.children}
+                    <div className='controls'>
+                        <button onClick={this.onSubmit}>
+                            {this.props.submit}
+                        </button>
+                        <button onClick={this.onCancel}>
+                            {this.props.cancel}
+                        </button>
                     </div>
                 </div>
-            );
-        }
-
-        return null;
+            </div>
+        );
     }
 
 };

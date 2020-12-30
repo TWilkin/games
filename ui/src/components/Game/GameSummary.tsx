@@ -13,6 +13,7 @@ export default class GameSummary extends Component<GameSummaryProps, {}> {
 
     public render() {
         const title = this.props.gamePlatform.alias ? this.props.gamePlatform.alias : this.props.gamePlatform.game.title;
+        
         return (
             <div className='gameSummary'>
                 {title} ({this.props.gamePlatform.platform.name})

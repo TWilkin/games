@@ -51,17 +51,13 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
                         .sort(this.sort)
                         .map((data, i) => {
                             let cells = this.props.row(data);
-                            if(cells) {
-                                return (
-                                    <tr key={i}>
-                                        {cells.map((cell, j) => (
-                                            <td key={j}>{cell}</td>
-                                        ))}
-                                    </tr>
-                                )
-                            }
-
-                            return null;
+                            return cells ? (
+                                <tr key={i}>
+                                    {cells.map((cell, j) => (
+                                        <td key={j}>{cell}</td>
+                                    ))}
+                                </tr>
+                            ) : null;
                         })
                     }
                 </tbody>
@@ -77,12 +73,12 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
         return (
             <th key={heading} className='button' onClick={() => this.onSortClick(column)}>
                 {heading}
-                {sort && sortedByThis ? (
+                {sort && sortedByThis && (
                     <>
                         {' '}
                         <FontAwesomeIcon icon={directionIcon} />
                     </>
-                ) : null}
+                )}
             </th>
         );
     }

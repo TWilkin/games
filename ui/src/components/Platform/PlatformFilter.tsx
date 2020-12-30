@@ -53,22 +53,21 @@ export default class PlatformFilter extends Component<PlatformFilterProps, Platf
     }
 
     private renderPlatforms() {
-        if(this.state.platforms) {
-            return(
-                <select onChange={this.onChange} defaultValue='-1'>
-                    <option key='-1' value='-1'>-</option>
-                    {this.state.platforms.map(entry => {
-                        return(
-                            <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>
-                        );
-                    })}
-                </select>
-            );
-        }
-
         return (
-            <div>No platforms found</div>
-        )
+            <div>
+                {this.state.platforms ?
+                (
+                    <select onChange={this.onChange} defaultValue='-1'>
+                        <option key='-1' value='-1'>-</option>
+                        {this.state.platforms.map(entry => 
+                            <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>
+                        )}
+                    </select>
+                ) : (
+                    <>No platforms found</>
+                )}
+            </div>
+        );
     }
 
 };

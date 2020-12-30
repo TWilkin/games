@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
+import { withRouter, NavLink, RouteComponentProps } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
@@ -50,25 +50,23 @@ class Collection extends Component<CollectionProps, CollectionState> {
     }
 
     private renderCollection() {
-        if(this.state.collection) {
-            return(
-                <div>
-                    {this.state.collection.map(entry => {
-                        return(
-                            <div key={entry.gameCollectionId}>
-                                <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
-                                    <GameSummary gamePlatform={entry.gamePlatform} />
-                                </Link>
-                            </div>
-                        );
-                    })}
-                </div>
-            );
-        }
-
         return (
-            <div>No games found</div>
-        )
+            <div>
+                {this.state.collection ? (
+                    <>
+                        {this.state.collection.map(entry => (
+                            <div key={entry.gameCollectionId}>
+                                <NavLink to={`/game/${entry.gamePlatform.gamePlatformId}`}>
+                                    <GameSummary gamePlatform={entry.gamePlatform} />
+                                </NavLink>
+                            </div>
+                        ))}
+                    </>
+                ) : (
+                    <>No games found</>
+                )}
+            </div>
+        );
     }
 
     private async load(userId: number) {

@@ -12,29 +12,29 @@ interface PlayTimeListProps {
 
 export default class PlayTimeList extends Component<PlayTimeListProps> {
     render() {
-        let content = <></>;
-
-        if(this.props.playTime?.length > 0) {
-            content = <SortableTable<GamePlayTime>
-                title='Play Time'
-                headings={['Start', 'End', 'For', 'Demo']}
-                sortColumns={['startTime', 'endTime', null, 'demo']}
-                data={this.props.playTime}
-                row={this.renderCells}
-                />
-        }
-
-        return <div className='playTime'>{content}</div>;
+        return (
+            <div className='playTime'>
+                {this.props.playTime?.length > 0 ? (
+                    <SortableTable<GamePlayTime>
+                        title='Play Time'
+                        headings={['Start', 'End', 'For', 'Demo']}
+                        sortColumns={['startTime', 'endTime', null, 'demo']}
+                        data={this.props.playTime}
+                        row={this.renderCells}
+                    />
+                ) : null}
+            </div>
+        );
     }
 
     renderCells(playTime: GamePlayTime) {
-        return playTime?.endTime ? (
+        return playTime?.endTime && (
             [
                 <Moment date={playTime.startTime} format='L LT' />,
                 <Moment date={playTime.endTime} format='L LT' />,
                 <Moment duration={playTime.startTime} date={playTime.endTime} format='hh:mm:ss' />,
                 playTime.demo ? <FontAwesomeIcon icon={faCheckCircle} /> : null
             ]
-        ) : null;
+        );
     }
 };
