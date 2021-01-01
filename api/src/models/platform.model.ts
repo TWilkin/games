@@ -1,4 +1,4 @@
-import { AutoIncrement, Column, DataType, PrimaryKey, Table } from 'sequelize-typescript';
+import { AllowNull, AutoIncrement, Column, DataType, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable, Sortable } from '../api/decorators';
 import { AbstractRestrictedModel } from './restrictedmodel';
@@ -16,5 +16,10 @@ export default class Platform extends AbstractRestrictedModel<Platform> {
     @Sortable
     @Column(DataType.STRING)
     name!: string;
+
+    @Queryable
+    @AllowNull(true)
+    @Column(DataType.INTEGER)
+    igdbId?: number;
     
 }
