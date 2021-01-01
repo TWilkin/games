@@ -21,8 +21,10 @@ export default class IGDB {
     
     public getPlatforms = async () => await this.request('platforms');
 
+    public clearToken = () => this.token = undefined;
+
     private async request(type: QueryType) {
-        const token = await this.authenticate();
+        await this.authenticate();
 
         const response = await globalThis.fetch(
             `${IGDB.baseUrl}/${type}`,
@@ -31,7 +33,7 @@ export default class IGDB {
                 headers: {
                     'Accept': (mime.lookup('json') ?? '') as string,
                     'Client-ID': Configuration.getIGDBClientCredentials.id,
-                    'Authorization': `Bearer ${token.accessToken}`
+                    'Authorization': `Bearer ${this.token?.accessToken}`
                 }
             }
         );
@@ -41,9 +43,9 @@ export default class IGDB {
         return data;
     }
 
-    private async authenticate() {
+    public async authenticate() {
         // check if we have an in-date token
-        if(this.token?.expires && new Date() >= this.token.expires) {
+        if(this.token?.expires && new Date() < this.token.expires) {
             // token is valid
             return this.token;
         }
@@ -59,6 +61,7 @@ export default class IGDB {
 
             let data = await this.checkForErrors(response);
 
+            // calculate when the token expires, but 60s earlier to be sure
             let expires = new Date();
             expires.setSeconds(expires.getSeconds() + data.expires_in - 60);
 
@@ -66,9 +69,6 @@ export default class IGDB {
                 accessToken: data.access_token as string,
                 expires: expires
             };
-
-            return this.token;
-
         } catch(e) {
             throw new Error(`Failed to authenticate: ${e.message}`);
         }
