@@ -13,6 +13,12 @@ interface AuthConfiguration {
     secureCookie: boolean;
 }
 
+// OAuth service credentials
+interface OAuthCredentials {
+    id: string;
+    secret: string;
+}
+
 export default class Configuration {
 
     public static get getDatabaseData(): string | null {
@@ -54,6 +60,13 @@ export default class Configuration {
         return {
             secret: config.get('auth.secret'),
             secureCookie: config.get('auth.secure_cookie')
+        };
+    }
+
+    public static get getIGDBClientCredentials(): OAuthCredentials {
+        return {
+            id: config.get('igdb.id'),
+            secret: config.get('igdb.secret')
         };
     }
 
