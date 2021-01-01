@@ -12,20 +12,21 @@ class Token {
 
 type QueryType = 'games' | 'platforms';
 
-class Filter {
+class IGDBRequestFilter {
     field!: string;
     value!: string;
+    operator!: 'like' | 'equal' | 'not equal'
 };
 
-type RequestParameter = {
+type IGDBRequestParameter = {
     [key in 'limit' | 'where' | 'fields']: any;
 };
 
-class Request {
-    private query: RequestParameter;
+class IGDBRequestBuilder {
+    private query: IGDBRequestParameter;
 
     constructor(private func: (body: string) => Promise<any>) {
-        this.query = {} as RequestParameter;
+        this.query = {} as IGDBRequestParameter;
         this.limit(20).fields('*');
     }
 
@@ -39,13 +40,15 @@ class Request {
         return this;
     }
 
-    where(field: string, value: string) {
+    like = (field: string, value: string) => this.where(field, value, 'like');
+
+    where(field: string, value: string, operator: string) {
         if(!this.query['where']) {
-            this.query['where'] = new Array<Filter>();
+            this.query['where'] = new Array<IGDBRequestFilter>();
         }
         let where = this.query['where'];
 
-        where.push({ field, value });
+        where.push({ field, value, operator });
 
         return this;
     }
@@ -58,7 +61,13 @@ class Request {
 
         if(this.query['where']) {
             body += ` where ${this.query['where']
-                .map(filter => `${filter.field} ~ *"${filter.value}"*`)
+                .map((filter: IGDBRequestFilter) => {
+                    switch (filter.operator) {
+                        case 'like': return `${filter.field} ~ *"${filter.value}"*`;
+                        case 'equal': return `${filter.field} = "${filter.value}"`;
+                        case 'not equal': return `${filter.field} != "${filter.value}"`
+                    }
+                })
                 .join(' | ')
             };`
         }
@@ -84,13 +93,15 @@ export default class IGDB {
 
     private token: Token | undefined = undefined;
 
-    public getGames = (name: string) => new Request((body) => this.request('games', body))
-        .where('name', name);
+    public getGames = (name: string) => 
+        new IGDBRequestBuilder((body) => this.request('games', body))
+            .like('name', name);
     
-    public getPlatforms = (name: string) => new Request((body) => this.request('platforms', body))
-        .where('name', name)
-        .where('alternative_name', name)
-        .where('abbreviation', name);
+    public getPlatforms = (name: string) => 
+        new IGDBRequestBuilder((body) => this.request('platforms', body))
+            .like('name', name)
+            .like('alternative_name', name)
+            .like('abbreviation', name);
     
     public clearToken = () => this.token = undefined;
 
