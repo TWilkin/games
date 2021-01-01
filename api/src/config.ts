@@ -70,4 +70,8 @@ export default class Configuration {
         };
     }
 
+    public static get getUserAgent(): string {
+        return `games/${process.env.npm_package_version}`;
+    }
+
 }

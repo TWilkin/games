@@ -29,9 +29,9 @@ export default class IGDB {
 
     private token: Token | undefined = undefined;
 
-    public getGames = async () => await this.request('games');
+    public getGames = () => this.request('games');
     
-    public getPlatforms = async () => await this.request('platforms');
+    public getPlatforms = () => this.request('platforms');
 
     public clearToken = () => this.token = undefined;
 
@@ -43,16 +43,22 @@ export default class IGDB {
         await this.authenticate();
 
         if(this.isEnabled()) {
+            const url = `${IGDB.baseUrl}/${type}`;
+
             const response = await IGDB.queue.request(async () => {
+                console.info(`IGDB: Querying ${url}`);
                 return await globalThis.fetch(
-                    `${IGDB.baseUrl}/${type}`,
-                    { 
+                    url, { 
                         method: 'POST',
                         headers: {
-                            'Accept': (mime.lookup('json') ?? '') as string,
                             'Client-ID': Configuration.getIGDBClientCredentials.id,
-                            'Authorization': `Bearer ${this.token?.accessToken}`
-                        }
+                            'Authorization': `Bearer ${this.token?.accessToken}`,
+                            'User-Agent': Configuration.getUserAgent,
+                            'Content-Type': (mime.lookup('txt') ?? '') as string,
+                            'Accept': (mime.lookup('json') ?? '') as string
+                        },
+                        body: 'fields *; limit 20;',
+                        compress: true,
                     }
                 );
             }, '', 'igdb');
@@ -67,6 +73,7 @@ export default class IGDB {
         // check if we have an in-date token
         if(this.token?.expires && new Date() < this.token.expires) {
             // token is valid
+            console.info('IGDB: Re-using token');
             return this.token;
         }
 
@@ -91,6 +98,8 @@ export default class IGDB {
                     accessToken: data.access_token as string,
                     expires: expires
                 };
+
+                console.info('IGDB: Authenticated');
             } catch(e) {
                 throw new Error(`Failed to authenticate: ${e.message}`);
             }

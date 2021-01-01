@@ -7,6 +7,7 @@ import fetch from 'node-fetch';
 import Auth from './api/auth';
 import Configuration from './config';
 import GraphQLAPI from './api/graphql';
+import IGDB from './services/igdb/igdb';
 
 // add fetch to global
 if(!globalThis.fetch) {
@@ -28,6 +29,17 @@ const auth = Auth.init(app);
 
 // add the API routes
 GraphQLAPI.init(app, auth);
+
+// TEMP for testing IGDB
+const service = new IGDB();
+app.use(`${Configuration.getExpress.root}/igdb/games`.replace('//', '/'), async (_, res) => {
+    let result = await service.getGames();
+    res.json(result);
+});
+app.use(`${Configuration.getExpress.root}/igdb/platforms`.replace('//', '/'), async (_, res) => {
+    let result = await service.getPlatforms();
+    res.json(result);
+});
 
 // start listening
 let server = app.listen(Configuration.getExpress.port, () => {
