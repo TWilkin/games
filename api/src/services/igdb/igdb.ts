@@ -12,6 +12,11 @@ class Token {
 
 type QueryType = 'games' | 'platforms';
 
+export class Filter {
+    field!: string;
+    value!: string;
+};
+
 export default class IGDB {
     private static readonly authUrl = "https://id.twitch.tv/oauth2/token";
     private static readonly baseUrl = "https://api.igdb.com/v4";
@@ -29,9 +34,15 @@ export default class IGDB {
 
     private token: Token | undefined = undefined;
 
-    public getGames = () => this.request('games');
+    public getGames = (name: string) => this.request('games', [
+        { field: 'name', value: name }
+    ]);
     
-    public getPlatforms = () => this.request('platforms');
+    public getPlatforms = (name: string) => this.request('platforms', [
+        { field: 'name', value: name },
+        { field: 'alternative_name', value: name },
+        { field: 'abbreviation', value: name }
+    ]);
 
     public clearToken = () => this.token = undefined;
 
@@ -39,11 +50,20 @@ export default class IGDB {
         Configuration.getIGDBClientCredentials?.id 
         && Configuration.getIGDBClientCredentials.secret;
 
-    private async request(type: QueryType) {
+    private async request(type: QueryType, where?: Filter[]) {
         await this.authenticate();
 
         if(this.isEnabled()) {
             const url = `${IGDB.baseUrl}/${type}`;
+
+            let query = 'fields *; limit 20;';
+            if(where) {
+                query += ` where ${where
+                    .map(filter => `${filter.field} ~ *"${filter.value}"*`)
+                    .join(' | ')
+                };`
+            }
+            console.log(query);
 
             const response = await IGDB.queue.request(async () => {
                 console.info(`IGDB: Querying ${url}`);
@@ -57,7 +77,7 @@ export default class IGDB {
                             'Content-Type': (mime.lookup('txt') ?? '') as string,
                             'Accept': (mime.lookup('json') ?? '') as string
                         },
-                        body: 'fields *; limit 20;',
+                        body: query,
                         compress: true,
                     }
                 );
