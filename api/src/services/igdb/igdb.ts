@@ -10,11 +10,11 @@ class Token {
     expires: Date | undefined = undefined;
 }
 
-type QueryType = 'games' | 'platforms';
+type QueryType = 'covers' | 'games' | 'platforms';
 
 class IGDBRequestFilter {
     field!: string;
-    value!: string;
+    value!: string | number;
     operator!: 'like' | 'equal' | 'not equal'
 };
 
@@ -40,9 +40,11 @@ class IGDBRequestBuilder {
         return this;
     }
 
+    equal = (field: string, value: string | number) => this.where(field, value, 'equal');
+
     like = (field: string, value: string) => this.where(field, value, 'like');
 
-    where(field: string, value: string, operator: string) {
+    where(field: string, value: string | number, operator: string) {
         if(!this.query['where']) {
             this.query['where'] = new Array<IGDBRequestFilter>();
         }
@@ -62,10 +64,12 @@ class IGDBRequestBuilder {
         if(this.query['where']) {
             body += ` where ${this.query['where']
                 .map((filter: IGDBRequestFilter) => {
+                    let value = typeof filter.value === 'number' ? `${filter.value}` : `"${filter.value}"`;
+
                     switch (filter.operator) {
                         case 'like': return `${filter.field} ~ *"${filter.value}"*`;
-                        case 'equal': return `${filter.field} = "${filter.value}"`;
-                        case 'not equal': return `${filter.field} != "${filter.value}"`
+                        case 'equal': return `${filter.field} = ${value}`;
+                        case 'not equal': return `${filter.field} != ${value}`
                     }
                 })
                 .join(' | ')
@@ -92,6 +96,10 @@ export default class IGDB {
     });
 
     private token: Token | undefined = undefined;
+
+    public getCover = (id: number) =>
+        new IGDBRequestBuilder((body) => this.request('covers', body))
+            .equal('id', id)
 
     public getGames = (name: string) => 
         new IGDBRequestBuilder((body) => this.request('games', body))

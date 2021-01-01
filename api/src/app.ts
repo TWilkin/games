@@ -32,6 +32,10 @@ GraphQLAPI.init(app, auth);
 
 // TEMP for testing IGDB
 const service = new IGDB();
+app.use(`${Configuration.getExpress.root}/igdb/covers/:id`.replace('//', '/'), async (req, res) => {
+    let result = await service.getCover(parseInt(req.params.id)).fetch();
+    res.json(result);
+});
 app.use(`${Configuration.getExpress.root}/igdb/games/:name`.replace('//', '/'), async (req, res) => {
     let result = await service.getGames(req.params.name).fetch();
     res.json(result);
