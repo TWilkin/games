@@ -21,7 +21,6 @@ export default class ImageAPI {
     public async get(id: number) {
         // check if the file exists
         const image = path.join(ImageAPI.imageDir, `${id}.jpg`);
-        console.log(image);
         if(fs.existsSync(image)) {
             return image;
         }
@@ -35,15 +34,12 @@ export default class ImageAPI {
         });
 
         // find if the game has cover art
-        console.log(`game id ${game?.igdbId}`);
         if(game?.igdbId) {
             const covers = await this.igdbService.getCover(game.igdbId)
                 .fetch();
             const cover = covers?.length > 0 ? covers[0] : null;
-            console.log(JSON.stringify(cover));
 
             // if there is an image id, download the image
-            console.log(`image id ${cover?.image_id}`);
             if(cover?.image_id) {
                 if(await this.downloadImage(
                     image, 
@@ -59,9 +55,7 @@ export default class ImageAPI {
 
     private async downloadImage(path: string, url: string) {
         try {
-            console.log(url);
             let response = await globalThis.fetch(url);
-            console.log(JSON.stringify(response));
 
             if(response?.status !== HttpStatus.OK) {
                 throw new Error(getStatusText(response.status));
@@ -78,7 +72,7 @@ export default class ImageAPI {
     public static init(app: Express | null, igdbService: IGDB) {
         // ensure the image directories exist
         if(!fs.existsSync(ImageAPI.imageDir)) {
-            fs.mkdirSync(ImageAPI.imageDir);
+            fs.mkdirSync(ImageAPI.imageDir, { recursive: true });
         }
 
         const imageApi = new ImageAPI(igdbService);
@@ -88,7 +82,6 @@ export default class ImageAPI {
                 `${Configuration.getExpress.root}/images/:id`.replace('//', '/'),
                 async (request, response) => {
                     const image = await imageApi.get(parseInt(request.params.id));
-                    console.log(image);
 
                     if(image) {
                         response.setHeader('Content-Type', (mime.lookup('jpg') ?? '') as string);

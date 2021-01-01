@@ -4,3 +4,4 @@ config/production.json
 Dockerfile
 node_modules
 npm-debug.log
+src/cache
