@@ -15,7 +15,7 @@ services:
   
   api:
     build: ./api
-    image: ${REGISTRY}/games/api:0.0.1
+    image: ${REGISTRY}/games/api:0.0.2
     depends_on:
       - db
     environment:
