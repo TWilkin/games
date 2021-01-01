@@ -1,6 +1,7 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 import mime from 'mime-types';
 import { Response } from 'node-fetch';
+import Queue from 'smart-request-balancer';
 
 import Configuration from '../../config';
 
@@ -14,6 +15,17 @@ type QueryType = 'games' | 'platforms';
 export default class IGDB {
     private static readonly authUrl = "https://id.twitch.tv/oauth2/token";
     private static readonly baseUrl = "https://api.igdb.com/v4";
+
+    // rate limit to 4 requests per second
+    private static queue = new Queue({
+        rules: {
+            igdb: {
+                rate: 4,
+                limit: 1,
+                priority: 1
+            }
+        }
+    });
 
     private token: Token | undefined = undefined;
 
@@ -31,21 +43,21 @@ export default class IGDB {
         await this.authenticate();
 
         if(this.isEnabled()) {
-            const response = await globalThis.fetch(
-                `${IGDB.baseUrl}/${type}`,
-                { 
-                    method: 'POST',
-                    headers: {
-                        'Accept': (mime.lookup('json') ?? '') as string,
-                        'Client-ID': Configuration.getIGDBClientCredentials.id,
-                        'Authorization': `Bearer ${this.token?.accessToken}`
+            const response = await IGDB.queue.request(async () => {
+                return await globalThis.fetch(
+                    `${IGDB.baseUrl}/${type}`,
+                    { 
+                        method: 'POST',
+                        headers: {
+                            'Accept': (mime.lookup('json') ?? '') as string,
+                            'Client-ID': Configuration.getIGDBClientCredentials.id,
+                            'Authorization': `Bearer ${this.token?.accessToken}`
+                        }
                     }
-                }
-            );
-            
-            let data = await this.checkForErrors(response);
+                );
+            }, '', 'igdb');
 
-            return data;
+            return await this.checkForErrors(response);
         }
 
         return [];
