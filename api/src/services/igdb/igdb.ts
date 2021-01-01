@@ -23,24 +23,32 @@ export default class IGDB {
 
     public clearToken = () => this.token = undefined;
 
+    public isEnabled = () => 
+        Configuration.getIGDBClientCredentials?.id 
+        && Configuration.getIGDBClientCredentials.secret;
+
     private async request(type: QueryType) {
         await this.authenticate();
 
-        const response = await globalThis.fetch(
-            `${IGDB.baseUrl}/${type}`,
-            { 
-                method: 'POST',
-                headers: {
-                    'Accept': (mime.lookup('json') ?? '') as string,
-                    'Client-ID': Configuration.getIGDBClientCredentials.id,
-                    'Authorization': `Bearer ${this.token?.accessToken}`
+        if(this.isEnabled()) {
+            const response = await globalThis.fetch(
+                `${IGDB.baseUrl}/${type}`,
+                { 
+                    method: 'POST',
+                    headers: {
+                        'Accept': (mime.lookup('json') ?? '') as string,
+                        'Client-ID': Configuration.getIGDBClientCredentials.id,
+                        'Authorization': `Bearer ${this.token?.accessToken}`
+                    }
                 }
-            }
-        );
-        
-        let data = await this.checkForErrors(response);
+            );
+            
+            let data = await this.checkForErrors(response);
 
-        return data;
+            return data;
+        }
+
+        return [];
     }
 
     public async authenticate() {
@@ -50,27 +58,30 @@ export default class IGDB {
             return this.token;
         }
 
-        // request a new token
-        try {
-            const clientCreds = Configuration.getIGDBClientCredentials;
+        // only request a token if the service is enabled
+        if(this.isEnabled()) {
+            // request a new token
+            try {
+                const clientCreds = Configuration.getIGDBClientCredentials;
 
-            const response = await globalThis.fetch(
-                `${IGDB.authUrl}?client_id=${clientCreds.id}&client_secret=${clientCreds.secret}&grant_type=client_credentials`,
-                { method: 'POST' }
-            );
+                const response = await globalThis.fetch(
+                    `${IGDB.authUrl}?client_id=${clientCreds.id}&client_secret=${clientCreds.secret}&grant_type=client_credentials`,
+                    { method: 'POST' }
+                );
 
-            let data = await this.checkForErrors(response);
+                let data = await this.checkForErrors(response);
 
-            // calculate when the token expires, but 60s earlier to be sure
-            let expires = new Date();
-            expires.setSeconds(expires.getSeconds() + data.expires_in - 60);
+                // calculate when the token expires, but 60s earlier to be sure
+                let expires = new Date();
+                expires.setSeconds(expires.getSeconds() + data.expires_in - 60);
 
-            this.token = {
-                accessToken: data.access_token as string,
-                expires: expires
-            };
-        } catch(e) {
-            throw new Error(`Failed to authenticate: ${e.message}`);
+                this.token = {
+                    accessToken: data.access_token as string,
+                    expires: expires
+                };
+            } catch(e) {
+                throw new Error(`Failed to authenticate: ${e.message}`);
+            }
         }
     }
 
