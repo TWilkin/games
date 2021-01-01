@@ -8,6 +8,7 @@ import Auth from './api/auth';
 import Configuration from './config';
 import GraphQLAPI from './api/graphql';
 import IGDB from './services/igdb/igdb';
+import ImageAPI from './api/image';
 
 // add fetch to global
 if(!globalThis.fetch) {
@@ -27,21 +28,24 @@ app.use(bodyParser.json());
 // add authentication middleware
 const auth = Auth.init(app);
 
+// initialise IGDB
+const igdbService = new IGDB();
+
 // add the API routes
 GraphQLAPI.init(app, auth);
+ImageAPI.init(app, igdbService);
 
 // TEMP for testing IGDB
-const service = new IGDB();
 app.use(`${Configuration.getExpress.root}/igdb/covers/:id`.replace('//', '/'), async (req, res) => {
-    let result = await service.getCover(parseInt(req.params.id)).fetch();
+    let result = await igdbService.getCover(parseInt(req.params.id)).fetch();
     res.json(result);
 });
 app.use(`${Configuration.getExpress.root}/igdb/games/:name`.replace('//', '/'), async (req, res) => {
-    let result = await service.getGames(req.params.name).fetch();
+    let result = await igdbService.getGames(req.params.name).fetch();
     res.json(result);
 });
 app.use(`${Configuration.getExpress.root}/igdb/platforms/:name`.replace('//', '/'), async (req, res) => {
-    let result = await service.getPlatforms(req.params.name).fetch();
+    let result = await igdbService.getPlatforms(req.params.name).fetch();
     res.json(result);
 });
 

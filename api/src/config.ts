@@ -1,5 +1,6 @@
 import config from 'config';
 import fs from 'fs';
+import path from 'path';
 
 // the interface for the Express configuration
 interface ExpressConfiguration {
@@ -20,6 +21,10 @@ interface OAuthCredentials {
 }
 
 export default class Configuration {
+
+    public static get getCacheDirectory(): string {
+        return path.join(__dirname, 'cache');
+    }
 
     public static get getDatabaseData(): string | null {
         return config.get('database.data');

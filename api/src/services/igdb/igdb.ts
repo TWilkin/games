@@ -81,8 +81,9 @@ class IGDBRequestBuilder {
 }
 
 export default class IGDB {
-    private static readonly authUrl = "https://id.twitch.tv/oauth2/token";
-    private static readonly baseUrl = "https://api.igdb.com/v4";
+    private static readonly authUrl = 'https://id.twitch.tv/oauth2/token';
+    private static readonly apiBaseUrl = 'https://api.igdb.com/v4';
+    private static readonly imageBaseUrl = 'https://images.igdb.com/igdb/image/upload';
 
     // rate limit to 4 requests per second
     private static queue = new Queue({
@@ -97,9 +98,9 @@ export default class IGDB {
 
     private token: Token | undefined = undefined;
 
-    public getCover = (id: number) =>
+    public getCover = (gameId: number) =>
         new IGDBRequestBuilder((body) => this.request('covers', body))
-            .equal('id', id)
+            .equal('game', gameId)
 
     public getGames = (name: string) => 
         new IGDBRequestBuilder((body) => this.request('games', body))
@@ -117,11 +118,17 @@ export default class IGDB {
         Configuration.getIGDBClientCredentials?.id 
         && Configuration.getIGDBClientCredentials.secret;
 
+    public getImageUrl(size: 'thumb' | 'cover', id: string) {
+        const sizeStr = 't_' + size === 'thumb' ? size : `${size}_big`;
+
+        return `${IGDB.imageBaseUrl}/t_${sizeStr}/${id}.jpg`;
+    }
+
     private async request(type: QueryType, body?: string) {
         await this.authenticate();
 
         if(this.isEnabled()) {
-            const url = `${IGDB.baseUrl}/${type}`;
+            const url = `${IGDB.apiBaseUrl}/${type}`;
 
             console.log(body);
 
