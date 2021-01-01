@@ -2,10 +2,16 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import { AddressInfo } from 'net';
+import fetch from 'node-fetch';
 
 import Auth from './api/auth';
 import Configuration from './config';
 import GraphQLAPI from './api/graphql';
+
+// add fetch to global
+if(!globalThis.fetch) {
+    globalThis.fetch = fetch;
+}
 
 // initialise express
 const app = express();

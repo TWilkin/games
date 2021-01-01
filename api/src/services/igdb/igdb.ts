@@ -1,6 +1,6 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 import mime from 'mime-types';
-import fetch, { Headers, Response } from 'node-fetch';
+import { Response } from 'node-fetch';
 
 import Configuration from '../../config';
 
@@ -24,15 +24,15 @@ export default class IGDB {
     private async request(type: QueryType) {
         const token = await this.authenticate();
 
-        const response = await fetch(
+        const response = await globalThis.fetch(
             `${IGDB.baseUrl}/${type}`,
             { 
                 method: 'POST',
-                headers: new Headers({
+                headers: {
                     'Accept': (mime.lookup('json') ?? '') as string,
                     'Client-ID': Configuration.getIGDBClientCredentials.id,
                     'Authorization': `Bearer ${token.accessToken}`
-                })
+                }
             }
         );
         
@@ -52,7 +52,7 @@ export default class IGDB {
         try {
             const clientCreds = Configuration.getIGDBClientCredentials;
 
-            const response = await fetch(
+            const response = await globalThis.fetch(
                 `${IGDB.authUrl}?client_id=${clientCreds.id}&client_secret=${clientCreds.secret}&grant_type=client_credentials`,
                 { method: 'POST' }
             );
