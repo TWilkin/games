@@ -79,9 +79,7 @@ export default class Login extends Component<LoginProps, LoginState> {
                         onChange={this.handleChange} />
                     <br />
 
-                    <input 
-                        type='submit'
-                        value='Login' />
+                    <input type='submit'value='Login' />
                     
                     {this.state.success == true && (
                         <div>Login successful!</div>
@@ -93,5 +91,4 @@ export default class Login extends Component<LoginProps, LoginState> {
             </div>
         );
     }
-
-}
+};

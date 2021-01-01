@@ -41,25 +41,25 @@ export default class GameList extends Component<APIProps, GameListState> {
     }
 
     private renderGames() {
-        if(this.state.games) {
-            return(
-                <div>
-                    {this.state.games.map(entry => {
-                        return(
-                            <div key={entry.gamePlatformId}>
-                                <Link to={`/game/${entry.gamePlatformId}`}>
-                                    <GameSummary gamePlatform={entry} />
-                                </Link>
-                            </div>
-                        );
-                    })}
-                </div>
-            );
-        }
-
-        return (
-            <div>No games found</div>
-        )
+        return(
+            <div>
+                {this.state.games ? (
+                    <>
+                        {this.state.games.map(entry => {
+                            return(
+                                <div key={entry.gamePlatformId}>
+                                    <Link to={`/game/${entry.gamePlatformId}`}>
+                                        <GameSummary gamePlatform={entry} />
+                                    </Link>
+                                </div>
+                            );
+                        })}
+                    </>
+                ) : (
+                    <>No games found</>
+                )}
+            </div>
+        );
     }
 
     private async load(platformId: number) {

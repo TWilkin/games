@@ -68,39 +68,35 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     }
 
     public render() {
-        let content: JSX.Element;
-
-        if(this.state.gamePlatform) {
-            content = (
-                <div>
-                    <GameSummary gamePlatform={this.state.gamePlatform} />
-                    {this.renderInCollection()}
-                    <PlayTimeCounter 
-                        api={this.props.api}
-                        gamePlatform={this.state.gamePlatform} />
-                    <PlayTimeList playTime={this.state.gamePlayTime} />
-                </div>                
-            );
-        } else {
-            content = <p>Game not found</p>;
-        };
-
         return (
-            <div className='game'>{content}</div>
+            <div className='game'>
+                {this.state.gamePlatform ? (
+                    <div>
+                        <GameSummary gamePlatform={this.state.gamePlatform} />
+                        {this.renderInCollection()}
+                        <PlayTimeCounter 
+                            api={this.props.api}
+                            gamePlatform={this.state.gamePlatform} />
+                        <PlayTimeList playTime={this.state.gamePlayTime} />
+                    </div>
+                ) : (
+                    <>Game not found</>
+                )}
+            </div>
         );
     }
 
     private renderInCollection() {
-        if(this.state.gameCollectionId) {
-            return (
-                <p>In Collection</p>
-            )
-        }
-
         return (
-            <button onClick={this.onAddToCollectionClick}>
-                Add to Collection
-            </button>
+            <div>
+                {this.state.gameCollectionId ? (
+                    <>In collection</>
+                ) : (
+                    <button onClick={this.onAddToCollectionClick}>
+                        Add to Collection
+                    </button>
+                )}
+            </div>
         );
     }
 

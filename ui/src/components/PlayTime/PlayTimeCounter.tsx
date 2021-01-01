@@ -155,13 +155,11 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
 
     private renderStart() {
         // show the start button when we are not counting
-        if(!this.state.gamePlayTime) {
-            return (
-                <button type='button' onClick={this.onStart}>
-                    Start Play Counter
-                </button>
-            );
-        }
+        return !this.state.gamePlayTime && (
+            <button type='button' onClick={this.onStart}>
+                Start Play Counter
+            </button>
+        );
     }
 
     private renderStartDialog() {
@@ -181,44 +179,38 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
     }
 
     private renderCompilationSelect() {
-        if(this.props.gamePlatform.game.includes 
-                && this.props.gamePlatform.game.includes.length > 0)
-        {
-            return (
-                <select onChange={this.onCompilationSelect} defaultValue='-1'>
-                    <option key='-1' value='-1'>-</option>
-                    {this.props.gamePlatform.game.includes.map(compilation => {
-                        return (
-                            <option 
-                                    key={compilation.gameCompilationId} 
-                                    value={compilation.gameCompilationId}>
-                                {compilation.included.title}
-                            </option>
-                        );
-                    })}
-                </select>
-            );
-        }
+        return this.props.gamePlatform.game.includes 
+                && this.props.gamePlatform.game.includes.length > 0
+                && (
+            <select onChange={this.onCompilationSelect} defaultValue='-1'>
+                <option key='-1' value='-1'>-</option>
+                {this.props.gamePlatform.game.includes.map(compilation => {
+                    return (
+                        <option 
+                                key={compilation.gameCompilationId} 
+                                value={compilation.gameCompilationId}>
+                            {compilation.included.title}
+                        </option>
+                    );
+                })}
+            </select>
+        );
     }
 
     private renderStop() {
         // show the stop button while we are counting
-        if(this.state.gamePlayTime) {
-            return (
-                <button type='button' onClick={this.onStop}>
-                    Stop Play Counter
-                </button>
-            );
-        }
+        return this.state.gamePlayTime && (
+            <button type='button' onClick={this.onStop}>
+                Stop Play Counter
+            </button>
+        );
     }
 
     private renderTimer() {
         // show time timer if we have a start time
-        if(this.state.gamePlayTime) {
-            return (
-                <span>{this.timeSince()}</span>
-            );
-        }
+        return this.state.gamePlayTime && (
+            <span>{this.timeSince()}</span>
+        );
     }
 
     private async startCounter() {

@@ -18,6 +18,7 @@ module.exports = merge(common, {
                 target: 'http://localhost:3000'
             }
         },
+        publicPath: '/',
         historyApiFallback: true
     }
 });

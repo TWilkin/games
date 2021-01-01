@@ -1,9 +1,8 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
-import moment from 'moment';
 import React, { Component } from 'react';
 import Cookies from 'react-cookies';
-import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, NavLink, Redirect, Route, Switch } from 'react-router-dom';
 
 import Collection from '../Collection/Collection';
 import { APISettings } from '../common';
@@ -11,8 +10,6 @@ import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
 import GameList from '../Game/GameList';
-
-moment.locale('en-GB');
 
 const apiUrl = `${window.location.origin}/api`;
 
@@ -88,24 +85,15 @@ export default class App extends Component<AppProps, AppState> {
     }
 
     private renderNavigation() {
-        let elements: JSX.Element;
-        if(this.state.unauthorised) {
-            elements = (
-                <li><Link to='/login'>Login</Link></li>
-            );
-        } else {
-            elements = (
-                <li><Link to={`/user/${this.state.user.userId}/collection`}>My Collection</Link></li>
-            );
-        }
-
         return (
             <div className='menu'>
                 <nav>
-                    <ul>
-                    <li><Link to='/games'>Games</Link></li>
-                        {elements}
-                    </ul>
+                    <NavLink to='/games'>Games</NavLink>
+                    {this.state.unauthorised ? (
+                        <NavLink to='/login'>Login</NavLink>
+                    ) : (
+                        <NavLink to={`/user/${this.state.user.userId}/collection`}>My Collection</NavLink>
+                    )}
                 </nav>
             </div>
         )
