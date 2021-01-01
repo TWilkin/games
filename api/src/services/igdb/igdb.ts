@@ -12,10 +12,60 @@ class Token {
 
 type QueryType = 'games' | 'platforms';
 
-export class Filter {
+class Filter {
     field!: string;
     value!: string;
 };
+
+type RequestParameter = {
+    [key in 'limit' | 'where' | 'fields']: any;
+};
+
+class Request {
+    private query: RequestParameter;
+
+    constructor(private func: (body: string) => Promise<any>) {
+        this.query = {} as RequestParameter;
+        this.limit(20).fields('*');
+    }
+
+    limit(n: number) {
+        this.query['limit'] = n;
+        return this;
+    }
+
+    fields(...fields: string[]) {
+        this.query['fields'] = fields.join(',');
+        return this;
+    }
+
+    where(field: string, value: string) {
+        if(!this.query['where']) {
+            this.query['where'] = new Array<Filter>();
+        }
+        let where = this.query['where'];
+
+        where.push({ field, value });
+
+        return this;
+    }
+
+    fetch() {
+        let body = Object.keys(this.query)
+            .filter(key => key != 'where')
+            .map(key => `${key} ${this.query[key]};`)
+            .join(' ');
+
+        if(this.query['where']) {
+            body += ` where ${this.query['where']
+                .map(filter => `${filter.field} ~ *"${filter.value}"*`)
+                .join(' | ')
+            };`
+        }
+
+        return this.func(body);
+    }
+}
 
 export default class IGDB {
     private static readonly authUrl = "https://id.twitch.tv/oauth2/token";
@@ -34,36 +84,27 @@ export default class IGDB {
 
     private token: Token | undefined = undefined;
 
-    public getGames = (name: string) => this.request('games', [
-        { field: 'name', value: name }
-    ]);
+    public getGames = (name: string) => new Request((body) => this.request('games', body))
+        .where('name', name);
     
-    public getPlatforms = (name: string) => this.request('platforms', [
-        { field: 'name', value: name },
-        { field: 'alternative_name', value: name },
-        { field: 'abbreviation', value: name }
-    ]);
-
+    public getPlatforms = (name: string) => new Request((body) => this.request('platforms', body))
+        .where('name', name)
+        .where('alternative_name', name)
+        .where('abbreviation', name);
+    
     public clearToken = () => this.token = undefined;
 
     public isEnabled = () => 
         Configuration.getIGDBClientCredentials?.id 
         && Configuration.getIGDBClientCredentials.secret;
 
-    private async request(type: QueryType, where?: Filter[]) {
+    private async request(type: QueryType, body?: string) {
         await this.authenticate();
 
         if(this.isEnabled()) {
             const url = `${IGDB.baseUrl}/${type}`;
 
-            let query = 'fields *; limit 20;';
-            if(where) {
-                query += ` where ${where
-                    .map(filter => `${filter.field} ~ *"${filter.value}"*`)
-                    .join(' | ')
-                };`
-            }
-            console.log(query);
+            console.log(body);
 
             const response = await IGDB.queue.request(async () => {
                 console.info(`IGDB: Querying ${url}`);
@@ -77,7 +118,7 @@ export default class IGDB {
                             'Content-Type': (mime.lookup('txt') ?? '') as string,
                             'Accept': (mime.lookup('json') ?? '') as string
                         },
-                        body: query,
+                        body,
                         compress: true,
                     }
                 );

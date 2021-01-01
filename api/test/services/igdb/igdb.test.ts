@@ -72,7 +72,7 @@ describe('IGDB', () => {
                 const params = getTests[key];
                 fetchMock.mock(params.matcher, [{ id: 1 }, { id: 2 }]);
 
-                let response = await params.func();
+                let response = await params.func().fetch();
 
                 expect(fetchMock.called(params.matcher)).to.be.true;
             });
