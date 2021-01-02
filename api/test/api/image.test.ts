@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import devnull from 'dev-null';
 import fetchMock from 'fetch-mock';
 import fs from 'fs';
+import HttpStatus from 'http-status-codes';
 import sinon from 'sinon';
 
 import ImageController from '../../src/api/image';
@@ -64,12 +65,20 @@ describe('ImageController', () => {
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
+
+        it('cover art not found', async () => {
+            let subject = createSubject([{ image_id: 10 }], HttpStatus.NOT_FOUND);
+
+            let response = await subject.getGame(1);
+            expect(response).to.be.null;
+            expect(fetchMock.called(igdbImageUrlMatcher)).to.be.true;
+        });
     });
 });
 
-function createSubject(result: object[]) {
+function createSubject(result: object[], image: Buffer | number=Buffer.from([])) {
     // return an empty binary buffer when it tries to return the image
-    fetchMock.mock(igdbImageUrlMatcher, Buffer.from([]));
+    fetchMock.mock(igdbImageUrlMatcher, image);
 
     // write any files to /dev/null
     sinon.stub(fs, 'createWriteStream')
