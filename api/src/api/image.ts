@@ -3,7 +3,7 @@ import fs from 'fs';
 import HttpStatus, { getStatusText } from 'http-status-codes';
 import mime from 'mime-types';
 import path from 'path';
-import { pipeline } from 'stream';
+import { pipeline, Readable } from 'stream';
 import util from 'util';
 
 import Configuration from '../config';
@@ -61,8 +61,14 @@ export default class ImageController {
                 throw new Error(getStatusText(response.status));
             }
             
-            await streamPipeline(response.body, fs.createWriteStream(path));
+            // check if we have a stream
+            const stream = typeof response.body.on === 'function' 
+                ? response.body
+                : Readable.from(response.body);
+            
+            await streamPipeline(stream, fs.createWriteStream(path));
         } catch(e) {
+            console.error(e);
             return false;
         }
 
