@@ -4,7 +4,7 @@ import { Response } from 'node-fetch';
 import Queue from 'smart-request-balancer';
 
 import Configuration from '../../config';
-import IGDBRequestBuilder from '../builder';
+import IGDBRequestBuilder from './builder';
 
 class Token {
     accessToken: string | undefined = undefined;
