@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 
-import { mockContext, mockSequelize } from './utility/mock';
+import { mockContext, mockSequelize } from '../utility/mock';
 
-import { GraphQLUpdateOptions } from '../src/api/graphql';
-import { AbstractOwnableModel } from '../src/models/ownablemodel';
-import GameCollection from '../src/models/game_collection.model';
+import { GraphQLUpdateOptions } from '../../src/api/graphql';
+import { AbstractOwnableModel } from '../../src/models/ownablemodel';
+import GameCollection from '../../src/models/game_collection.model';
 
 describe('Ownable Model', () => {
 

@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 
-import { AbstractRestrictedModel } from '../src/models/restrictedmodel';
-import { mockContext } from './utility/mock';
-import { GraphQLUpdateOptions } from '../src/api/graphql';
+import { AbstractRestrictedModel } from '../../src/models/restrictedmodel';
+import { mockContext } from '../utility/mock';
+import { GraphQLUpdateOptions } from '../../src/api/graphql';
 
 describe('Restricted Model', () => {
 

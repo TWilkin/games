@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { graphql, GraphQLInt } from 'graphql';
 
-import GraphQLAPI from '../src/api/graphql';
-import { sequelize } from '../src/db';
-import { generateQuery, generateMutation } from './utility/util';
-import { generateData, mockContext, mockSequelize } from './utility/mock';
+import GraphQLAPI from '../../src/api/graphql';
+import { sequelize } from '../../src/db';
+import { generateQuery, generateMutation } from '../utility/util';
+import { generateData, mockContext, mockSequelize } from '../utility/mock';
 
 // initialise GraphQL
 const schema = GraphQLAPI.init(null, null);
