@@ -91,7 +91,10 @@ export default class ImageController {
                     const image = await controller.getGame(parseInt(request.params.id));
 
                     if(image) {
+                        const cacheAge = 30 * 24 * 60 * 60;
                         response.setHeader('Content-Type', (mime.lookup('jpg') ?? '') as string);
+                        response.setHeader('Cache-Control', `public, max-age=${cacheAge}`);
+                        response.setHeader('Expires', new Date(Date.now() + cacheAge * 1000).toUTCString());
                         response.sendFile(image);
                     } else {
                         response.status(HttpStatus.NOT_FOUND).send();
