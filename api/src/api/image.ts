@@ -12,7 +12,7 @@ import IGDB from '../services/igdb/igdb';
 
 const streamPipeline = util.promisify(pipeline);
 
-export default class ImageAPI {
+export default class ImageController {
 
     private static readonly imageDir = path.join(Configuration.getCacheDirectory, 'images');
 
@@ -20,7 +20,7 @@ export default class ImageAPI {
 
     public async get(id: number) {
         // check if the file exists
-        const image = path.join(ImageAPI.imageDir, `${id}.jpg`);
+        const image = path.join(ImageController.imageDir, `${id}.jpg`);
         if(fs.existsSync(image)) {
             return image;
         }
@@ -71,11 +71,11 @@ export default class ImageAPI {
 
     public static init(app: Express | null, igdbService: IGDB) {
         // ensure the image directories exist
-        if(!fs.existsSync(ImageAPI.imageDir)) {
-            fs.mkdirSync(ImageAPI.imageDir, { recursive: true });
+        if(!fs.existsSync(ImageController.imageDir)) {
+            fs.mkdirSync(ImageController.imageDir, { recursive: true });
         }
 
-        const imageApi = new ImageAPI(igdbService);
+        const imageApi = new ImageController(igdbService);
 
         if(app) {
             app.use(

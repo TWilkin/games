@@ -8,7 +8,7 @@ import Auth from './api/auth';
 import Configuration from './config';
 import GraphQLAPI from './api/graphql';
 import IGDB from './services/igdb/igdb';
-import ImageAPI from './api/image';
+import ImageController from './api/image';
 
 // add fetch to global
 if(!globalThis.fetch) {
@@ -33,7 +33,7 @@ const igdbService = new IGDB();
 
 // add the API routes
 GraphQLAPI.init(app, auth);
-ImageAPI.init(app, igdbService);
+ImageController.init(app, igdbService);
 
 // TEMP for testing IGDB
 app.use(`${Configuration.getExpress.root}/igdb/covers/:id`.replace('//', '/'), async (req, res) => {

@@ -4,6 +4,7 @@ import { Response } from 'node-fetch';
 import Queue from 'smart-request-balancer';
 
 import Configuration from '../../config';
+import IGDBRequestBuilder from '../builder';
 
 class Token {
     accessToken: string | undefined = undefined;
@@ -12,75 +13,7 @@ class Token {
 
 type QueryType = 'covers' | 'games' | 'platforms';
 
-class IGDBRequestFilter {
-    field!: string;
-    value!: string | number;
-    operator!: 'like' | 'equal' | 'not equal'
-};
-
-type IGDBRequestParameter = {
-    [key in 'limit' | 'where' | 'fields']: any;
-};
-
-class IGDBRequestBuilder {
-    private query: IGDBRequestParameter;
-
-    constructor(private func: (body: string) => Promise<any>) {
-        this.query = {} as IGDBRequestParameter;
-        this.limit(20).fields('*');
-    }
-
-    limit(n: number) {
-        this.query['limit'] = n;
-        return this;
-    }
-
-    fields(...fields: string[]) {
-        this.query['fields'] = fields.join(',');
-        return this;
-    }
-
-    equal = (field: string, value: string | number) => this.where(field, value, 'equal');
-
-    like = (field: string, value: string) => this.where(field, value, 'like');
-
-    where(field: string, value: string | number, operator: string) {
-        if(!this.query['where']) {
-            this.query['where'] = new Array<IGDBRequestFilter>();
-        }
-        let where = this.query['where'];
-
-        where.push({ field, value, operator });
-
-        return this;
-    }
-
-    fetch() {
-        let body = Object.keys(this.query)
-            .filter(key => key != 'where')
-            .map(key => `${key} ${this.query[key]};`)
-            .join(' ');
-
-        if(this.query['where']) {
-            body += ` where ${this.query['where']
-                .map((filter: IGDBRequestFilter) => {
-                    let value = typeof filter.value === 'number' ? `${filter.value}` : `"${filter.value}"`;
-
-                    switch (filter.operator) {
-                        case 'like': return `${filter.field} ~ *"${filter.value}"*`;
-                        case 'equal': return `${filter.field} = ${value}`;
-                        case 'not equal': return `${filter.field} != ${value}`
-                    }
-                })
-                .join(' | ')
-            };`
-        }
-
-        return this.func(body);
-    }
-}
-
-export default class IGDB {
+export default class IGDBService {
     private static readonly authUrl = 'https://id.twitch.tv/oauth2/token';
     private static readonly apiBaseUrl = 'https://api.igdb.com/v4';
     private static readonly imageBaseUrl = 'https://images.igdb.com/igdb/image/upload';
@@ -121,18 +54,18 @@ export default class IGDB {
     public getImageUrl(size: 'thumb' | 'cover', id: string) {
         const sizeStr = 't_' + size === 'thumb' ? size : `${size}_big`;
 
-        return `${IGDB.imageBaseUrl}/t_${sizeStr}/${id}.jpg`;
+        return `${IGDBService.imageBaseUrl}/t_${sizeStr}/${id}.jpg`;
     }
 
     private async request(type: QueryType, body?: string) {
         await this.authenticate();
 
         if(this.isEnabled()) {
-            const url = `${IGDB.apiBaseUrl}/${type}`;
+            const url = `${IGDBService.apiBaseUrl}/${type}`;
 
             console.log(body);
 
-            const response = await IGDB.queue.request(async () => {
+            const response = await IGDBService.queue.request(async () => {
                 console.info(`IGDB: Querying ${url}`);
                 return await globalThis.fetch(
                     url, { 
@@ -171,7 +104,7 @@ export default class IGDB {
                 const clientCreds = Configuration.getIGDBClientCredentials;
 
                 const response = await globalThis.fetch(
-                    `${IGDB.authUrl}?client_id=${clientCreds.id}&client_secret=${clientCreds.secret}&grant_type=client_credentials`,
+                    `${IGDBService.authUrl}?client_id=${clientCreds.id}&client_secret=${clientCreds.secret}&grant_type=client_credentials`,
                     { method: 'POST' }
                 );
 
