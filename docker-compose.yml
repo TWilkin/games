@@ -34,6 +34,11 @@ services:
       - DB_PASSWORD_FILE=/var/run/secrets/db_password
     secrets:
       - db_password
+    volumes:
+      - /var/lib/docker-volumes/games/api:/usr/src/app/src/cache
+    configs:
+      - source: api_config
+        target: /usr/src/app/config/docker.json
 
   ui:
     build: ./ui
@@ -46,3 +51,7 @@ services:
 secrets:
   db_password:
     file: ./config/mysql.txt
+
+configs:
+  api_config:
+    file: ./api/config/docker.json
