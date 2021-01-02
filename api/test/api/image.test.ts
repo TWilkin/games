@@ -21,11 +21,11 @@ describe('ImageController', () => {
         sinon.restore();
     });
 
-    describe('get', () => {
+    describe('getGame', () => {
         it('not cached', async () => {
             let subject = createSubject([{ image_id: 10 }]);
 
-            let response = await subject.get(1);
+            let response = await subject.getGame(1);
             expect(response).to.match(/1.jpg$/);
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.true;
         });
@@ -36,7 +36,7 @@ describe('ImageController', () => {
             sinon.stub(fs, 'existsSync')
                 .callsFake(() => true);
             
-            let response = await subject.get(1);
+            let response = await subject.getGame(1);
             expect(response).to.match(/1.jpg$/);
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
@@ -44,7 +44,7 @@ describe('ImageController', () => {
         it('game does not exist', async () => {
             let subject = createSubject([{ image_id: 10 }]);
 
-            let response = await subject.get(1000);
+            let response = await subject.getGame(1000);
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
@@ -52,7 +52,7 @@ describe('ImageController', () => {
         it('no IGDB id', async () => {
             let subject = createSubject([{ image_id: 10 }]);
 
-            let response = await subject.get(2);
+            let response = await subject.getGame(2);
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
@@ -60,7 +60,7 @@ describe('ImageController', () => {
         it('no cover art', async () => {
             let subject = createSubject([]);
 
-            let response = await subject.get(1);
+            let response = await subject.getGame(1);
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });

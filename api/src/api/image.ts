@@ -15,12 +15,13 @@ const streamPipeline = util.promisify(pipeline);
 export default class ImageController {
 
     private static readonly imageDir = path.join(Configuration.getCacheDirectory, 'images');
+    private static readonly gamesImageDir = path.join(ImageController.imageDir, 'games');
 
     private constructor(private igdbService: IGDB) { }
 
-    public async get(id: number) {
+    public async getGame(id: number) {
         // check if the file exists
-        const image = path.join(ImageController.imageDir, `${id}.jpg`);
+        const image = path.join(ImageController.gamesImageDir, `${id}.jpg`);
         if(fs.existsSync(image)) {
             return image;
         }
@@ -77,17 +78,17 @@ export default class ImageController {
 
     public static init(app: Express | null, igdbService: IGDB) {
         // ensure the image directories exist
-        if(!fs.existsSync(ImageController.imageDir)) {
-            fs.mkdirSync(ImageController.imageDir, { recursive: true });
+        if(!fs.existsSync(ImageController.gamesImageDir)) {
+            fs.mkdirSync(ImageController.gamesImageDir, { recursive: true });
         }
 
-        const imageApi = new ImageController(igdbService);
+        const controller = new ImageController(igdbService);
 
         if(app) {
             app.use(
-                `${Configuration.getExpress.root}/images/:id`.replace('//', '/'),
+                `${Configuration.getExpress.root}/images/games/:id`.replace('//', '/'),
                 async (request, response) => {
-                    const image = await imageApi.get(parseInt(request.params.id));
+                    const image = await controller.getGame(parseInt(request.params.id));
 
                     if(image) {
                         response.setHeader('Content-Type', (mime.lookup('jpg') ?? '') as string);
@@ -99,6 +100,6 @@ export default class ImageController {
             );
         }
 
-        return imageApi;
+        return controller;
     }
 };
