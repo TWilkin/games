@@ -22,10 +22,12 @@
         "data": [
             {
                 "gameId": 1,
-                "title": "Test Game 1"
+                "title": "Test Game 1",
+                "igdbId": 1000
             }, {
                 "gameId": 2,
-                "title": "Test Game 2"
+                "title": "Test Game 2",
+                "igdbId": null
             }
         ]
     }, {

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { APIProps } from '../common';
+import GameImage from './GameImage';
 import GameSummary from './GameSummary';
 import query, { queries, mutate, mutations } from '../../graphql';
 import { GameCollection, GameCompilation, GamePlatform, GamePlayTime } from '../../models';
@@ -72,6 +73,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
             <div className='game'>
                 {this.state.gamePlatform ? (
                     <div>
+                        <GameImage api={this.props.api} game={this.state.gamePlatform?.game} />
                         <GameSummary gamePlatform={this.state.gamePlatform} />
                         {this.renderInCollection()}
                         <PlayTimeCounter 

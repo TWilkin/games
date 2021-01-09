@@ -1,4 +1,4 @@
-import { AutoIncrement, Column, DataType, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
+import { AllowNull, AutoIncrement, Column, DataType, HasMany, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable, Sortable } from '../api/decorators';
 import GameCompilation from './game_compilation.model';
@@ -19,6 +19,11 @@ export default class Game extends AbstractRestrictedModel<Game> {
     @Sortable
     @Column(DataType.STRING)
     title!: string;
+
+    @Queryable
+    @AllowNull(true)
+    @Column(DataType.INTEGER)
+    igdbId?: number;
 
     @HasMany(() => GamePlatform)
     platforms!: GamePlatform[];

@@ -1,6 +1,10 @@
 .nyc_output
 config/development.json
+config/dev.json
+config/docker.json
 config/production.json
+data.json
 Dockerfile
 node_modules
 npm-debug.log
+src/cache

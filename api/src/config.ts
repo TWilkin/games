@@ -1,5 +1,6 @@
 import config from 'config';
 import fs from 'fs';
+import path from 'path';
 
 // the interface for the Express configuration
 interface ExpressConfiguration {
@@ -13,7 +14,17 @@ interface AuthConfiguration {
     secureCookie: boolean;
 }
 
+// OAuth service credentials
+interface OAuthCredentials {
+    id: string;
+    secret: string;
+}
+
 export default class Configuration {
+
+    public static get getCacheDirectory(): string {
+        return path.join(__dirname, 'cache');
+    }
 
     public static get getDatabaseData(): string | null {
         return config.get('database.data');
@@ -55,6 +66,17 @@ export default class Configuration {
             secret: config.get('auth.secret'),
             secureCookie: config.get('auth.secure_cookie')
         };
+    }
+
+    public static get getIGDBClientCredentials(): OAuthCredentials {
+        return {
+            id: config.get('igdb.id'),
+            secret: config.get('igdb.secret')
+        };
+    }
+
+    public static get getUserAgent(): string {
+        return `games/${process.env.npm_package_version}`;
     }
 
 }

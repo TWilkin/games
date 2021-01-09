@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import { loadData, mockSequelize } from './utility/mock';
-import User from '../src/models/user.model';
+import { loadData, mockSequelize } from '../utility/mock';
+import User from '../../src/models/user.model';
 
 describe('User model', () => {
     let users: User[];

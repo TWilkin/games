@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import { Model } from 'sequelize-typescript';
 
-import Game from '../src/models/game.model';
-import GamePlatform from '../src/models/game_platform.model';
-import sortBy, { convertSortValue } from '../src/models/sortable';
+import Game from '../../src/models/game.model';
+import GamePlatform from '../../src/models/game_platform.model';
+import sortBy, { convertSortValue } from '../../src/models/sortable';
 
 // the list of games to test
 const games = [

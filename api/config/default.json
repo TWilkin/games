@@ -18,5 +18,10 @@
     "auth": {
         "secret": "secret",
         "secure_cookie": false
+    },
+
+    "igdb": {
+        "id" : null,
+        "secret": null
     }
 }
