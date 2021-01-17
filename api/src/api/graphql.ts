@@ -102,7 +102,7 @@ export default class GraphQLAPI {
 
                     // replace any nested arguments with their fully qualified name
                     Object.keys(args)
-                        .filter(key => args[key].fullyQualifiedName)
+                        .filter(key => args[key].fullyQualifiedName && queryArgs[key])
                         .forEach(key => {
                             queryArgs[args[key].fullyQualifiedName] = queryArgs[key];
                             delete queryArgs[key];
