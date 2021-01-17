@@ -13,13 +13,14 @@ interface GamePlatformWrapper {
 
 interface GameListProps extends APIProps {
     query: Query;
+    args?: object;
 }
 
-interface GameListState<GamePlatformList> {
-    games?: GamePlatformList[];
+interface GameListState {
+    games?: GamePlatformWrapper[];
 }
 
-class GameList extends Component<GameListProps, GameListState<GamePlatformWrapper>> {
+export class GameList extends Component<GameListProps, GameListState> {
     
     constructor(props: GameListProps) {
         super(props);
@@ -38,7 +39,6 @@ class GameList extends Component<GameListProps, GameListState<GamePlatformWrappe
     public render() {
         return (
             <div className='games'>
-                <h1>All Games</h1>
                 <PlatformFilter
                     api={this.props.api}
                     onSelect={this.onPlatformSelect} />
@@ -73,6 +73,7 @@ class GameList extends Component<GameListProps, GameListState<GamePlatformWrappe
     private async load(platformId: number) {
         try {
             const args = {
+                ...this.props.args,
                 platformId: platformId
             };
             const data = await query(this.props.api.url, this.props.query, args);
@@ -105,7 +106,12 @@ class GameList extends Component<GameListProps, GameListState<GamePlatformWrappe
 export class AllGameList extends Component<APIProps> {
     render() {
         return (
-            <GameList api={this.props.api} query={queries['GamePlatform']} />
+            <div>
+                <h1>All Games</h1>
+                <GameList 
+                    api={this.props.api} 
+                    query={queries['GamePlatform']} />
+            </div>
         )
     }
 };
