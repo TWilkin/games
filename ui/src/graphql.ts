@@ -56,8 +56,8 @@ export const queries: { [name in Models]: Query | null} = {
         query: 'query($userId: Int, $gamePlatformId: Int) { GetGameWishlist(userId: $userId, gamePlatformId: $gamePlatformId) { ...GameWishlistFields } }',
         fragments: [
             'Game',
-            'GameWishlist',
             'GamePlatform',
+            'GameWishlist',
             'Platform'
         ]
     },
@@ -85,6 +85,16 @@ export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = 
             name: 'AddGamePlayTime',
             query: 'mutation($input: GamePlayTimeInput!) { AddGamePlayTime(input: $input) { ...GamePlayTimeFields } }',
             fragments: [ 'GamePlayTime' ]
+        },
+        'GameWishlist': {
+            name: 'AddGameWishlist',
+            query: 'mutation($input: GameWishlistInput!) { AddGameWishlist(input: $input) { ...GameWishlistFields } }',
+            fragments: [
+                'Game',
+                'GamePlatform',
+                'GameWishlist',
+                'Platform'
+            ]
         }
     },
     'update': {
