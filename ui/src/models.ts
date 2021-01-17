@@ -1,4 +1,4 @@
-export type Models = 'Game' | 'GameCollection' | 'GameCompilation' | 'GamePlatform' | 'GamePlayTime' | 'Platform' | 'User';
+export type Models = 'Game' | 'GameCollection' | 'GameCompilation' | 'GamePlatform' | 'GamePlayTime' | 'GameWishlist' | 'Platform' | 'User';
 
 export interface Model {
     createdAt: Date;
@@ -36,6 +36,11 @@ export interface GamePlayTime extends Model {
     demo: boolean;
     startTime: number;
     endTime?: number;
+};
+
+export interface GameWishlist extends Model {
+    gameWishlistId: number;
+    gamePlatform: GamePlatform;
 };
 
 export interface Platform extends Model {

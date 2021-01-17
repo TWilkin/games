@@ -8,6 +8,7 @@ const fragments: { [name in Models]: string } = {
     'GameCompilation': 'fragment GameCompilationFields on GameCompilation { gameCompilationId, primary { ...GameFields }, included { ...GameFields } }',
     'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, alias, game { ...GameFields }, platform { ...PlatformFields } }',
     'GamePlayTime': 'fragment GamePlayTimeFields on GamePlayTime { gamePlayTimeId, gamePlatformId, gameCompilationId, demo, startTime, endTime }',
+    'GameWishlist': 'fragment GameWishlistFields on GameWishlist { gameWishlistId, gamePlatform { ...GamePlatformFields } }',
     'Platform': 'fragment PlatformFields on Platform { platformId, name }',
     'User': 'fragment UserFields on User { userId, userName }'
 };
@@ -49,6 +50,16 @@ export const queries: { [name in Models]: Query | null} = {
         name: 'GetGamePlayTime',
         query: 'query($gamePlatformId: Int, $userId: Int, $endTime: DateTime) { GetGamePlayTime(gamePlatformId: $gamePlatformId, userId: $userId, endTime: $endTime) { ...GamePlayTimeFields } }',
         fragments: [ 'GamePlayTime' ]
+    },
+    'GameWishlist': {
+        name: 'GetGameWishlist',
+        query: 'query($userId: Int, $gamePlatformId: Int) { GetGameWishlist(userId: $userId, gamePlatformId: $gamePlatformId) { ...GameWishlistFields } }',
+        fragments: [
+            'Game',
+            'GameWishlist',
+            'GamePlatform',
+            'Platform'
+        ]
     },
     'Platform': {
         name: 'GetPlatform',
