@@ -1,0 +1,26 @@
+name: API-test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+        
+      - run: npm install
+        working-directory: api
+        
+      - run: cd api && npm test
+        working-directory: api
