@@ -6,10 +6,10 @@ import { BrowserRouter, NavLink, Redirect, Route, Switch } from 'react-router-do
 
 import Collection from '../Collection/Collection';
 import { APISettings } from '../common';
+import AllGameList from '../Game/AllGameList';
 import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
-import GameList from '../Game/GameList';
 
 const apiUrl = `${window.location.origin}/api`;
 
@@ -73,7 +73,7 @@ export default class App extends Component<AppProps, AppState> {
                         </Route>
 
                         <Route path='/games'>
-                            <GameList api={this.getAPISettings} />
+                            <AllGameList api={this.getAPISettings} />
                         </Route>
                         <Route path='/game/:gamePlatformId'>
                             <GameDetails api={this.getAPISettings} />

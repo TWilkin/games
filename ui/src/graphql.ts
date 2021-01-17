@@ -96,7 +96,7 @@ export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = 
     }
 };
 
-interface Query {
+export interface Query {
     name: string;
     query: string;
     fragments: Models[];

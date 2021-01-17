@@ -3,17 +3,25 @@ import { Link } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
-import query, { queries } from '../../graphql';
-import { GamePlatform } from '../../models';
+import query, { Query } from '../../graphql';
+import { GamePlatform, Model, } from '../../models';
 import PlatformFilter from '../Platform/PlatformFilter';
 
-interface GameListState {
-    games?: GamePlatform[];
+interface GamePlatformWrapper {
+    gamePlatform: GamePlatform;
 }
 
-export default class GameList extends Component<APIProps, GameListState> {
+interface GameListProps extends APIProps {
+    query: Query;
+}
+
+interface GameListState<GamePlatformList> {
+    games?: GamePlatformList[];
+}
+
+export default class GameList extends Component<GameListProps, GameListState<GamePlatformWrapper>> {
     
-    constructor(props: APIProps) {
+    constructor(props: GameListProps) {
         super(props);
 
         this.state = {
@@ -47,9 +55,9 @@ export default class GameList extends Component<APIProps, GameListState> {
                     <>
                         {this.state.games.map(entry => {
                             return(
-                                <div key={entry.gamePlatformId}>
-                                    <Link to={`/game/${entry.gamePlatformId}`}>
-                                        <GameSummary gamePlatform={entry} />
+                                <div key={entry.gamePlatform.gamePlatformId}>
+                                    <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
+                                        <GameSummary gamePlatform={entry.gamePlatform} />
                                     </Link>
                                 </div>
                             );
@@ -67,13 +75,29 @@ export default class GameList extends Component<APIProps, GameListState> {
             const args = {
                 platformId: platformId
             };
-            const data: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
+            const data = await query(this.props.api.url, this.props.query, args);
             this.setState({
-                games: data
+                games: this.toGamePlatformList(data)
             });
         } catch(error) {
             this.props.api.onError(error);
         }
+    }
+
+    private toGamePlatformList(data: Model[]) {
+        if(data.length == 0) {
+            return [] as GamePlatformWrapper[];
+        }
+
+        if('gameCollectionId' in data[0]
+            || 'gameWishlistId' in data[0])
+        {
+            return data as unknown as GamePlatformWrapper[];
+        }
+
+        return data.map(gamePlatform => ({
+            gamePlatform
+        } as GamePlatformWrapper));
     }
 
 };
