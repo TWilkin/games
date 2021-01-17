@@ -8,7 +8,7 @@ import Auth, { AuthenticatedRequest } from './auth';
 import Configuration from '../config';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
-import { isInputSecret, isQueryable, isResultSecret, isSortable } from './decorators';
+import { getNestedQueryable, isInputSecret, isQueryable, isResultSecret, isSortable } from './decorators';
 import sortBy from '../models/sortable';
 import User from '../models/user.model';
 
@@ -64,6 +64,8 @@ export default class GraphQLAPI {
                 type: GraphQLInt
             }
         };
+
+        // add the queryable fields
         Object.values(this.model.rawAttributes)
             .filter(field => isQueryable(field))
             .forEach(field => {
@@ -71,21 +73,42 @@ export default class GraphQLAPI {
                     type: GraphQLAPI.generateType(field, true)
                 };
             });
+        
+        // add any nested queryable fields
+        Object.values(this.model.rawAttributes)
+            .filter(field => getNestedQueryable(field))
+            .forEach(field => {
+                const nestedFieldName = getNestedQueryable(field) as string;
+                const parentName = field.field?.toLowerCase().slice(0, -2);  
+
+                args[nestedFieldName] = {
+                    type: GraphQLInt,
+                    fullyQualifiedName: `\$${parentName}.${nestedFieldName}\$`
+                };
+            });
 
         query.fields[`Get${model.name}`] = {
             type: new GraphQLList(this.type),
             args: args,
-            resolve: async (_: any, args: any, __: any, info: GraphQLResolveInfo) => {
+            resolve: async (_: any, queryArgs: any, __: any, info: GraphQLResolveInfo) => {
                 let query: FindOptions = this.restrictColumns(info);
 
-                if(args) {
+                if(queryArgs) {
                     // replace args.id with the actual name of the field
-                    if(args.id) {
-                        args[model.primaryKeyAttribute] = args.id;
-                        delete args.id;
+                    if(queryArgs.id) {
+                        queryArgs[model.primaryKeyAttribute] = queryArgs.id;
+                        delete queryArgs.id;
                     }
 
-                    query.where = args;
+                    // replace any nested arguments with their fully qualified name
+                    Object.keys(args)
+                        .filter(key => args[key].fullyQualifiedName)
+                        .forEach(key => {
+                            queryArgs[args[key].fullyQualifiedName] = queryArgs[key];
+                            delete queryArgs[key];
+                        });
+
+                    query.where = queryArgs;
                 }
                 
                 let result = await model.findAll(query);
