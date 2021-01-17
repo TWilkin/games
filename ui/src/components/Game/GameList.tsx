@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
-import query, { Query } from '../../graphql';
+import query, { queries, Query } from '../../graphql';
 import { GamePlatform, Model, } from '../../models';
 import PlatformFilter from '../Platform/PlatformFilter';
 
@@ -19,7 +19,7 @@ interface GameListState<GamePlatformList> {
     games?: GamePlatformList[];
 }
 
-export default class GameList extends Component<GameListProps, GameListState<GamePlatformWrapper>> {
+class GameList extends Component<GameListProps, GameListState<GamePlatformWrapper>> {
     
     constructor(props: GameListProps) {
         super(props);
@@ -100,4 +100,12 @@ export default class GameList extends Component<GameListProps, GameListState<Gam
         } as GamePlatformWrapper));
     }
 
+};
+
+export class AllGameList extends Component<APIProps> {
+    render() {
+        return (
+            <GameList api={this.props.api} query={queries['GamePlatform']} />
+        )
+    }
 };

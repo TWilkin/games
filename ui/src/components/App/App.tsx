@@ -6,7 +6,7 @@ import { BrowserRouter, NavLink, Redirect, Route, Switch } from 'react-router-do
 
 import Collection from '../Collection/Collection';
 import { APISettings } from '../common';
-import AllGameList from '../Game/AllGameList';
+import { AllGameList } from '../Game/GameList';
 import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
