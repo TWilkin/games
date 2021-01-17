@@ -19,7 +19,6 @@ export default class GameCollection extends AbstractOwnableModel<GameCollection>
     @Column(DataType.INTEGER)
     gamePlatformId!: number;
 
-
     @BelongsTo(() => GamePlatform)
     gamePlatform!: GamePlatform;
 

@@ -47,7 +47,7 @@ export function NestedQueryable(columns: string[] | string) {
 
     return function(target: any, propertyName: string): any {
         addMetadata(target, propertyName, 'nestedQueryable', columnList);
-    }
+    };
 }
 
 // Secret annotation for a model column which indicates this column should not appear in query results or inputs
