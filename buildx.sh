@@ -24,13 +24,13 @@ fi
 # build the API
 echo "Building API"
 cd api
-docker buildx build --platform linux/amd64,linux/arm/v7 --push -t $REGISTRY/games/api:0.0.2 .
+docker buildx build --platform linux/amd64,linux/arm/v7 --push -t $REGISTRY/games/api:0.0.3 .
 cd ..
 echo "Done"
 
 # build the UI
 echo "Building UI"
 cd ui
-docker buildx build --platform linux/amd64,linux/arm/v7 --push -t $REGISTRY/games/ui:0.0.1 .
+docker buildx build --platform linux/amd64,linux/arm/v7 --push -t $REGISTRY/games/ui:0.0.2 .
 cd ..
 echo "Done"
