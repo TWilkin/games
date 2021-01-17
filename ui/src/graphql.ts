@@ -21,7 +21,7 @@ export const queries: { [name in Models]: Query | null} = {
     },
     'GameCollection': {
         name: 'GetGameCollection',
-        query: 'query($userId: Int, $gamePlatformId: Int) { GetGameCollection(userId: $userId, gamePlatformId: $gamePlatformId) { ...GameCollectionFields } }',
+        query: 'query($userId: Int, $gamePlatformId: Int, $platformId: Int) { GetGameCollection(userId: $userId, gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GameCollectionFields } }',
         fragments: [
             'Game',
             'GameCollection',
@@ -53,7 +53,7 @@ export const queries: { [name in Models]: Query | null} = {
     },
     'GameWishlist': {
         name: 'GetGameWishlist',
-        query: 'query($userId: Int, $gamePlatformId: Int) { GetGameWishlist(userId: $userId, gamePlatformId: $gamePlatformId) { ...GameWishlistFields } }',
+        query: 'query($userId: Int, $gamePlatformId: Int, $platformId: Int) { GetGameWishlist(userId: $userId, gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GameWishlistFields } }',
         fragments: [
             'Game',
             'GamePlatform',
