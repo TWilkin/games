@@ -4,8 +4,8 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { APIProps } from '../common';
 import GameImage from './GameImage';
 import GameSummary from './GameSummary';
-import query, { queries, mutate, mutations } from '../../graphql';
-import { GameCollection, GameCompilation, GamePlatform, GamePlayTime } from '../../models';
+import query, { queries, mutate, mutations, Query } from '../../graphql';
+import { GameCollection, GameCompilation, GamePlatform, GamePlayTime, GameWishlist, UserGamePlatform } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
 
@@ -18,6 +18,7 @@ interface GameDetailsProps extends APIProps, RouteComponentProps<GameDetailsMatc
 interface GameDetailsState {
     gamePlatform?: GamePlatform;
     gameCollectionId?: number;
+    gameWishlistId?: number;
     gamePlayTime?: GamePlayTime[];
 }
 
@@ -28,10 +29,12 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
 
         this.state = {
             gamePlatform: undefined,
-            gameCollectionId: undefined
+            gameCollectionId: undefined,
+            gameWishlistId: undefined
         };
 
         this.onAddToCollectionClick = this.onAddToCollectionClick.bind(this);
+        this.onAddToWishlistClick = this.onAddToWishlistClick.bind(this);
     }
 
     public componentDidMount() {
@@ -68,6 +71,27 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
         }
     }
 
+    private async onAddToWishlistClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        event.preventDefault();
+
+        // add to the user's wishlist
+        try {
+            const args = {
+                input: {
+                    gamePlatformId: this.state.gamePlatform.gamePlatformId
+                }
+            };
+            const data: GameWishlist = await mutate(this.props.api.url, mutations['add']['GameWishlist'], args);
+            if(data) {
+                this.setState({
+                    gameWishlistId: data.gameWishlistId
+                });
+            }
+        } catch(error) {
+            this.props.api.onError(error);
+        }
+    }
+
     public render() {
         return (
             <div className='game'>
@@ -75,7 +99,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                     <div>
                         <GameImage api={this.props.api} game={this.state.gamePlatform?.game} />
                         <GameSummary gamePlatform={this.state.gamePlatform} />
-                        {this.renderInCollection()}
+                        {this.renderInCollectionOrWishlist()}
                         <PlayTimeCounter 
                             api={this.props.api}
                             gamePlatform={this.state.gamePlatform} />
@@ -88,15 +112,25 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
         );
     }
 
-    private renderInCollection() {
+    private renderInCollectionOrWishlist() {
         return (
             <div>
                 {this.state.gameCollectionId ? (
                     <>In collection</>
                 ) : (
-                    <button onClick={this.onAddToCollectionClick}>
-                        Add to Collection
-                    </button>
+                    <>
+                        <button onClick={this.onAddToCollectionClick}>
+                            Add to Collection
+                        </button>
+
+                        {this.state.gameWishlistId ? (
+                            <>In wishlist</>
+                        ) : (
+                            <button onClick={this.onAddToWishlistClick}>
+                                Add to Wishlist
+                            </button>
+                        )}
+                    </>
                 )}
             </div>
         );
@@ -121,19 +155,13 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                 gamePlatform: game
             });
 
-            // check if this game in the user's collection
-            if(game) {
-                args = {
-                    gamePlatformId: gamePlatformId,
-                    userId: this.props.api.user.userId
-                };
-                const collection: GameCollection[] = await query(this.props.api.url, queries['GameCollection'], args);
-                if(collection && collection.length >= 1) {
-                    this.setState({
-                        gameCollectionId: collection[0].gameCollectionId
-                    });
-                }
-            }
+            // check if this game in the user's collection or wishlist
+            let gameCollection = await this.loadUserGamePlatform<GameCollection>(game, queries['GameCollection']);
+            let gameWishlist = await this.loadUserGamePlatform<GameWishlist>(game, queries['GameWishlist']);
+            this.setState({
+                gameCollectionId: gameCollection?.gameCollectionId,
+                gameWishlistId: gameWishlist?.gameWishlistId
+            });        
 
             // load the playtime
             if(game) {
@@ -152,6 +180,19 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
             }
         } catch(error) {
             this.props.api.onError(error);
+        }
+    }
+
+    private async loadUserGamePlatform<TGamePlatform extends UserGamePlatform>(game: GamePlatform, graphQLQuery: Query) {
+        if(game) {
+            const args = {
+                gamePlatformId: game.gamePlatformId,
+                userId: this.props.api.user.userId
+            };
+            const data = await query(this.props.api.url, graphQLQuery, args);
+            if(data && data.length >= 1) {
+                return data[0] as unknown as TGamePlatform;
+            }
         }
     }
 
