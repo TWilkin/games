@@ -77,15 +77,16 @@ export default class GraphQLAPI {
         // add any nested queryable fields
         Object.values(this.model.rawAttributes)
             .filter(field => getNestedQueryable(field))
-            .forEach(field => {
-                const nestedFieldName = getNestedQueryable(field) as string;
-                const parentName = field.field?.toLowerCase().slice(0, -2);  
+            .forEach(field =>
+                getNestedQueryable(field).forEach(nestedFieldName => {
+                    const parentName = field.field?.toLowerCase().slice(0, -2);  
 
-                args[nestedFieldName] = {
-                    type: GraphQLInt,
-                    fullyQualifiedName: `\$${parentName}.${nestedFieldName}\$`
-                };
-            });
+                    args[nestedFieldName] = {
+                        type: GraphQLInt,
+                        fullyQualifiedName: `\$${parentName}.${nestedFieldName}\$`
+                    };
+                })
+            );
 
         query.fields[`Get${model.name}`] = {
             type: new GraphQLList(this.type),
