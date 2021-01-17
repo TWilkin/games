@@ -141,5 +141,19 @@
                 "seriesId": 2
             }
         ]
+    }, {
+        "model": "GameWishlist",
+        "data": [
+            {
+                "gameWishlistId": 1,
+                "gamePlatformId": 1,
+                "userId": 1
+            },
+            {
+                "gameWishlistId": 2,
+                "gamePlatformId": 2,
+                "userId": 2
+            }
+        ]
     }
 ]
