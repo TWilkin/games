@@ -4,12 +4,8 @@ import { Link } from 'react-router-dom';
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
 import query, { queries, Query } from '../../graphql';
-import { GamePlatform, Model, } from '../../models';
+import { Model, UserGamePlatform, } from '../../models';
 import PlatformFilter from '../Platform/PlatformFilter';
-
-interface GamePlatformWrapper {
-    gamePlatform: GamePlatform;
-}
 
 interface GameListProps extends APIProps {
     query: Query;
@@ -17,7 +13,7 @@ interface GameListProps extends APIProps {
 }
 
 interface GameListState {
-    games?: GamePlatformWrapper[];
+    games?: UserGamePlatform[];
 }
 
 export class GameList extends Component<GameListProps, GameListState> {
@@ -78,27 +74,27 @@ export class GameList extends Component<GameListProps, GameListState> {
             };
             const data = await query(this.props.api.url, this.props.query, args);
             this.setState({
-                games: this.toGamePlatformList(data)
+                games: this.toUserGamePlatform(data)
             });
         } catch(error) {
             this.props.api.onError(error);
         }
     }
 
-    private toGamePlatformList(data: Model[]) {
+    private toUserGamePlatform(data: Model[]) {
         if(data.length == 0) {
-            return [] as GamePlatformWrapper[];
+            return [] as UserGamePlatform[];
         }
 
         if('gameCollectionId' in data[0]
             || 'gameWishlistId' in data[0])
         {
-            return data as unknown as GamePlatformWrapper[];
+            return data as unknown as UserGamePlatform[];
         }
 
         return data.map(gamePlatform => ({
             gamePlatform
-        } as GamePlatformWrapper));
+        } as UserGamePlatform));
     }
 
 };

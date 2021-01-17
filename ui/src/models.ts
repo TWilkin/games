@@ -3,7 +3,7 @@ export type Models = 'Game' | 'GameCollection' | 'GameCompilation' | 'GamePlatfo
 export interface Model {
     createdAt: Date;
     updatedAt: Date;
-};  
+};
 
 export interface Game extends Model {
     gameId: number;
@@ -11,9 +11,8 @@ export interface Game extends Model {
     includes?: GameCompilation[];
 };
 
-export interface GameCollection extends Model {
+export interface GameCollection extends Model, UserGamePlatform {
     gameCollectionId: number;
-    gamePlatform: GamePlatform;
 };
 
 export interface GameCompilation extends Model {
@@ -38,7 +37,7 @@ export interface GamePlayTime extends Model {
     endTime?: number;
 };
 
-export interface GameWishlist extends Model {
+export interface GameWishlist extends Model, UserGamePlatform {
     gameWishlistId: number;
     gamePlatform: GamePlatform;
 };
@@ -52,4 +51,8 @@ export interface User extends Model {
     userId: number;
     userName: string;
     role: string;
+};
+
+export interface UserGamePlatform {
+    gamePlatform: GamePlatform;
 };
