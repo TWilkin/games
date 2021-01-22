@@ -6,7 +6,7 @@ import { GraphQLContext, GraphQLUpdateOptions } from '../api/graphql';
 export abstract class AbstractRestrictedModel<T extends Model<T>> extends Model<T> {
 
     @BeforeCreate
-    public static checkAdmin(_, context: GraphQLContext) {
+    public static checkAdmin(_, context: GraphQLContext): void {
         // confirm the user is an admin
         if(context.user?.isAdmin) {
             return;
@@ -17,7 +17,7 @@ export abstract class AbstractRestrictedModel<T extends Model<T>> extends Model<
     }
 
     @BeforeUpdate
-    public static checkAdminUpdate(_, options: GraphQLUpdateOptions) {
+    public static checkAdminUpdate(_, options: GraphQLUpdateOptions): void {
         AbstractRestrictedModel.checkAdmin(_, options.context);
     }
 

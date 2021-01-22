@@ -24,7 +24,7 @@ interface ExtendedModelAttributeColumnOptions extends ModelAttributeColumnOption
     
 }
 
-function addMetadata(target: any, propertyName: string, key: string, value: any): any {
+function addMetadata(target: any, propertyName: string, key: string, value: any) {
     // retrieve the existing sequelize attributes
     let attributes = Reflect.getMetadata(metadataKey, target);
     if(!attributes) {
@@ -37,22 +37,22 @@ function addMetadata(target: any, propertyName: string, key: string, value: any)
 }
 
 // Queryable annotation for a model column which indicates this column should appear in query parameters
-export function Queryable(target: any, propertyName: string): any {
+export function Queryable(target: any, propertyName: string): void {
     addMetadata(target, propertyName, 'queryable', true);
 }
 
 // Nested queryable annotation for model column(s) nested in a foreign key relationship
-export function NestedQueryable(columns: string[] | string) {
+export function NestedQueryable(columns: string[] | string): (target: any, propertyName: string) => void {
     const columnList = typeof columns === 'string' ? [ columns ] : columns;
 
-    return function(target: any, propertyName: string): any {
+    return function(target: any, propertyName: string) {
         addMetadata(target, propertyName, 'nestedQueryable', columnList);
     };
 }
 
 // Secret annotation for a model column which indicates this column should not appear in query results or inputs
 export function Secret(excludeInput=false, excludeResult=true) {
-    return function(target: any, propertyName: string): any {
+    return function(target: any, propertyName: string): void {
         addMetadata(target, propertyName, 'secret', {
             excludeInput: excludeInput,
             excludeResult: excludeResult
@@ -61,19 +61,19 @@ export function Secret(excludeInput=false, excludeResult=true) {
 }
 
 // Sortable annotation for a model column which indicates the column should be used for sorting after query
-export function Sortable(target: any, propertyName: string): any {
+export function Sortable(target: any, propertyName: string): void {
     addMetadata(target, propertyName, 'sortable', true);
 }
 
 // check whether a model column is queryable
 export function isQueryable(field: ModelAttributeColumnOptions): boolean {
-    const columnOptions = field as ExtendedModelAttributeColumnOptions
+    const columnOptions = field as ExtendedModelAttributeColumnOptions;
     return columnOptions.queryable && !columnOptions.secret?.excludeResult ? true : false;
 }
 
 // check whether a model column has nested queryable columns
 export function getNestedQueryable(field: ModelAttributeColumnOptions): string[] {
-    const columnOptions = field as ExtendedModelAttributeColumnOptions
+    const columnOptions = field as ExtendedModelAttributeColumnOptions;
     return columnOptions.nestedQueryable && !columnOptions.secret?.excludeResult ? columnOptions.nestedQueryable : [];
 }
 

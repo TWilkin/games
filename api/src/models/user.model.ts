@@ -41,13 +41,13 @@ export default class User extends AbstractRestrictedModel<User> {
     @HasMany(() => GameCompletion)
     completed!: GameCompletion[];*/
 
-    public get isAdmin() {
-        return this.role == 'admin';
+    public get isAdmin(): boolean {
+        return this.role === 'admin';
     }
 
     @BeforeCreate
     @BeforeUpdate
-    static async hashPassword(instance: User) {
+    static async hashPassword(instance: User): Promise<void> {
         instance.password = await bcrypt.hash(instance.password, 10);
     }
 

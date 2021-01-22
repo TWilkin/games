@@ -19,7 +19,7 @@ export default class ImageController {
 
     private constructor(private igdbService: IGDB) { }
 
-    public async getGame(id: number) {
+    public async getGame(id: number): Promise<string | null> {
         // check if the file exists
         const image = path.join(ImageController.gamesImageDir, `${id}.jpg`);
         if(fs.existsSync(image)) {
@@ -56,7 +56,7 @@ export default class ImageController {
 
     private async downloadImage(path: string, url: string) {
         try {
-            let response = await globalThis.fetch(url);
+            const response = await globalThis.fetch(url);
 
             if(response?.status !== HttpStatus.OK) {
                 throw new Error(getStatusText(response.status));
@@ -76,7 +76,7 @@ export default class ImageController {
         return true;
     }
 
-    public static init(app: Express | null, igdbService: IGDB) {
+    public static init(app: Express | null, igdbService: IGDB): ImageController {
         // ensure the image directories exist
         if(!fs.existsSync(ImageController.gamesImageDir)) {
             fs.mkdirSync(ImageController.gamesImageDir, { recursive: true });
@@ -105,4 +105,4 @@ export default class ImageController {
 
         return controller;
     }
-};
+}

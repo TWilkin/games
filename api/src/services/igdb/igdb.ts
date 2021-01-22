@@ -31,27 +31,27 @@ export default class IGDBService {
 
     private token: Token | undefined = undefined;
 
-    public getCover = (gameId: number) =>
+    public getCover = (gameId: number): IGDBRequestBuilder =>
         new IGDBRequestBuilder((body) => this.request('covers', body))
             .equal('game', gameId)
 
-    public getGames = (name: string) => 
+    public getGames = (name: string): IGDBRequestBuilder => 
         new IGDBRequestBuilder((body) => this.request('games', body))
             .like('name', name);
     
-    public getPlatforms = (name: string) => 
+    public getPlatforms = (name: string): IGDBRequestBuilder => 
         new IGDBRequestBuilder((body) => this.request('platforms', body))
             .like('name', name)
             .like('alternative_name', name)
             .like('abbreviation', name);
     
-    public clearToken = () => this.token = undefined;
+    public clearToken = (): void => this.token = undefined;
 
-    public isEnabled = () => 
+    public isEnabled = (): string => 
         Configuration.getIGDBClientCredentials?.id 
         && Configuration.getIGDBClientCredentials.secret;
 
-    public getImageUrl(size: 'thumb' | 'cover', id: string) {
+    public getImageUrl(size: 'thumb' | 'cover', id: string): string {
         const sizeStr = 't_' + size === 'thumb' ? size : `${size}_big`;
 
         return `${IGDBService.imageBaseUrl}/t_${sizeStr}/${id}.jpg`;
@@ -89,7 +89,7 @@ export default class IGDBService {
         return [];
     }
 
-    public async authenticate() {
+    public async authenticate(): Promise<Token | null> {
         // check if we have an in-date token
         if(this.token?.expires && new Date() < this.token.expires) {
             // token is valid
@@ -108,10 +108,10 @@ export default class IGDBService {
                     { method: 'POST' }
                 );
 
-                let data = await this.checkForErrors(response);
+                const data = await this.checkForErrors(response);
 
                 // calculate when the token expires, but 60s earlier to be sure
-                let expires = new Date();
+                const expires = new Date();
                 expires.setSeconds(expires.getSeconds() + data.expires_in - 60);
 
                 this.token = {
@@ -120,10 +120,14 @@ export default class IGDBService {
                 };
 
                 console.info('IGDB: Authenticated');
+
+                return this.token;
             } catch(e) {
                 throw new Error(`Failed to authenticate: ${e.message}`);
             }
         }
+
+        return null;
     }
 
     private async checkForErrors(response: Response) {
@@ -138,4 +142,4 @@ export default class IGDBService {
 
         return data;
     }
-};
+}

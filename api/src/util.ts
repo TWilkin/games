@@ -1,8 +1,8 @@
-export async function sleep(ms: number) {
+export async function sleep(ms: number): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function retry<T>(name: string, func: () => Promise<T>, attempts: number=10, wait: number=2, backoff: number=1.2): Promise<T | null>
+export async function retry<T>(name: string, func: () => Promise<T>, attempts=10, wait=2, backoff=1.2): Promise<T | null>
 {
     let sleepTime = 0;
 

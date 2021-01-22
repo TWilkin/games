@@ -47,7 +47,7 @@ export default class Auth {
         ];
     }
 
-    private getToken(req: Request<any>): string | null {
+    private getToken(req: Request): string | null {
         // read from the authorization header
         const split = req.headers.authorization?.split(' ');
         if(split && split.length == 2 && split[0] == 'Bearer') {
@@ -61,14 +61,14 @@ export default class Auth {
         return null;
     }
 
-    private authorise(req: Request<any>, res: Response<any>, next: NextFunction) {
+    private authorise(req: Request, res: Response, next: NextFunction) {
         // check the user is logged in
         const authReq = req as AuthenticatedRequest;
         if(authReq.user && authReq.user.userId && authReq.user.role) {
             console.log(`Authorised ${authReq.user.userName} as ${authReq.user.role}`);
 
             // ensure the user is a User type
-            let user = new User();
+            const user = new User();
             user.userId = authReq.user.userId;
             user.userName = authReq.user.userName;
             user.role = authReq.user.role;
@@ -79,7 +79,7 @@ export default class Auth {
         return res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
-    private async authenticate(req: Request<any>, res: Response<any>): Promise<any> {
+    private async authenticate(req: Request, res: Response): Promise<void> {
         const user = await User.authenticate(req.body.userName, req.body.password);
         if(user) {
             // create the JWT token

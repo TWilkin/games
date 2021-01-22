@@ -1,7 +1,7 @@
 import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Queryable } from '../api/decorators';
-import GameCompilation from './game_compilation.model'
+import GameCompilation from './game_compilation.model';
 import GamePlatform from './game_platform.model';
 import { AbstractOwnableModel } from './ownablemodel';
 
