@@ -39,7 +39,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         this.onStop = this.onStop.bind(this);
     }
 
-    public async componentDidMount() {
+    public async componentDidMount(): Promise<void> {
         // check if there is playtime already for this game
         try {
             const args = {
@@ -142,7 +142,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         }
     }
 
-    public render() {
+    public render(): JSX.Element {
         return (
             <div className='playTimeCounter'>
                 {this.renderTimer()}
@@ -165,10 +165,11 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
     private renderStartDialog() {
         return (
             <ModalDialog
-                    submit='Start'
-                    cancel='Cancel'
-                    visible={this.state.compilationDialogVisible}
-                    onClose={this.onDialogClose}>
+                submit='Start'
+                cancel='Cancel'
+                visible={this.state.compilationDialogVisible}
+                onClose={this.onDialogClose}
+            >
                 {this.renderCompilationSelect()}
                 <br />
                 <label>Demo? 
@@ -182,19 +183,19 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
         return this.props.gamePlatform.game.includes 
                 && this.props.gamePlatform.game.includes.length > 0
                 && (
-            <select onChange={this.onCompilationSelect} defaultValue='-1'>
-                <option key='-1' value='-1'>-</option>
-                {this.props.gamePlatform.game.includes.map(compilation => {
-                    return (
-                        <option 
-                                key={compilation.gameCompilationId} 
-                                value={compilation.gameCompilationId}>
-                            {compilation.included.title}
-                        </option>
-                    );
-                })}
-            </select>
-        );
+                    <select onChange={this.onCompilationSelect} defaultValue='-1'>
+                        <option key='-1' value='-1'>-</option>
+                        {this.props.gamePlatform.game.includes.map(compilation => {
+                            return (
+                                <option 
+                                    key={compilation.gameCompilationId} 
+                                    value={compilation.gameCompilationId}>
+                                    {compilation.included.title}
+                                </option>
+                            );
+                        })}
+                    </select>
+                );
     }
 
     private renderStop() {
@@ -268,4 +269,4 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
             .join(':');
     }
 
-};
+}

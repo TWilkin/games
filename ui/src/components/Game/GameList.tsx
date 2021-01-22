@@ -9,7 +9,7 @@ import PlatformFilter from '../Platform/PlatformFilter';
 
 interface GameListProps extends APIProps {
     query: Query;
-    args?: object;
+    args?: any;
 }
 
 interface GameListState {
@@ -28,11 +28,11 @@ export class GameList extends Component<GameListProps, GameListState> {
         this.onPlatformSelect = this.onPlatformSelect.bind(this);
     }
 
-    public onPlatformSelect(platformId: number) {
+    public onPlatformSelect(platformId: number): void {
         this.load(platformId);
     }
 
-    public render() {
+    public render(): JSX.Element {
         return (
             <div className='games'>
                 <PlatformFilter
@@ -41,7 +41,7 @@ export class GameList extends Component<GameListProps, GameListState> {
                 <br />
                 {this.renderGames()}
             </div>
-        )
+        );
     }
 
     private renderGames() {
@@ -97,10 +97,10 @@ export class GameList extends Component<GameListProps, GameListState> {
         } as UserGamePlatform));
     }
 
-};
+}
 
 export class AllGameList extends Component<APIProps> {
-    render() {
+    render(): JSX.Element {
         return (
             <div>
                 <h1>All Games</h1>
@@ -108,6 +108,6 @@ export class AllGameList extends Component<APIProps> {
                     api={this.props.api} 
                     query={queries['GamePlatform']} />
             </div>
-        )
+        );
     }
-};
+}

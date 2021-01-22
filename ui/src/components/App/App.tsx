@@ -14,16 +14,14 @@ import Wishlist from '../Wishlist/Wishlist';
 
 const apiUrl = `${window.location.origin}/api`;
 
-type AppProps = {};
-
 interface AppState {
     unauthorised?: boolean;
     user?: User;
 }
 
-export default class App extends Component<AppProps, AppState> {
+export default class App extends Component<never, AppState> {
 
-    constructor(props: AppProps) {
+    constructor(props: never) {
         super(props);
 
         const user = this.getUser;
@@ -36,7 +34,7 @@ export default class App extends Component<AppProps, AppState> {
         this.onLogin = this.onLogin.bind(this);
     }
 
-    public onLogin() {
+    public onLogin(): void {
         const user = this.getUser;
         this.setState({
             unauthorised: user ? false : true,
@@ -44,7 +42,7 @@ export default class App extends Component<AppProps, AppState> {
         });
     }
 
-    public onError(error: Error) {
+    public onError(error: Error): void {
         // check if the error is 401/403
         switch(error.message) {
             case getStatusText(HttpStatus.FORBIDDEN):
@@ -53,7 +51,7 @@ export default class App extends Component<AppProps, AppState> {
         }
     }
 
-    public render() {
+    public render(): JSX.Element {
         return (
             <BrowserRouter>
                 {this.redirect()}
@@ -103,7 +101,7 @@ export default class App extends Component<AppProps, AppState> {
                     )}
                 </nav>
             </div>
-        )
+        );
     }
 
     private redirect() {
@@ -130,4 +128,4 @@ export default class App extends Component<AppProps, AppState> {
         };
     }
 
-};
+}

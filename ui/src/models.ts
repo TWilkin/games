@@ -3,17 +3,17 @@ export type Models = 'Game' | 'GameCollection' | 'GameCompilation' | 'GamePlatfo
 export interface Model {
     createdAt: Date;
     updatedAt: Date;
-};
+}
 
 export interface Game extends Model {
     gameId: number;
     title: string;
     includes?: GameCompilation[];
-};
+}
 
 export interface GameCollection extends Model, UserGamePlatform {
     gameCollectionId: number;
-};
+}
 
 export interface GameCompilation extends Model {
     gameCompilationId: number;
@@ -26,7 +26,7 @@ export interface GamePlatform extends Model {
     alias?: string;
     game: Game;
     platform: Platform;
-};
+}
 
 export interface GamePlayTime extends Model {
     gamePlayTimeId: number;
@@ -35,24 +35,24 @@ export interface GamePlayTime extends Model {
     demo: boolean;
     startTime: number;
     endTime?: number;
-};
+}
 
 export interface GameWishlist extends Model, UserGamePlatform {
     gameWishlistId: number;
     gamePlatform: GamePlatform;
-};
+}
 
 export interface Platform extends Model {
     platformId: number;
     name: string;
-};
+}
 
 export interface User extends Model {
     userId: number;
     userName: string;
     role: string;
-};
+}
 
 export interface UserGamePlatform {
     gamePlatform: GamePlatform;
-};
+}

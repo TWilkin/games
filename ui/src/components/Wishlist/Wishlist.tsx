@@ -33,7 +33,7 @@ class Wishlist extends Component<WishlistProps, WishlistState> {
                     query={queries['GameWishlist']}
                     args={{ userId: this.state.userId }} />
             </div>
-        )
+        );
     }
 }
 

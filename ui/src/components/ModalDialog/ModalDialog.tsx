@@ -26,7 +26,7 @@ export default class ModalDialog extends Component<ModalDialogProps> {
         this.props.onClose(false);
     }
 
-    public render() {
+    public render(): JSX.Element {
         return this.props.visible && (
             <div className='modal'>
                 <div className='modal-content'>
@@ -45,4 +45,4 @@ export default class ModalDialog extends Component<ModalDialogProps> {
         );
     }
 
-};
+}

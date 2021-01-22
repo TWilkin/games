@@ -139,7 +139,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
     private async load(gamePlatformId: number) {
         try {
             // load the gamePlatform
-            let args: object = { gamePlatformId: gamePlatformId };
+            let args: unknown = { gamePlatformId: gamePlatformId };
             const games: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
             const game = games && games.length >= 1 ? games[0] : undefined;
 
@@ -156,8 +156,8 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
             });
 
             // check if this game in the user's collection or wishlist
-            let gameCollection = await this.loadUserGamePlatform<GameCollection>(game, queries['GameCollection']);
-            let gameWishlist = await this.loadUserGamePlatform<GameWishlist>(game, queries['GameWishlist']);
+            const gameCollection = await this.loadUserGamePlatform<GameCollection>(game, queries['GameCollection']);
+            const gameWishlist = await this.loadUserGamePlatform<GameWishlist>(game, queries['GameWishlist']);
             this.setState({
                 gameCollectionId: gameCollection?.gameCollectionId,
                 gameWishlistId: gameWishlist?.gameWishlistId

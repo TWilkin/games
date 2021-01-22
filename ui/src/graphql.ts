@@ -112,7 +112,7 @@ export interface Query {
     fragments: Models[];
 }
 
-async function graphql(apiUrl: string, query: Query, variables: object): Promise<any> {
+async function graphql(apiUrl: string, query: Query, variables={}): Promise<any> {
     const response = await fetch(`${apiUrl}/graphql`, {
         method: 'POST',
         credentials: 'include',
@@ -142,8 +142,8 @@ async function graphql(apiUrl: string, query: Query, variables: object): Promise
 
 export default function query<T extends Model>(apiUrl: string, query: Query, variables={}): Promise<T[]> {
     return graphql(apiUrl, query, variables);
-};
+}
 
-export function mutate<T extends Model>(apiUrl: string, mutation: Query, variables: object): Promise<T> {
+export function mutate<T extends Model>(apiUrl: string, mutation: Query, variables={}): Promise<T> {
     return graphql(apiUrl, mutation, variables);
-};
+}

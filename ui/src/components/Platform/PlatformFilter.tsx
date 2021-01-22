@@ -33,7 +33,7 @@ export default class PlatformFilter extends Component<PlatformFilterProps, Platf
         }
     }
 
-    public async componentDidMount() {
+    public async componentDidMount(): Promise<void> {
         try {
             const data: Platform[] = await query(this.props.api.url, queries['Platform']);
             this.setState({
@@ -44,19 +44,18 @@ export default class PlatformFilter extends Component<PlatformFilterProps, Platf
         }
     }
 
-    public render() {
+    public render(): JSX.Element {
         return (
             <div className='platforms'>
                 {this.renderPlatforms()}
             </div>
-        )
+        );
     }
 
     private renderPlatforms() {
         return (
             <div>
-                {this.state.platforms ?
-                (
+                {this.state.platforms ? (
                     <select onChange={this.onChange} defaultValue='-1'>
                         <option key='-1' value='-1'>-</option>
                         {this.state.platforms.map(entry => 
@@ -70,4 +69,4 @@ export default class PlatformFilter extends Component<PlatformFilterProps, Platf
         );
     }
 
-};
+}
