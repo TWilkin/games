@@ -37,11 +37,11 @@ export function generateData(schema: GraphQLSchema, typeName: string): any {
 
 export function mockContext(role: 'user'|'admin', userId=1, userName='test'): { user: User, database: Sequelize } {
     return {
-        user: {
+        user: new User({
             userId,
             userName,
             role
-        } as User,
+        }),
         database: sequelize
     };
 }
