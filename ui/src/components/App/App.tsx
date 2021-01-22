@@ -19,9 +19,9 @@ interface AppState {
     user?: User;
 }
 
-export default class App extends Component<never, AppState> {
+export default class App extends Component<Record<string, never>, AppState> {
 
-    constructor(props: never) {
+    constructor(props: Record<string, never>) {
         super(props);
 
         const user = this.getUser;
