@@ -1,7 +1,7 @@
 import { GraphQLSchema, GraphQLObjectType, isScalarType, isNonNullType, isListType, assertNonNullType, assertListType } from 'graphql';
 import { Model, ModelCtor } from 'sequelize';
 
-export function generateQuery(schema: GraphQLSchema, typeName: string, params: unknown=null): string {
+export function generateQuery(schema: GraphQLSchema, typeName: string, params: any=null): string {
     // find the query from the schema
     const type = schema.getType(typeName) as GraphQLObjectType;
 
