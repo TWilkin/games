@@ -11,7 +11,7 @@ interface PlayTimeListProps {
 }
 
 export default class PlayTimeList extends Component<PlayTimeListProps> {
-    render() {
+    render(): JSX.Element {
         return (
             <div className='playTime'>
                 {this.props.playTime?.length > 0 ? (
@@ -27,14 +27,14 @@ export default class PlayTimeList extends Component<PlayTimeListProps> {
         );
     }
 
-    renderCells(playTime: GamePlayTime) {
+    renderCells(playTime: GamePlayTime): JSX.Element[] {
         return playTime?.endTime && (
             [
-                <Moment date={playTime.startTime} format='L LT' />,
-                <Moment date={playTime.endTime} format='L LT' />,
-                <Moment duration={playTime.startTime} date={playTime.endTime} format='hh:mm:ss' />,
-                playTime.demo ? <FontAwesomeIcon icon={faCheckCircle} /> : null
+                <Moment key='startTime' date={playTime.startTime} format='L LT' />,
+                <Moment key='endTime' date={playTime.endTime} format='L LT' />,
+                <Moment key='duration' duration={playTime.startTime} date={playTime.endTime} format='hh:mm:ss' />,
+                playTime.demo ? <FontAwesomeIcon key='isDemo' icon={faCheckCircle} /> : null
             ]
         );
     }
-};
+}

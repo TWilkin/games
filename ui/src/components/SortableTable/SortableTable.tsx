@@ -29,7 +29,7 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
         this.onSortClick = this.onSortClick.bind(this);
     }
 
-    render() {
+    render(): JSX.Element {
         const columns = this.props.headings.length;
 
         return (
@@ -50,7 +50,7 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
                     {this.props.data
                         .sort(this.sort)
                         .map((data, i) => {
-                            let cells = this.props.row(data);
+                            const cells = this.props.row(data);
                             return cells ? (
                                 <tr key={i}>
                                     {cells.map((cell, j) => (
@@ -84,8 +84,8 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
     }
 
     private sort(field1: T, field2: T) {
-        let str1 = field1[this.state.sortBy]?.toString();
-        let str2 = field2[this.state.sortBy]?.toString();
+        const str1 = field1[this.state.sortBy]?.toString();
+        const str2 = field2[this.state.sortBy]?.toString();
 
         let order = str1 == str2 ? 0 : str1 < str2 ? -1 : 1;
 
@@ -105,4 +105,4 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
             ascending: direction
         });
     }
-};
+}

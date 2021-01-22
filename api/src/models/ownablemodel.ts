@@ -16,7 +16,7 @@ export abstract class AbstractOwnableModel<T extends Model<T>> extends Model<T> 
     owner!: User;
 
     @BeforeCreate
-    public static addOwner<T extends AbstractOwnableModel<T>>(instance: T, context: GraphQLContext) {
+    public static addOwner<T extends AbstractOwnableModel<T>>(instance: T, context: GraphQLContext): void {
         if(context && context.user) {
             // add the owner
             instance.userId = context.user.userId;
@@ -28,7 +28,7 @@ export abstract class AbstractOwnableModel<T extends Model<T>> extends Model<T> 
     }
 
     @BeforeUpdate
-    public static async checkOwner<T extends AbstractOwnableModel<T>>(instance: T, options: GraphQLUpdateOptions) {
+    public static async checkOwner<T extends AbstractOwnableModel<T>>(instance: T, options: GraphQLUpdateOptions): Promise<void> {
         const context = options.context;
         if(context && context.user) {
             // check this is being updated by the owner

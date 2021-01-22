@@ -37,20 +37,20 @@ ImageController.init(app, igdbService);
 
 // TEMP for testing IGDB
 app.use(`${Configuration.getExpress.root}/igdb/covers/:id`.replace('//', '/'), async (req, res) => {
-    let result = await igdbService.getCover(parseInt(req.params.id)).fetch();
+    const result = await igdbService.getCover(parseInt(req.params.id)).fetch();
     res.json(result);
 });
 app.use(`${Configuration.getExpress.root}/igdb/games/:name`.replace('//', '/'), async (req, res) => {
-    let result = await igdbService.getGames(req.params.name).fetch();
+    const result = await igdbService.getGames(req.params.name).fetch();
     res.json(result);
 });
 app.use(`${Configuration.getExpress.root}/igdb/platforms/:name`.replace('//', '/'), async (req, res) => {
-    let result = await igdbService.getPlatforms(req.params.name).fetch();
+    const result = await igdbService.getPlatforms(req.params.name).fetch();
     res.json(result);
 });
 
 // start listening
-let server = app.listen(Configuration.getExpress.port, () => {
+const server = app.listen(Configuration.getExpress.port, () => {
     const { address, port } = server.address() as AddressInfo;
     console.log('Listening on http://%s:%s%s', address, port, Configuration.getExpress.root);
 });

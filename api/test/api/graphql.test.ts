@@ -1,5 +1,8 @@
 import { expect } from 'chai';
-import { graphql, GraphQLInt } from 'graphql';
+import { ExecutionResult, graphql, GraphQLInt } from 'graphql';
+import { ExecutionResultDataDefault } from 'graphql/execution/execute';
+import 'mocha';
+import { Model, ModelCtor } from 'sequelize';
 
 import GraphQLAPI from '../../src/api/graphql';
 import { sequelize } from '../../src/db';
@@ -17,120 +20,127 @@ describe('GraphQL', () => {
     Object.values(sequelize.models).forEach((model) => {
         describe(model.name, () => {
             it('Query no parameter', async () => {
-                let queryName = `Get${model.name}`;
-                let response = await graphql(
+                const queryName = `Get${model.name}`;
+                const response = await graphql(
                     schema, 
                     generateQuery(schema, model.name),
                     null,
                     mockContext('admin')
                 );
-                expect(response).to.be.not.null;
-                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
-                expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName].length).to.equal(2);
+
+                checkQueryResponse(response, queryName, 2);
             });
 
             it('Query with valid id', async () => {
-                let queryName = `Get${model.name}`;
-                let data = {
+                const queryName = `Get${model.name}`;
+                const data = {
                     id: 1
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateQuery(schema, model.name, { id: GraphQLInt }), 
                     null, 
                     mockContext('admin'), 
                     data
                 );
-                expect(response).to.be.not.null;
-                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
-                expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName].length).to.equal(1);
+                
+                checkQueryResponse(response, queryName, 1);
             });
 
             it('Mutation add', async () => {
-                let queryName = `Add${model.name}`;
-                let data = {
+                const mutationName = `Add${model.name}`;
+                const data = {
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateMutation(model, true), 
-                    null, 
+                    null,
                     mockContext('admin'),
                     data
                 );
-                expect(response).to.be.not.null;
-                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
-                expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName]).to.not.be.an('array');
-                expect((response.data as object)[queryName][model.primaryKeyAttribute]).to.be.a('number');
+                
+                checkMutationResponse(response, mutationName, model);
             });
 
             it('Mutation update with valid id', async () => {
-                let queryName = `Update${model.name}`;
-                let data = {
+                const mutationName = `Update${model.name}`;
+                const data = {
                     id: 1,
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateMutation(model, false), 
                     null,
                     mockContext('admin'), 
                     data
                 );
-                expect(response).to.be.not.null;
-                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
-                expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName]).to.not.be.an('array');
-                expect((response.data as object)[queryName][model.primaryKeyAttribute]).to.be.a('number');
+                
+                checkMutationResponse(response, mutationName, model);
             });
 
             it('Mutation update with invalid id', async () => {
-                let queryName = `Update${model.name}`;
-                let data = {
+                const mutationName = `Update${model.name}`;
+                const data = {
                     id: 3,
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateMutation(model, false), 
                     null, 
                     mockContext('admin'), 
                     data
                 );
-                expect(response).to.be.not.null;
-                expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
-                expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.null;
+                
+                checkMutationResponse(response, mutationName, model)
+                    .which.is.be.null;
             });
 
             if(model.name === 'GameCollection' || model.name === 'GameWishlist') {
                 it('Query with nested query parameter', async () => {
-                    let queryName = `Get${model.name}`;
-                    let data = {
+                    const queryName = `Get${model.name}`;
+                    const data = {
                         platformId: 2
                     };
-                    let response = await graphql(
+                    const response = await graphql(
                         schema, 
                         `query($platformId: Int) { Get${model.name}(platformId: $platformId) { gamePlatform { platformId } } }`, 
                         null, 
                         mockContext('admin'), 
                         data
                     );
-                    expect(response).to.be.not.null;
-                    expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
-                    expect(response.data).to.be.not.null;
-                    expect((response.data as object)[queryName]).to.be.not.null;
-                    expect((response.data as object)[queryName].length).to.equal(1);
-                    expect((response.data as object)[queryName][0]['gamePlatform']['platformId']).to.equal(data.platformId);
+
+                    checkQueryResponse(response, queryName, 1)
+                        .which.satisfies((result: { gamePlatform: { platformId: number; }; }) => 
+                            result?.gamePlatform?.platformId == data.platformId
+                        );
                 });
-        }
+            }
         });
     });
 });
+
+function checkResponse(response: ExecutionResult<ExecutionResultDataDefault>, queryName: string) {
+    expect(response).to.be.not.null;
+
+    expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
+
+    expect(response.data).to.be.not.null;
+    return expect(response.data).to.have.key(queryName);
+}
+
+function checkQueryResponse(response: ExecutionResult<ExecutionResultDataDefault>, queryName: string, length: number) {
+    return checkResponse(response, queryName)
+        .which.is.not.null
+        .and.length.is.equal(length);
+}
+
+function checkMutationResponse(response: ExecutionResult<ExecutionResultDataDefault>, mutationName: string, model: ModelCtor<Model<any, any>>) {
+    return checkResponse(response, mutationName)
+        .which.is.not.null
+        .and.is.not.an('array')
+        .which.has.key(model.primaryKeyAttribute)
+        .which.is.a('number');
+}

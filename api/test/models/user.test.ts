@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import 'mocha';
 
 import { loadData, mockSequelize } from '../utility/mock';
 import User from '../../src/models/user.model';
@@ -10,14 +11,12 @@ describe('User model', () => {
         users = (await loadData())
             .filter(entry => entry.model == 'User')
             .map(entry => entry.data)[0]
-            .map(data => {
-                let user = new User();
-                user.userId = data.userId;
-                user.userName = data.userName;
-                user.password = data.password;
-                user.role = data.role;
-                return user;
-            });
+            .map(data => ({
+                userId: data.userId,
+                userName: data.userName,
+                password: data.password,
+                role: data.role,
+            } as User));
     });
 
     mockSequelize();

@@ -8,10 +8,10 @@ interface GameImageProps extends APIProps {
 }
 
 export default class GameImage extends Component<GameImageProps> {
-    render() {
+    render(): JSX.Element {
         return (
             <img src={`${this.props.api.url}/images/games/${this.props.game.gameId}`}
                 alt={`Cover art for ${this.props.game.title}`} />
-        )
+        );
     }
-};
+}

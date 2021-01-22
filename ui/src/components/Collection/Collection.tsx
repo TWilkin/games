@@ -33,7 +33,7 @@ class Collection extends Component<CollectionProps, CollectionState> {
                     query={queries['GameCollection']}
                     args={{ userId: this.state.userId }} />
             </div>
-        )
+        );
     }
 }
 

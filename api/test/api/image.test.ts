@@ -3,6 +3,7 @@ import devnull from 'dev-null';
 import fetchMock from 'fetch-mock';
 import fs from 'fs';
 import HttpStatus from 'http-status-codes';
+import 'mocha';
 import sinon from 'sinon';
 
 import ImageController from '../../src/api/image';
@@ -24,59 +25,59 @@ describe('ImageController', () => {
 
     describe('getGame', () => {
         it('not cached', async () => {
-            let subject = createSubject([{ image_id: 10 }]);
+            const subject = createSubject([{ image_id: 10 }]);
 
-            let response = await subject.getGame(1);
+            const response = await subject.getGame(1);
             expect(response).to.match(/1.jpg$/);
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.true;
         });
 
         it('cached', async () => {
-            let subject = createSubject([{ image_id: 10 }]);
+            const subject = createSubject([{ image_id: 10 }]);
 
             sinon.stub(fs, 'existsSync')
                 .callsFake(() => true);
             
-            let response = await subject.getGame(1);
+            const response = await subject.getGame(1);
             expect(response).to.match(/1.jpg$/);
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
 
         it('game does not exist', async () => {
-            let subject = createSubject([{ image_id: 10 }]);
+            const subject = createSubject([{ image_id: 10 }]);
 
-            let response = await subject.getGame(1000);
+            const response = await subject.getGame(1000);
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
 
         it('no IGDB id', async () => {
-            let subject = createSubject([{ image_id: 10 }]);
+            const subject = createSubject([{ image_id: 10 }]);
 
-            let response = await subject.getGame(2);
+            const response = await subject.getGame(2);
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
 
         it('no cover art', async () => {
-            let subject = createSubject([]);
+            const subject = createSubject([]);
 
-            let response = await subject.getGame(1);
+            const response = await subject.getGame(1);
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.false;
         });
 
         it('cover art not found', async () => {
-            let subject = createSubject([{ image_id: 10 }], HttpStatus.NOT_FOUND);
+            const subject = createSubject([{ image_id: 10 }], HttpStatus.NOT_FOUND);
 
-            let response = await subject.getGame(1);
+            const response = await subject.getGame(1);
             expect(response).to.be.null;
             expect(fetchMock.called(igdbImageUrlMatcher)).to.be.true;
         });
     });
 });
 
-function createSubject(result: object[], image: Buffer | number=Buffer.from([])) {
+function createSubject(result: unknown[], image: Buffer | number=Buffer.from([])) {
     // return an empty binary buffer when it tries to return the image
     fetchMock.mock(igdbImageUrlMatcher, image);
 

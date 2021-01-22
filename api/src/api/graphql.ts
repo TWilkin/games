@@ -15,11 +15,11 @@ import User from '../models/user.model';
 export interface GraphQLContext {
     database: Sequelize,
     user?: User
-};
+}
 
 export interface GraphQLUpdateOptions extends UpdateOptions {
     context: GraphQLContext
-};
+}
 
 export default class GraphQLAPI {
 
@@ -59,7 +59,7 @@ export default class GraphQLAPI {
         const model = this.model;
 
         // generate the query args with default id and any other queryable column
-        let args = {
+        const args = {
             id: {
                 type: GraphQLInt
             }
@@ -83,7 +83,7 @@ export default class GraphQLAPI {
 
                     args[nestedFieldName] = {
                         type: GraphQLInt,
-                        fullyQualifiedName: `\$${parentName}.${nestedFieldName}\$`
+                        fullyQualifiedName: `$${parentName}.${nestedFieldName}$`
                     };
                 })
             );
@@ -92,7 +92,7 @@ export default class GraphQLAPI {
             type: new GraphQLList(this.type),
             args: args,
             resolve: async (_: any, queryArgs: any, __: any, info: GraphQLResolveInfo) => {
-                let query: FindOptions = this.restrictColumns(info);
+                const query: FindOptions = this.restrictColumns(info);
 
                 if(queryArgs) {
                     // replace args.id with the actual name of the field
@@ -171,7 +171,7 @@ export default class GraphQLAPI {
     private generateFields(isInput=false): 
             GraphQLFieldConfigMap<any, any, any> | GraphQLInputFieldConfigMap
     {
-        let fields = {};
+        const fields = {};
 
         // iterate over the database fields
         Object.values(this.model.rawAttributes)
@@ -286,7 +286,7 @@ export default class GraphQLAPI {
 
     private findSortColumn(includeable: Includeable[] | undefined, model: ModelCtor<any>=this.model, prefix: string | undefined=undefined) {
         // first check this model's fields
-        let column = Object.values(model.rawAttributes)
+        const column = Object.values(model.rawAttributes)
             .find(field => isSortable(field));
         let columnName = column ? column.field : undefined;
         if(columnName && prefix) {

@@ -2,6 +2,8 @@ import casual from 'casual';
 import dateformat from 'dateformat';
 import fs from 'fs';
 import { GraphQLSchema, GraphQLObjectType, GraphQLField, isNonNullType, assertNonNullType, GraphQLInt, GraphQLString, GraphQLBoolean } from 'graphql';
+import 'mocha';
+import { Sequelize } from 'sequelize/types';
 import util from 'util';
 
 import DateTimeScalarType from '../../src/api/datetime';
@@ -17,14 +19,14 @@ export interface TestData {
     data: {
         [key: string]: any
     }[]
-};
+}
 
 export function generateData(schema: GraphQLSchema, typeName: string): any {
     // find the query from the schema
     const type = schema.getType(`${typeName}Input`) as GraphQLObjectType;
 
     // iterate over the model fields
-    let generated = {};
+    const generated = {};
     Object.values(type.getFields())
         .forEach((field) => {
             generated[field.name] = generateType(field);
@@ -33,14 +35,13 @@ export function generateData(schema: GraphQLSchema, typeName: string): any {
     return generated;
 }
 
-export function mockContext(role: 'user'|'admin', userId=1, userName='test') {
-    let user = new User();
-    user.userId = userId;
-    user.userName = userName;
-    user.role = role;
-
+export function mockContext(role: 'user'|'admin', userId=1, userName='test'): { user: User, database: Sequelize } {
     return {
-        user: user,
+        user: new User({
+            userId,
+            userName,
+            role
+        }),
         database: sequelize
     };
 }
@@ -86,9 +87,9 @@ export function mockSequelize() {
         // import the test data into the database without hooks
         return Promise.all(
             data.map(entry => {
-                    const model = sequelize.models[entry.model];
-                    return model.bulkCreate(entry.data, { individualHooks: false });
-                })
+                const model = sequelize.models[entry.model];
+                return model.bulkCreate(entry.data, { individualHooks: false });
+            })
         );
     });
 
@@ -98,7 +99,7 @@ export function mockSequelize() {
     });
 }
 
-export async function loadData(filter: string | null=null): Promise<TestData[]> {
+export async function loadData(): Promise<TestData[]> {
     // read the test data from file
     const file = await readFile(`${__dirname}/../data.json`);
     return JSON.parse(file.toString()) as TestData[];

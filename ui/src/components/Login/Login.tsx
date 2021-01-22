@@ -57,9 +57,9 @@ export default class Login extends Component<LoginProps, LoginState> {
         } catch(e) {
             this.setState({ success: false });
         }
-    };
+    }
 
-    public render() {
+    public render(): JSX.Element {
         return (
             <div id='login'>
                 <form onSubmit={this.handleSubmit}>
@@ -91,4 +91,4 @@ export default class Login extends Component<LoginProps, LoginState> {
             </div>
         );
     }
-};
+}
