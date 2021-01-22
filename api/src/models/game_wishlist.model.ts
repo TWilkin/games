@@ -5,13 +5,13 @@ import GamePlatform from './game_platform.model';
 import { AbstractOwnableModel } from './ownablemodel';
 
 @Table
-export default class GameCollection extends AbstractOwnableModel<GameCollection> {
+export default class GameWishlist extends AbstractOwnableModel<GameWishlist> {
 
     @Queryable
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
-    gameCollectionId!: number;
+    gameWishlistId!: number;
 
     @Queryable
     @NestedQueryable('platformId')

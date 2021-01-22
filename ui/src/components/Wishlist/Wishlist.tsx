@@ -5,19 +5,19 @@ import { APIProps } from '../common';
 import { queries } from '../../graphql';
 import { GameList } from '../Game/GameList';
 
-interface CollectionMatch {
+interface WishlistMatch {
     userId: string;
 }
 
-interface CollectionProps extends APIProps, RouteComponentProps<CollectionMatch> { }
+interface WishlistProps extends APIProps, RouteComponentProps<WishlistMatch> { }
 
-interface CollectionState {
+interface WishlistState {
     userId: number;
 }
 
-class Collection extends Component<CollectionProps, CollectionState> {
+class Wishlist extends Component<WishlistProps, WishlistState> {
 
-    constructor(props: CollectionProps) {
+    constructor(props: WishlistProps) {
         super(props);
 
         this.state = {
@@ -27,14 +27,14 @@ class Collection extends Component<CollectionProps, CollectionState> {
 
     public render() {
         return (
-            <div className='collection'>
-                <h1>My Collection</h1>
+            <div className='wishlist'>
+                <h1>My Wishlist</h1>
                 <GameList api={this.props.api} 
-                    query={queries['GameCollection']}
+                    query={queries['GameWishlist']}
                     args={{ userId: this.state.userId }} />
             </div>
         )
     }
 }
 
-export default withRouter(Collection);
+export default withRouter(Wishlist);

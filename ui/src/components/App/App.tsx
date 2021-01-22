@@ -6,10 +6,11 @@ import { BrowserRouter, NavLink, Redirect, Route, Switch } from 'react-router-do
 
 import Collection from '../Collection/Collection';
 import { APISettings } from '../common';
+import { AllGameList } from '../Game/GameList';
 import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
-import GameList from '../Game/GameList';
+import Wishlist from '../Wishlist/Wishlist';
 
 const apiUrl = `${window.location.origin}/api`;
 
@@ -71,9 +72,12 @@ export default class App extends Component<AppProps, AppState> {
                         <Route path='/user/:userId/collection'>
                             <Collection api={this.getAPISettings} />
                         </Route>
+                        <Route path='/user/:userId/wishlist'>
+                            <Wishlist api={this.getAPISettings} />
+                        </Route>
 
                         <Route path='/games'>
-                            <GameList api={this.getAPISettings} />
+                            <AllGameList api={this.getAPISettings} />
                         </Route>
                         <Route path='/game/:gamePlatformId'>
                             <GameDetails api={this.getAPISettings} />
@@ -92,7 +96,10 @@ export default class App extends Component<AppProps, AppState> {
                     {this.state.unauthorised ? (
                         <NavLink to='/login'>Login</NavLink>
                     ) : (
-                        <NavLink to={`/user/${this.state.user.userId}/collection`}>My Collection</NavLink>
+                        <>
+                            <NavLink to={`/user/${this.state.user.userId}/collection`}>My Collection</NavLink>
+                            <NavLink to={`/user/${this.state.user.userId}/wishlist`}>My Wishlist</NavLink>
+                        </>
                     )}
                 </nav>
             </div>

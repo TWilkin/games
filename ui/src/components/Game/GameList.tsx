@@ -3,17 +3,22 @@ import { Link } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
-import query, { queries } from '../../graphql';
-import { GamePlatform } from '../../models';
+import query, { queries, Query } from '../../graphql';
+import { Model, UserGamePlatform, } from '../../models';
 import PlatformFilter from '../Platform/PlatformFilter';
 
-interface GameListState {
-    games?: GamePlatform[];
+interface GameListProps extends APIProps {
+    query: Query;
+    args?: object;
 }
 
-export default class GameList extends Component<APIProps, GameListState> {
+interface GameListState {
+    games?: UserGamePlatform[];
+}
+
+export class GameList extends Component<GameListProps, GameListState> {
     
-    constructor(props: APIProps) {
+    constructor(props: GameListProps) {
         super(props);
 
         this.state = {
@@ -30,7 +35,6 @@ export default class GameList extends Component<APIProps, GameListState> {
     public render() {
         return (
             <div className='games'>
-                <h1>All Games</h1>
                 <PlatformFilter
                     api={this.props.api}
                     onSelect={this.onPlatformSelect} />
@@ -47,9 +51,9 @@ export default class GameList extends Component<APIProps, GameListState> {
                     <>
                         {this.state.games.map(entry => {
                             return(
-                                <div key={entry.gamePlatformId}>
-                                    <Link to={`/game/${entry.gamePlatformId}`}>
-                                        <GameSummary gamePlatform={entry} />
+                                <div key={entry.gamePlatform.gamePlatformId}>
+                                    <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
+                                        <GameSummary gamePlatform={entry.gamePlatform} />
                                     </Link>
                                 </div>
                             );
@@ -65,15 +69,45 @@ export default class GameList extends Component<APIProps, GameListState> {
     private async load(platformId: number) {
         try {
             const args = {
+                ...this.props.args,
                 platformId: platformId
             };
-            const data: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
+            const data = await query(this.props.api.url, this.props.query, args);
             this.setState({
-                games: data
+                games: this.toUserGamePlatform(data)
             });
         } catch(error) {
             this.props.api.onError(error);
         }
     }
 
+    private toUserGamePlatform(data: Model[]) {
+        if(data.length == 0) {
+            return [] as UserGamePlatform[];
+        }
+
+        if('gameCollectionId' in data[0]
+            || 'gameWishlistId' in data[0])
+        {
+            return data as unknown as UserGamePlatform[];
+        }
+
+        return data.map(gamePlatform => ({
+            gamePlatform
+        } as UserGamePlatform));
+    }
+
+};
+
+export class AllGameList extends Component<APIProps> {
+    render() {
+        return (
+            <div>
+                <h1>All Games</h1>
+                <GameList 
+                    api={this.props.api} 
+                    query={queries['GamePlatform']} />
+            </div>
+        )
+    }
 };

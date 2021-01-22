@@ -109,7 +109,28 @@ describe('GraphQL', () => {
                 expect(response.data).to.be.not.null;
                 expect((response.data as object)[queryName]).to.be.null;
             });
+
+            if(model.name === 'GameCollection' || model.name === 'GameWishlist') {
+                it('Query with nested query parameter', async () => {
+                    let queryName = `Get${model.name}`;
+                    let data = {
+                        platformId: 2
+                    };
+                    let response = await graphql(
+                        schema, 
+                        `query($platformId: Int) { Get${model.name}(platformId: $platformId) { gamePlatform { platformId } } }`, 
+                        null, 
+                        mockContext('admin'), 
+                        data
+                    );
+                    expect(response).to.be.not.null;
+                    expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
+                    expect(response.data).to.be.not.null;
+                    expect((response.data as object)[queryName]).to.be.not.null;
+                    expect((response.data as object)[queryName].length).to.equal(1);
+                    expect((response.data as object)[queryName][0]['gamePlatform']['platformId']).to.equal(data.platformId);
+                });
+        }
         });
     });
-
 });

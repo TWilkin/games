@@ -10,6 +10,9 @@ interface ExtendedModelAttributeColumnOptions extends ModelAttributeColumnOption
     // whether the column should be included in query parameters or not
     queryable?: boolean;
 
+    // any nested queryable columns provided by this relationship
+    nestedQueryable?: string[];
+
     // whether the column should be included in query parameters and query results or not
     secret?: {
         excludeInput: boolean,
@@ -38,6 +41,15 @@ export function Queryable(target: any, propertyName: string): any {
     addMetadata(target, propertyName, 'queryable', true);
 }
 
+// Nested queryable annotation for model column(s) nested in a foreign key relationship
+export function NestedQueryable(columns: string[] | string) {
+    const columnList = typeof columns === 'string' ? [ columns ] : columns;
+
+    return function(target: any, propertyName: string): any {
+        addMetadata(target, propertyName, 'nestedQueryable', columnList);
+    };
+}
+
 // Secret annotation for a model column which indicates this column should not appear in query results or inputs
 export function Secret(excludeInput=false, excludeResult=true) {
     return function(target: any, propertyName: string): any {
@@ -57,6 +69,12 @@ export function Sortable(target: any, propertyName: string): any {
 export function isQueryable(field: ModelAttributeColumnOptions): boolean {
     const columnOptions = field as ExtendedModelAttributeColumnOptions
     return columnOptions.queryable && !columnOptions.secret?.excludeResult ? true : false;
+}
+
+// check whether a model column has nested queryable columns
+export function getNestedQueryable(field: ModelAttributeColumnOptions): string[] {
+    const columnOptions = field as ExtendedModelAttributeColumnOptions
+    return columnOptions.nestedQueryable && !columnOptions.secret?.excludeResult ? columnOptions.nestedQueryable : [];
 }
 
 // check whether a model column should be a secret from an Input
