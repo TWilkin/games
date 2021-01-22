@@ -1,12 +1,12 @@
 import { GraphQLSchema, GraphQLObjectType, isScalarType, isNonNullType, isListType, assertNonNullType, assertListType } from 'graphql';
 import { Model, ModelCtor } from 'sequelize';
 
-export function generateQuery(schema: GraphQLSchema, typeName: string, params: any=null): string {
+export function generateQuery(schema: GraphQLSchema, typeName: string, params: unknown=null): string {
     // find the query from the schema
     const type = schema.getType(typeName) as GraphQLObjectType;
 
     // extract the schema type fields
-    let fields: string[] = Object.values(type.getFields())
+    const fields: string[] = Object.values(type.getFields())
         .map(field => {
             let fieldType = field.type;
 
@@ -20,9 +20,10 @@ export function generateQuery(schema: GraphQLSchema, typeName: string, params: a
 
             // if it's a nested element add the sub-fields
             if(!isScalarType(fieldType)) {
-                return `${field.name} { createdAt, updatedAt }`
+                return `${field.name} { createdAt, updatedAt }`;
             }
-            return field.name
+
+            return field.name;
         });
 
     // add any query parameters if they are set
@@ -37,9 +38,10 @@ export function generateQuery(schema: GraphQLSchema, typeName: string, params: a
 }
 
 export function generateMutation(model: ModelCtor<Model<any, any>>, isAdd: boolean): string {
-    let method = isAdd ? 'Add' : 'Update';
-    let idParams = isAdd ? '' : '$id: Int!,';
-    let idAssign = isAdd ? '' : 'id: $id,';
+    const method = isAdd ? 'Add' : 'Update';
+    const idParams = isAdd ? '' : '$id: Int!,';
+    const idAssign = isAdd ? '' : 'id: $id,';
+    
     return `mutation(${idParams} $input: ${model.name}Input!) {
         ${method}${model.name}(${idAssign} input: $input) {
             ${model.primaryKeyAttribute},

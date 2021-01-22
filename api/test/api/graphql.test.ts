@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { graphql, GraphQLInt } from 'graphql';
+import 'mocha';
 
 import GraphQLAPI from '../../src/api/graphql';
 import { sequelize } from '../../src/db';
@@ -17,8 +18,8 @@ describe('GraphQL', () => {
     Object.values(sequelize.models).forEach((model) => {
         describe(model.name, () => {
             it('Query no parameter', async () => {
-                let queryName = `Get${model.name}`;
-                let response = await graphql(
+                const queryName = `Get${model.name}`;
+                const response = await graphql(
                     schema, 
                     generateQuery(schema, model.name),
                     null,
@@ -27,16 +28,16 @@ describe('GraphQL', () => {
                 expect(response).to.be.not.null;
                 expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName].length).to.equal(2);
+                expect((response.data)[queryName]).to.be.not.null;
+                expect((response.data)[queryName].length).to.equal(2);
             });
 
             it('Query with valid id', async () => {
-                let queryName = `Get${model.name}`;
-                let data = {
+                const queryName = `Get${model.name}`;
+                const data = {
                     id: 1
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateQuery(schema, model.name, { id: GraphQLInt }), 
                     null, 
@@ -46,16 +47,16 @@ describe('GraphQL', () => {
                 expect(response).to.be.not.null;
                 expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName].length).to.equal(1);
+                expect((response.data)[queryName]).to.be.not.null;
+                expect((response.data)[queryName].length).to.equal(1);
             });
 
             it('Mutation add', async () => {
-                let queryName = `Add${model.name}`;
-                let data = {
+                const queryName = `Add${model.name}`;
+                const data = {
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateMutation(model, true), 
                     null, 
@@ -65,18 +66,18 @@ describe('GraphQL', () => {
                 expect(response).to.be.not.null;
                 expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName]).to.not.be.an('array');
-                expect((response.data as object)[queryName][model.primaryKeyAttribute]).to.be.a('number');
+                expect((response.data)[queryName]).to.be.not.null;
+                expect((response.data)[queryName]).to.not.be.an('array');
+                expect((response.data)[queryName][model.primaryKeyAttribute]).to.be.a('number');
             });
 
             it('Mutation update with valid id', async () => {
-                let queryName = `Update${model.name}`;
-                let data = {
+                const queryName = `Update${model.name}`;
+                const data = {
                     id: 1,
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateMutation(model, false), 
                     null,
@@ -86,18 +87,18 @@ describe('GraphQL', () => {
                 expect(response).to.be.not.null;
                 expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.not.null;
-                expect((response.data as object)[queryName]).to.not.be.an('array');
-                expect((response.data as object)[queryName][model.primaryKeyAttribute]).to.be.a('number');
+                expect((response.data)[queryName]).to.be.not.null;
+                expect((response.data)[queryName]).to.not.be.an('array');
+                expect((response.data)[queryName][model.primaryKeyAttribute]).to.be.a('number');
             });
 
             it('Mutation update with invalid id', async () => {
-                let queryName = `Update${model.name}`;
-                let data = {
+                const queryName = `Update${model.name}`;
+                const data = {
                     id: 3,
                     input: generateData(schema, model.name)
                 };
-                let response = await graphql(
+                const response = await graphql(
                     schema, 
                     generateMutation(model, false), 
                     null, 
@@ -107,16 +108,16 @@ describe('GraphQL', () => {
                 expect(response).to.be.not.null;
                 expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                 expect(response.data).to.be.not.null;
-                expect((response.data as object)[queryName]).to.be.null;
+                expect((response.data)[queryName]).to.be.null;
             });
 
             if(model.name === 'GameCollection' || model.name === 'GameWishlist') {
                 it('Query with nested query parameter', async () => {
-                    let queryName = `Get${model.name}`;
-                    let data = {
+                    const queryName = `Get${model.name}`;
+                    const data = {
                         platformId: 2
                     };
-                    let response = await graphql(
+                    const response = await graphql(
                         schema, 
                         `query($platformId: Int) { Get${model.name}(platformId: $platformId) { gamePlatform { platformId } } }`, 
                         null, 
@@ -126,11 +127,11 @@ describe('GraphQL', () => {
                     expect(response).to.be.not.null;
                     expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
                     expect(response.data).to.be.not.null;
-                    expect((response.data as object)[queryName]).to.be.not.null;
-                    expect((response.data as object)[queryName].length).to.equal(1);
-                    expect((response.data as object)[queryName][0]['gamePlatform']['platformId']).to.equal(data.platformId);
+                    expect((response.data)[queryName]).to.be.not.null;
+                    expect((response.data)[queryName].length).to.equal(1);
+                    expect((response.data)[queryName][0]['gamePlatform']['platformId']).to.equal(data.platformId);
                 });
-        }
+            }
         });
     });
 });

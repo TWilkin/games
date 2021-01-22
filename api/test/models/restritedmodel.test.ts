@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import 'mocha';
 
 import { AbstractRestrictedModel } from '../../src/models/restrictedmodel';
 import { mockContext } from '../utility/mock';

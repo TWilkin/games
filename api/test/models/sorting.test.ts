@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import 'mocha';
 import { Model } from 'sequelize-typescript';
 
 import Game from '../../src/models/game.model';
@@ -17,7 +18,7 @@ const games = [
     ['Ōkami', 'OKAMI'],
     ['Sonic & Knuckles', 'SONIC AND KNUCKLES'],
     ['WipeOut 2097', 'WIPEOUT 0000002097']
-]
+];
 
 describe('Sorting', () => {
 

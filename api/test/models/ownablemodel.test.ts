@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import 'chai-as-promised';
+import 'mocha';
 
 import { mockContext, mockSequelize } from '../utility/mock';
 

@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import fetchMock, { MockRequest } from 'fetch-mock';
+import fetchMock from 'fetch-mock';
+import 'mocha';
 
 import IGDB from '../../../src/services/igdb/igdb';
 
@@ -29,7 +30,7 @@ describe('IGDB', () => {
             });
 
             // new token
-            subject.clearToken()
+            subject.clearToken();
             await subject.authenticate();
             expect(fetchMock.called(authMatcher)).to.be.true;
 
@@ -46,7 +47,7 @@ describe('IGDB', () => {
             });
 
             // new token
-            subject.clearToken()
+            subject.clearToken();
             await subject.authenticate();
             expect(fetchMock.called(authMatcher)).to.be.true;
 
@@ -54,7 +55,7 @@ describe('IGDB', () => {
             fetchMock.resetHistory();
             await subject.authenticate();
             expect(fetchMock.called(authMatcher)).to.be.true;
-        })
+        });
     });
 
     describe('Get Tests', () => {
@@ -72,7 +73,7 @@ describe('IGDB', () => {
                 const params = getTests[key];
                 fetchMock.mock(params.matcher, [{ id: 1 }, { id: 2 }]);
 
-                let response = await params.func().fetch();
+                await params.func().fetch();
 
                 expect(fetchMock.called(params.matcher)).to.be.true;
             });
