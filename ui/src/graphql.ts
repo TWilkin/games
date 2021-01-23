@@ -6,7 +6,7 @@ const fragments: { [name in Models]: string } = {
     'Game': 'fragment GameFields on Game { gameId, title }',
     'GameCollection': 'fragment GameCollectionFields on GameCollection { gameCollectionId, gamePlatform { ...GamePlatformFields } }',
     'GameCompilation': 'fragment GameCompilationFields on GameCompilation { gameCompilationId, primary { ...GameFields }, included { ...GameFields } }',
-    'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, alias, game { ...GameFields }, platform { ...PlatformFields } }',
+    'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, alias, game { ...GameFields, includes { ...GameCompilationFields } }, platform { ...PlatformFields } }',
     'GamePlayTime': 'fragment GamePlayTimeFields on GamePlayTime { gamePlayTimeId, gamePlatformId, gameCompilationId, demo, startTime, endTime }',
     'GameWishlist': 'fragment GameWishlistFields on GameWishlist { gameWishlistId, gamePlatform { ...GamePlatformFields } }',
     'Platform': 'fragment PlatformFields on Platform { platformId, name }',
@@ -17,7 +17,9 @@ export const queries: { [name in Models]: Query | null} = {
     'Game': {
         name: 'GetGame',
         query: 'query($gameId: Int) { GetGame(gameId: $gameId) { ...GameFields } }',
-        fragments: [ 'Game' ]
+        fragments: [ 
+            'Game'
+        ]
     },
     'GameCollection': {
         name: 'GetGameCollection',
@@ -25,6 +27,7 @@ export const queries: { [name in Models]: Query | null} = {
         fragments: [
             'Game',
             'GameCollection',
+            'GameCompilation',
             'GamePlatform',
             'Platform'
         ]
@@ -42,6 +45,7 @@ export const queries: { [name in Models]: Query | null} = {
         query: 'query($gamePlatformId: Int, $platformId: Int) { GetGamePlatform(gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GamePlatformFields } }',
         fragments: [
             'Game',
+            'GameCompilation',
             'GamePlatform',
             'Platform'
         ]
@@ -56,6 +60,7 @@ export const queries: { [name in Models]: Query | null} = {
         query: 'query($userId: Int, $gamePlatformId: Int, $platformId: Int) { GetGameWishlist(userId: $userId, gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GameWishlistFields } }',
         fragments: [
             'Game',
+            'GameCompilation',
             'GamePlatform',
             'GameWishlist',
             'Platform'
@@ -77,6 +82,7 @@ export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = 
             fragments: [
                 'Game',
                 'GameCollection',
+                'GameCompilation',
                 'GamePlatform',
                 'Platform'
             ]
@@ -91,6 +97,7 @@ export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = 
             query: 'mutation($input: GameWishlistInput!) { AddGameWishlist(input: $input) { ...GameWishlistFields } }',
             fragments: [
                 'Game',
+                'GameCompilation',
                 'GamePlatform',
                 'GameWishlist',
                 'Platform'
