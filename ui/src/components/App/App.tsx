@@ -29,6 +29,12 @@ const App = (): JSX.Element => {
         }
     };
 
+    const onLogin = () => {
+        const user = getCookie();
+        setUser(user);
+        setAuthorised(user !== null);
+    };
+
     return (
         <BrowserRouter>
             {!authorised && <Redirect to='/login' />}
@@ -53,7 +59,7 @@ const App = (): JSX.Element => {
                     <Route path='/login'>
                         <Login 
                             api={api}
-                            onLogin={() => setUser(getCookie())} />
+                            onLogin={onLogin} />
                     </Route>
                     
                     <Route path='/user/:userId/collection'>
