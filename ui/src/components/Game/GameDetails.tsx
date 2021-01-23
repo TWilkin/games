@@ -79,20 +79,17 @@ function useGameDetails(api: APISettings, gamePlatformId: number) {
     const gamePlatforms = useQuery<GamePlatform>(api, queries['GamePlatform'], args);
     const gamePlatform = gamePlatforms && gamePlatforms.length >= 1 ? gamePlatforms[0] : undefined;
 
-    // check if this game in the user's collection or wishlist
-    const collectionWishlistArgs = {
+    const gamePlatformUserArgs = {
         gamePlatformId,
         userId: api.user?.userId
     };
-    const gameCollection = useQuery<GameCollection>(api, queries['GameCollection'], collectionWishlistArgs);
-    const gameWishlist = useQuery<GameWishlist>(api, queries['GameWishlist'], collectionWishlistArgs);
+
+    // check if this game in the user's collection or wishlist
+    const gameCollection = useQuery<GameCollection>(api, queries['GameCollection'], gamePlatformUserArgs);
+    const gameWishlist = useQuery<GameWishlist>(api, queries['GameWishlist'], gamePlatformUserArgs);
 
     // load the playtime
-    const playtimeArgs = {
-        gamePlatformId,
-        userId: api.user?.userId
-    };
-    const playtime = useQuery<GamePlayTime>(api, queries['GamePlayTime'], playtimeArgs);
+    const playtime = useQuery<GamePlayTime>(api, queries['GamePlayTime'], gamePlatformUserArgs);
 
     return {
         gamePlatform,
