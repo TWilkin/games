@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent } from 'react';
 
 import { APIProps } from '../common';
 import { queries } from '../../graphql';
@@ -10,9 +10,7 @@ interface PlatformFilterProps extends APIProps {
 }
 
 const PlatformFilter = ({ api, onSelect }: PlatformFilterProps): JSX.Element => {
-    const [ platforms, setPlatforms ] = useState<Platform[]>(undefined);
-
-    useQuery(api, setPlatforms, queries['Platform']);
+    const platforms = useQuery<Platform>(api, queries['Platform']);
 
     const onChange = (event: FormEvent<HTMLSelectElement>) => {
         event.preventDefault();
