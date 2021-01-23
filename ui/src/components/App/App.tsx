@@ -14,8 +14,8 @@ import Wishlist from '../Wishlist/Wishlist';
 const apiUrl = `${window.location.origin}/api`;
 
 const App = (): JSX.Element => { 
-    const [authorised, setAuthorised] = useState(false);
-    const [user, setUser] = useState<User>(undefined);
+    const [user, setUser] = useState(getCookie());
+    const [authorised, setAuthorised] = useState(user !== null);
 
     const api = {
         url: apiUrl,
