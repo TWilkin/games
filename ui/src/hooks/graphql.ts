@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { APISettings } from '../components/common';
 
+import { APISettings } from '../components/common';
 import query, { mutate, Query } from '../graphql';
 import { Model } from '../models';
 
-export function useQuery<TModel extends Model>(
+export function useUpdatableQuery<TModel extends Model>(
     api: APISettings,
     graphqlQuery: Query, 
-    variables={}): TModel[]
+    variables={}
+): { results: TModel[], setResults: React.Dispatch<React.SetStateAction<TModel[]>> }
 {
     const [results, setResults] = useState<TModel[]>(undefined);
 
@@ -21,13 +22,28 @@ export function useQuery<TModel extends Model>(
         })();
     }, Object.values(variables));
 
+    return {
+        results,
+        setResults
+    };
+}
+
+export function useQuery<TModel extends Model>(
+    api: APISettings,
+    graphqlQuery: Query, 
+    variables={}
+): TModel[]
+{
+    const { results } = useUpdatableQuery<TModel>(api, graphqlQuery, variables);
     return results;
 }
 
 export function useMutation<TModel extends Model>(
     api: APISettings,
     graphqlQuery: Query, 
-    variables={}): () => Promise<TModel>
+    variables={},
+    setResults?: React.Dispatch<React.SetStateAction<TModel[]>>
+): () => Promise<void>
 {
     const [isSending, setIsSending] = useState(false);
     const isMounted = useRef(true);
@@ -39,7 +55,11 @@ export function useMutation<TModel extends Model>(
 
         try {
             setIsSending(true);
-            return await mutate<TModel>(api.url, graphqlQuery, variables);
+            const results = await mutate<TModel>(api.url, graphqlQuery, variables);
+
+            if(setResults) {
+                setResults([results]);
+            }
         } catch(error) {
             api.onError(error);
         } finally {

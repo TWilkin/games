@@ -8,7 +8,7 @@ import { mutations, queries } from '../../graphql';
 import { GameCollection, GamePlatform, GameWishlist } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
-import { useMutation, useQuery } from '../../hooks/graphql';
+import { useMutation, useQuery, useUpdatableQuery } from '../../hooks/graphql';
 
 interface GameDetailsMatch {
     gamePlatformId: string;
@@ -28,8 +28,8 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
     const addArgs = {
         input: { gamePlatformId }
     };
-    const onAddToCollectionClick = useMutation(api, mutations['add']['GameCollection'], addArgs);
-    const onAddToWishlistClick = useMutation(api, mutations['add']['GameWishlist'], addArgs);
+    const onAddToCollectionClick = useMutation(api, mutations['add']['GameCollection'], addArgs, gameCollection.setResults);
+    const onAddToWishlistClick = useMutation(api, mutations['add']['GameWishlist'], addArgs, gameWishlist.setResults);
 
     return (
         <div className='game'>
@@ -39,7 +39,7 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
                     <GameSummary gamePlatform={gamePlatform} />
                     
                     <div>
-                        {gameCollection?.length > 0 ? (
+                        {gameCollection?.results?.length > 0 ? (
                             <>In collection</>
                         ) : (
                             <>
@@ -47,7 +47,7 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
                                     Add to Collection
                                 </button>
 
-                                {gameWishlist?.length > 0 ? (
+                                {gameWishlist?.results?.length > 0 ? (
                                     <>In wishlist</>
                                 ) : (
                                     <button onClick={onAddToWishlistClick}>
@@ -86,8 +86,8 @@ function useGameDetails(api: APISettings, gamePlatformId: number) {
     };
 
     // check if this game in the user's collection or wishlist
-    const gameCollection = useQuery<GameCollection>(api, queries['GameCollection'], gamePlatformUserArgs);
-    const gameWishlist = useQuery<GameWishlist>(api, queries['GameWishlist'], gamePlatformUserArgs);
+    const gameCollection = useUpdatableQuery<GameCollection>(api, queries['GameCollection'], gamePlatformUserArgs);
+    const gameWishlist = useUpdatableQuery<GameWishlist>(api, queries['GameWishlist'], gamePlatformUserArgs);
 
     return {
         gamePlatform,
