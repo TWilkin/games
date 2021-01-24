@@ -6,6 +6,7 @@ import { useMutation, useUpdatableQuery } from '../../hooks/graphql';
 import { GamePlatform, GamePlayTime } from '../../models';
 import { APIProps, APISettings } from '../common';
 import ModalDialog from '../ModalDialog/ModalDialog';
+import Timer from './Timer';
 
 interface PlayTimeCounterProps extends APIProps {
     gamePlatform: GamePlatform;
@@ -32,7 +33,7 @@ const PlayTimeCounter = ({ api, gamePlatform}: PlayTimeCounterProps): JSX.Elemen
     };
     const playTime = useUpdatableQuery<GamePlayTime>(api, queries['GamePlayTime'], args);
 
-    const [startCounterDialogVisible, setStartCounterDialogVisible ] = useState(false);
+    const [ startCounterDialogVisible, setStartCounterDialogVisible ] = useState(false);
 
     const { startCounterForm, onStartCounterSubmit } = useStartCounterForm(
         api,
@@ -41,14 +42,22 @@ const PlayTimeCounter = ({ api, gamePlatform}: PlayTimeCounterProps): JSX.Elemen
         playTime.setResults
     );
 
-    const onStopCounterSubmit = useStopCounter(api, gamePlatform, playTime.setResults);
+    const onStopCounterSubmit = useStopCounter(
+        api, 
+        gamePlatform, 
+        playTime.setResults
+    );
 
     return (
         <div className='playTimeCounter'>
             {playTime.results?.length > 0 ? (
-                <button type='button' onClick={() => onStopCounterSubmit(playTime.results[0])}>
-                    Stop Play Counter
-                </button>
+                <>
+                    <Timer startTime={playTime.results[0].startTime} />
+                    {' '}
+                    <button type='button' onClick={() => onStopCounterSubmit(playTime.results[0])}>
+                        Stop Play Counter
+                    </button>
+                </>
             ) : (
                 <button type='button' onClick={() => setStartCounterDialogVisible(true)}>
                     Start Play Counter
@@ -139,7 +148,7 @@ function useStartCounterForm(
 
 function useStopCounter(
     api: APISettings,
-    gamePlatform: GamePlatform, 
+    gamePlatform: GamePlatform,
     setPlayTime: React.Dispatch<React.SetStateAction<GamePlayTime[]>>
 ) {
     const args = {
