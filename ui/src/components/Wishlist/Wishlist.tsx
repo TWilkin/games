@@ -1,40 +1,20 @@
-import React, { Component } from 'react';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import React from 'react';
+import { withRouter } from 'react-router-dom';
 
-import { APIProps } from '../common';
+import { UserRouteProps } from '../common';
 import { queries } from '../../graphql';
 import { GameList } from '../Game/GameList';
+import { GameWishlist } from '../../models';
 
-interface WishlistMatch {
-    userId: string;
-}
-
-interface WishlistProps extends APIProps, RouteComponentProps<WishlistMatch> { }
-
-interface WishlistState {
-    userId: number;
-}
-
-class Wishlist extends Component<WishlistProps, WishlistState> {
-
-    constructor(props: WishlistProps) {
-        super(props);
-
-        this.state = {
-            userId: parseInt(this.props.match.params.userId)
-        };
-    }
-
-    public render() {
-        return (
-            <div className='wishlist'>
-                <h1>My Wishlist</h1>
-                <GameList api={this.props.api} 
-                    query={queries['GameWishlist']}
-                    args={{ userId: this.state.userId }} />
-            </div>
-        );
-    }
-}
+const Wishlist = ({ api, match }: UserRouteProps): JSX.Element => {
+    return (
+        <div className='wishlist'>
+            <h1>My Wishlist</h1>
+            <GameList<GameWishlist> api={api} 
+                query={queries['GameWishlist']}
+                args={{ userId: parseInt(match.params.userId) }} />
+        </div>
+    );
+};
 
 export default withRouter(Wishlist);

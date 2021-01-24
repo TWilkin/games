@@ -1,48 +1,35 @@
-import React, { Component } from 'react';
+import React, { Ref } from 'react';
 
 interface ModalDialogProps {
     submit: string;
     cancel: string;
-    visible: boolean;
-    onClose: (cancelled: boolean) => void;
+    form?: Ref<any>;
+    onClose: () => void;
+    children: JSX.Element | JSX.Element[]
 }
 
-export default class ModalDialog extends Component<ModalDialogProps> {
-
-    constructor(props: ModalDialogProps) {
-        super(props);
-
-        this.onCancel = this.onCancel.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
-    }
-
-    private onCancel(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+const ModalDialog = ({ submit, cancel, form, onClose, children }: ModalDialogProps): JSX.Element => {
+    const onCancel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        this.props.onClose(true);
-    }
+        onClose();
+    };
 
-    private onSubmit(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        event.preventDefault();
-        this.props.onClose(false);
-    }
-
-    public render(): JSX.Element {
-        return this.props.visible && (
-            <div className='modal'>
-                <div className='modal-content'>
-                    <span className='modal-close' onClick={this.onCancel}>&times;</span>
-                    {this.props.children}
-                    <div className='controls'>
-                        <button onClick={this.onSubmit}>
-                            {this.props.submit}
-                        </button>
-                        <button onClick={this.onCancel}>
-                            {this.props.cancel}
-                        </button>
-                    </div>
+    return (
+        <div className='modal'>
+            <div className='modal-content'>
+                <span className='modal-close' onClick={onCancel}>&times;</span>
+                {children}
+                <div className='controls'>
+                    <button name={submit} ref={form}>
+                        {submit}
+                    </button>
+                    <button name={cancel} onClick={onCancel}>
+                        {cancel}
+                    </button>
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
+};
 
-}
+export default ModalDialog;

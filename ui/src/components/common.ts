@@ -1,3 +1,5 @@
+import { RouteComponentProps } from 'react-router-dom';
+
 import { User } from '../models';
 
 export interface APISettings {
@@ -9,3 +11,9 @@ export interface APISettings {
 export interface APIProps {
     api: APISettings;
 }
+
+export interface UserRouteMatch {
+    userId: string;
+}
+
+export interface UserRouteProps extends APIProps, RouteComponentProps<UserRouteMatch> { }

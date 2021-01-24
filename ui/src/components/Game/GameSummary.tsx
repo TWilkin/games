@@ -1,24 +1,19 @@
-import React, { Component } from 'react';
+import React from 'react';
+
 import { GamePlatform } from '../../models';
 
 interface GameSummaryProps {
     gamePlatform: GamePlatform;
 }
 
-export default class GameSummary extends Component<GameSummaryProps> {
-
-    constructor(props: GameSummaryProps) {
-        super(props);
-    }
-
-    public render(): JSX.Element {
-        const title = this.props.gamePlatform.alias ? this.props.gamePlatform.alias : this.props.gamePlatform.game.title;
+const GameSummary = ({ gamePlatform }: GameSummaryProps): JSX.Element => {
+    const title = gamePlatform.alias ?? gamePlatform.game.title;
         
-        return (
-            <div className='gameSummary'>
-                {title} ({this.props.gamePlatform.platform.name})
-            </div>
-        );
-    }
+    return (
+        <div className='gameSummary'>
+            {title} ({gamePlatform.platform.name})
+        </div>
+    );
+};
 
-}
+export default GameSummary;

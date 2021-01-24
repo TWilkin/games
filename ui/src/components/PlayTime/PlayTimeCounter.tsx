@@ -1,272 +1,177 @@
-import React, { ChangeEvent, Component, FormEvent } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { APIProps } from '../common';
+import { mutations, queries } from '../../graphql';
+import { useMutation, useUpdatableQuery } from '../../hooks/graphql';
 import { GamePlatform, GamePlayTime } from '../../models';
-import query, { mutate, mutations, queries } from '../../graphql';
+import { APIProps, APISettings } from '../common';
 import ModalDialog from '../ModalDialog/ModalDialog';
+import Timer from './Timer';
 
 interface PlayTimeCounterProps extends APIProps {
     gamePlatform: GamePlatform;
 }
 
-interface PlayTimeCounterState {
-    gamePlayTime?: GamePlayTime;
-    gameCompilationId?: number;
+interface StartCounterFormData {
+    gameCompilationId: string;
     demo: boolean;
-    counter?: number;
-    timer?: NodeJS.Timeout;
-    compilationDialogVisible?: boolean;
 }
 
-export default class PlayTimeCounter extends Component<PlayTimeCounterProps, PlayTimeCounterState> {
+interface GamePlayTimeInput {
+    gamePlatformId?: number;
+    gameCompilationId?: number;
+    demo?: boolean;
+    startTime?: number;
+    endTime?: number;
+}
 
-    constructor(props: PlayTimeCounterProps) {
-        super(props);
+const PlayTimeCounter = ({ api, gamePlatform}: PlayTimeCounterProps): JSX.Element => {
+    const args = {
+        gamePlatformId: gamePlatform.gamePlatformId,
+        userId: api.user?.userId,
+        endTime: null as Date
+    };
+    const playTime = useUpdatableQuery<GamePlayTime>(api, queries['GamePlayTime'], args);
 
-        this.state = {
-            gamePlayTime: null,
-            gameCompilationId: null,
-            demo: false,
-            counter: 0,
-            timer: null,
-            compilationDialogVisible: false
-        };
+    const [ startCounterDialogVisible, setStartCounterDialogVisible ] = useState(false);
 
-        this.onCompilationSelect = this.onCompilationSelect.bind(this);
-        this.onDemoChange = this.onDemoChange.bind(this);
-        this.onDialogClose = this.onDialogClose.bind(this);
-        this.onStart = this.onStart.bind(this);
-        this.onStop = this.onStop.bind(this);
-    }
+    const { startCounterForm, onStartCounterSubmit } = useStartCounterForm(
+        api,
+        gamePlatform,
+        () => setStartCounterDialogVisible(false),
+        playTime.setResults
+    );
 
-    public async componentDidMount(): Promise<void> {
-        // check if there is playtime already for this game
-        try {
-            const args = {
-                gamePlatformId: this.props.gamePlatform.gamePlatformId,
-                userId: this.props.api.user.userId,
-                endTime: null as Date
+    const onStopCounterSubmit = useStopCounter(
+        api, 
+        gamePlatform, 
+        playTime.setResults
+    );
+
+    return (
+        <div className='playTimeCounter'>
+            {playTime.results?.length > 0 ? (
+                <>
+                    <Timer startTime={playTime.results[0].startTime} />
+                    {' '}
+                    <button type='button' onClick={() => onStopCounterSubmit(playTime.results[0])}>
+                        Stop Play Counter
+                    </button>
+                </>
+            ) : (
+                <button type='button' onClick={() => setStartCounterDialogVisible(true)}>
+                    Start Play Counter
+                </button>
+            )}
+
+            {startCounterDialogVisible && (
+                <form onSubmit={onStartCounterSubmit}>
+                    <ModalDialog
+                        submit='Start'
+                        cancel='Cancel'
+                        form={startCounterForm}
+                        onClose={() => setStartCounterDialogVisible(false)}
+                    >
+                        {gamePlatform.game.includes?.length > 0 && (
+                            <>
+                                <select 
+                                    name='gameCompilationId'
+                                    defaultValue={-1}
+                                    ref={startCounterForm}
+                                >
+                                    <option key={-1} value={-1}>-</option>
+                                    {gamePlatform.game.includes.map(compilation => {
+                                        return (
+                                            <option 
+                                                key={compilation.gameCompilationId} 
+                                                value={compilation.gameCompilationId}>
+                                                {compilation.included.title}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                                <br />
+                            </>
+                        )}
+
+                        <label>Demo? 
+                            <input 
+                                type='checkbox'
+                                name='demo' 
+                                ref={startCounterForm}  />
+                        </label>
+                    </ModalDialog>
+                </form>
+            )}
+        </div>
+    );
+};
+
+export default PlayTimeCounter;
+
+function useStartCounterForm(
+    api: APISettings,
+    gamePlatform: GamePlatform, 
+    onFormSubmit: () => void,
+    setPlayTime: React.Dispatch<React.SetStateAction<GamePlayTime[]>>
+) {
+    const { register, handleSubmit } = useForm<StartCounterFormData>();
+
+    const args = {
+        input: { } as GamePlayTimeInput
+    };
+
+    const addPlayTime = useMutation(api, mutations['add']['GamePlayTime'], args, setPlayTime);
+
+    const onSubmit = useCallback(
+        (data: StartCounterFormData) => {
+            onFormSubmit();
+            
+            args.input = {
+                gamePlatformId: gamePlatform.gamePlatformId,
+                gameCompilationId: data.gameCompilationId === '-1' 
+                    ? undefined : parseInt(data.gameCompilationId),
+                demo: data.demo,
+                startTime: Date.now()
             };
-            const data: GamePlayTime[] = await query(this.props.api.url, queries['GamePlayTime'], args);
 
-            // if we have records
-            if(data && data.length > 0) {
-                // find the latest startTime
-                const latest = data.reduce((latest, current) => {
-                    if(!latest || latest.startTime < current.startTime)
-                    {
-                        return current;
-                    }
-                    return latest;
-                }, null);
+            addPlayTime();
+        },
+        []
+    );
 
-                // set that as the current timer
-                if(latest) {
-                    this.start(latest);
-                }
-            }
-        } catch(error) {
-            this.props.api.onError(error);
-        }
-    }
+    return {
+        startCounterForm: register,
+        onStartCounterSubmit: handleSubmit(onSubmit)
+    };
+}
 
-    private onCompilationSelect(event: FormEvent<HTMLSelectElement>) {
-        event.preventDefault();
+function useStopCounter(
+    api: APISettings,
+    gamePlatform: GamePlatform,
+    setPlayTime: React.Dispatch<React.SetStateAction<GamePlayTime[]>>
+) {
+    const args = {
+        id: -1,
+        input: { } as GamePlayTimeInput
+    };
 
-        let gameCompilationId = parseInt(event.currentTarget.value);
-        if(gameCompilationId == -1) {
-            gameCompilationId = null;
-        }
-        this.setState({
-            gameCompilationId: gameCompilationId
-        });
-    }
+    const updatePlayTime = useMutation(api, mutations['update']['GamePlayTime'], args);
 
-    private onDemoChange(event: ChangeEvent<HTMLInputElement>) {
-        event.preventDefault();
-
-        this.setState({
-            demo: event.target.checked
-        });
-    }
-
-    private onDialogClose(cancelled: boolean) {
-        if(!cancelled) {
-            this.startCounter();
-        }
-        this.setState({
-            compilationDialogVisible: false
-        });
-    }
-
-    private onStart(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        event.preventDefault();
-
-        // show dialog
-        this.setState({
-            compilationDialogVisible: true
-        });
-    }
-
-    private async onStop(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        event.preventDefault();
-        
-        // stop the counter
-        clearInterval(this.state.timer);
-
-        try {
-            // update the playtime in the API
-            const args = {
-                id: this.state.gamePlayTime.gamePlayTimeId,
-                input: {
-                    gameCompilationId: this.state.gameCompilationId,
-                    demo: this.state.demo,
-                    startTime: this.state.gamePlayTime.startTime,
-                    endTime: Date.now()
-                }
+    return useCallback(
+        (playTime: GamePlayTime) => {
+            args.input = {
+                gamePlatformId: gamePlatform.gamePlatformId,
+                gameCompilationId: playTime.gameCompilationId,
+                demo: playTime.demo,
+                startTime: playTime.startTime,
+                endTime: Date.now()
             };
-            const data: GamePlayTime = await mutate(this.props.api.url, mutations['update']['GamePlayTime'], args);
+            args.id = playTime.gamePlayTimeId;
 
-            // check the update worked
-            if(data) {
-                this.setState({ 
-                    gamePlayTime: null,
-                    gameCompilationId: null,
-                    demo: null,
-                    counter: 0,
-                    timer: null
-                });
-            }
-        } catch(error) {
-            this.props.api.onError(error);
-        }
-    }
-
-    public render(): JSX.Element {
-        return (
-            <div className='playTimeCounter'>
-                {this.renderTimer()}
-                {this.renderStart()}
-                {this.renderStartDialog()}
-                {this.renderStop()}
-            </div>
-        );
-    }
-
-    private renderStart() {
-        // show the start button when we are not counting
-        return !this.state.gamePlayTime && (
-            <button type='button' onClick={this.onStart}>
-                Start Play Counter
-            </button>
-        );
-    }
-
-    private renderStartDialog() {
-        return (
-            <ModalDialog
-                submit='Start'
-                cancel='Cancel'
-                visible={this.state.compilationDialogVisible}
-                onClose={this.onDialogClose}
-            >
-                {this.renderCompilationSelect()}
-                <br />
-                <label>Demo? 
-                    <input type='checkbox' value='Demo' onChange={this.onDemoChange} />
-                </label>
-            </ModalDialog>
-        );
-    }
-
-    private renderCompilationSelect() {
-        return this.props.gamePlatform.game.includes 
-                && this.props.gamePlatform.game.includes.length > 0
-                && (
-                    <select onChange={this.onCompilationSelect} defaultValue='-1'>
-                        <option key='-1' value='-1'>-</option>
-                        {this.props.gamePlatform.game.includes.map(compilation => {
-                            return (
-                                <option 
-                                    key={compilation.gameCompilationId} 
-                                    value={compilation.gameCompilationId}>
-                                    {compilation.included.title}
-                                </option>
-                            );
-                        })}
-                    </select>
-                );
-    }
-
-    private renderStop() {
-        // show the stop button while we are counting
-        return this.state.gamePlayTime && (
-            <button type='button' onClick={this.onStop}>
-                Stop Play Counter
-            </button>
-        );
-    }
-
-    private renderTimer() {
-        // show time timer if we have a start time
-        return this.state.gamePlayTime && (
-            <span>{this.timeSince()}</span>
-        );
-    }
-
-    private async startCounter() {
-        try {
-            // create the new playtime in the API
-            const args = {
-                input: {
-                    gamePlatformId: this.props.gamePlatform.gamePlatformId,
-                    gameCompilationId: this.state.gameCompilationId,
-                    demo: this.state.demo,
-                    startTime: Date.now()
-                }
-            };
-            const data: GamePlayTime = await mutate(this.props.api.url, mutations['add']['GamePlayTime'], args);
-
-            // check the add worked
-            if(data) {
-                this.start(data);
-            }
-        } catch(error) {
-            this.props.api.onError(error);
-        }
-    }
-
-    private start(gamePlayTime: GamePlayTime) {
-        // update the state and start the counter
-        this.setState({ 
-            gamePlayTime: gamePlayTime,
-            gameCompilationId: gamePlayTime.gameCompilationId,
-            demo: gamePlayTime.demo,
-            counter: 0,
-            timer: setInterval(() => {
-                this.setState({
-                    counter: this.state.counter + 1
-                });
-            }, 1000)
-        });
-    }
-
-    private timeSince(): string {
-        // calculate how many seconds have elapsed
-        const startTime = new Date(this.state.gamePlayTime.startTime).getTime();
-        let seconds = Math.floor((Date.now() - startTime) / 1000);
-
-        // hours
-        const hours = Math.floor(seconds / (60 * 60));
-        seconds -= hours * 60 * 60;
-        
-        // minutes
-        const minutes = Math.floor(seconds / 60);
-        seconds -= minutes * 60;
-
-        return [hours, minutes, seconds]
-            .map(interval => interval.toString().padStart(2, '0'))
-            .join(':');
-    }
-
+            updatePlayTime();
+            setPlayTime(undefined);
+        },
+        []
+    );
 }

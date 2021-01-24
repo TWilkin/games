@@ -1,94 +1,98 @@
 import HttpStatus from 'http-status-codes';
-import React, { Component, FormEvent } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { APIProps } from '../common';
+import { APIProps, APISettings } from '../common';
 
 interface LoginProps extends APIProps {
     onLogin: () => void;
 }
 
-interface LoginState {
-    userName?: string;
-    password?: string;
-    success?: boolean;
+interface LoginFormData {
+    userName: string;
+    password: string;
 }
 
-export default class Login extends Component<LoginProps, LoginState> {
-
-    constructor(props: LoginProps) {
-        super(props);
-
-        this.state = {
-            userName: '',
-            password: ''
-        };
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
-
-    private handleChange(event: FormEvent<HTMLInputElement>) {
-        const { name, value } = event.currentTarget;
-        this.setState({
-            [name]: value
-        });
-    }
-
-    private async handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-        event.preventDefault();
-        
-        // attempt the login
-        try {
-            const result = await fetch(`${this.props.api.url}/login`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: new Headers({
-                    'Content-Type': 'application/json'
-                }),
-                body: JSON.stringify({
-                    userName: this.state.userName,
-                    password: this.state.password
-                })
-            });
-            if(result.status == HttpStatus.OK) {
-                this.setState({ success: true });
-                this.props.onLogin();
-            }
-        } catch(e) {
-            this.setState({ success: false });
+const Login = ({ api, onLogin }: LoginProps): JSX.Element => {
+    const [ loggedId, setLoggedIn ] = useState<boolean>(undefined);
+    
+    const { loginForm, onSubmit } = useLoginForm(api, (status) => {
+        setLoggedIn(status);
+        if(status) {
+            onLogin();
         }
-    }
+    });
 
-    public render(): JSX.Element {
-        return (
-            <div id='login'>
-                <form onSubmit={this.handleSubmit}>
+    const onChange = () => setLoggedIn(undefined);
+
+    return (
+        <div id='login'>
+            {!loggedId && (
+                <form onSubmit={onSubmit}>
                     <label>Username:</label>
                     <input 
                         type='text'
                         name='userName'
-                        value={this.state.userName}
-                        onChange={this.handleChange} />
+                        ref={loginForm}
+                        onChange={onChange} />
                     <br />
 
                     <label>Password:</label>
                     <input 
                         type='password'
                         name='password'
-                        value={this.state.password}
-                        onChange={this.handleChange} />
+                        ref={loginForm}
+                        onChange={onChange} />
                     <br />
 
-                    <input type='submit'value='Login' />
-                    
-                    {this.state.success == true && (
-                        <div>Login successful!</div>
-                    )}
-                    {this.state.success == false && (
-                        <div>Login failed!</div>
-                    )}
+                    <input type='submit' value='Login' />
                 </form>
-            </div>
-        );
+            )}
+
+            {loggedId === true && (
+                <div>Login successful!</div>
+            )}
+
+            {loggedId === false && (
+                <div>Login failed!</div>
+            )}
+        </div>
+    );
+};
+
+export default Login;
+
+function useLoginForm(api: APISettings, onLogin: (status: boolean) => void) {
+    const { register, handleSubmit } = useForm<LoginFormData>();
+
+    const onSubmit = useCallback(
+        async (data: LoginFormData) => onLogin(await handleLogin(api, data)),
+        []
+    );
+
+    return {
+        loginForm: register,
+        onSubmit: handleSubmit(onSubmit)
+    };
+}
+
+async function handleLogin(api: APISettings, data: LoginFormData): Promise<boolean> {
+    // attempt the login
+    try {
+        const result = await fetch(`${api.url}/login`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify(data)
+        });
+
+        if(result.status === HttpStatus.OK) {
+            return true;
+        }
+        return false;
+    } catch(e) {
+        return false;
     }
 }
