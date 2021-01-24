@@ -1,6 +1,6 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 
-import { Model, Models } from './models';
+import { Models } from './models';
 
 const fragments: { [name in Models]: string } = {
     'Game': 'fragment GameFields on Game { gameId, title }',
@@ -119,7 +119,7 @@ export interface Query {
     fragments: Models[];
 }
 
-async function graphql(apiUrl: string, query: Query, variables={}): Promise<any> {
+export async function graphql(apiUrl: string, query: Query, variables={}): Promise<any> {
     const response = await fetch(`${apiUrl}/graphql`, {
         method: 'POST',
         credentials: 'include',
@@ -145,12 +145,4 @@ async function graphql(apiUrl: string, query: Query, variables={}): Promise<any>
 
     // extract the response for the executed query
     return data.data[query.name];
-}
-
-export default function query<T extends Model>(apiUrl: string, query: Query, variables={}): Promise<T[]> {
-    return graphql(apiUrl, query, variables);
-}
-
-export function mutate<T extends Model>(apiUrl: string, mutation: Query, variables={}): Promise<T> {
-    return graphql(apiUrl, mutation, variables);
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { APISettings } from '../components/common';
-import query, { mutate, Query } from '../graphql';
+import { graphql, Query } from '../graphql';
 import { Model } from '../models';
 
 export function useUpdatableQuery<TModel extends Model>(
@@ -15,7 +15,7 @@ export function useUpdatableQuery<TModel extends Model>(
     useEffect(() => {
         (async () => {
             try {
-                setResults(await query<TModel>(api.url, graphqlQuery, variables));
+                setResults(await graphql(api.url, graphqlQuery, variables));
             } catch(error) {
                 api.onError(error);
             }
@@ -55,7 +55,7 @@ export function useMutation<TModel extends Model>(
 
         try {
             setIsSending(true);
-            const results = await mutate<TModel>(api.url, graphqlQuery, variables);
+            const results = await graphql(api.url, graphqlQuery, variables);
 
             if(setResults) {
                 setResults([results]);

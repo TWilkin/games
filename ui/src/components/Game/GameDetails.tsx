@@ -6,7 +6,7 @@ import GameImage from './GameImage';
 import GameSummary from './GameSummary';
 import { mutations, queries } from '../../graphql';
 import { GameCollection, GamePlatform, GameWishlist } from '../../models';
-import PlayTimeCounter from '../PlayTime/PlayTimeCounter2';
+import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
 import { useMutation, useQuery, useUpdatableQuery } from '../../hooks/graphql';
 
