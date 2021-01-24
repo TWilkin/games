@@ -1,48 +1,33 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 interface ModalDialogProps {
     submit: string;
     cancel: string;
     visible: boolean;
     onClose: (cancelled: boolean) => void;
+    children: JSX.Element[]
 }
 
-export default class ModalDialog extends Component<ModalDialogProps> {
+const ModalDialog = ({ submit, cancel, visible, onClose, children }: ModalDialogProps): JSX.Element => {
+    const onCancel = () => onClose(true);
+    const onSubmit = () => onClose(false);
 
-    constructor(props: ModalDialogProps) {
-        super(props);
-
-        this.onCancel = this.onCancel.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
-    }
-
-    private onCancel(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        event.preventDefault();
-        this.props.onClose(true);
-    }
-
-    private onSubmit(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        event.preventDefault();
-        this.props.onClose(false);
-    }
-
-    public render(): JSX.Element {
-        return this.props.visible && (
-            <div className='modal'>
-                <div className='modal-content'>
-                    <span className='modal-close' onClick={this.onCancel}>&times;</span>
-                    {this.props.children}
-                    <div className='controls'>
-                        <button onClick={this.onSubmit}>
-                            {this.props.submit}
-                        </button>
-                        <button onClick={this.onCancel}>
-                            {this.props.cancel}
-                        </button>
-                    </div>
+    return visible && (
+        <div className='modal'>
+            <div className='modal-content'>
+                <span className='modal-close' onClick={onCancel}>&times;</span>
+                {children}
+                <div className='controls'>
+                    <button onClick={onSubmit}>
+                        {submit}
+                    </button>
+                    <button onClick={onCancel}>
+                        {cancel}
+                    </button>
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
+};
 
-}
+export default ModalDialog;
