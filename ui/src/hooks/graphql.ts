@@ -9,7 +9,7 @@ export function useQuery<TModel extends Model>(
     graphqlQuery: Query, 
     variables={}): TModel[]
 {
-    const [ results, setResults ] = useState<TModel[]>(undefined);
+    const [results, setResults] = useState<TModel[]>(undefined);
 
     useEffect(() => {
         (async () => {
@@ -19,7 +19,7 @@ export function useQuery<TModel extends Model>(
                 api.onError(error);
             }
         })();
-    }, Object.keys(variables));
+    }, Object.values(variables));
 
     return results;
 }
@@ -29,7 +29,7 @@ export function useMutation<TModel extends Model>(
     graphqlQuery: Query, 
     variables={}): () => Promise<TModel>
 {
-    const [ isSending, setIsSending ] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const isMounted = useRef(true);
 
     const sendRequest = useCallback(async () => {
@@ -47,7 +47,7 @@ export function useMutation<TModel extends Model>(
                 setIsSending(false);
             }
         }
-    }, [isSending, ...Object.keys(variables)]);
+    }, [isSending, ...Object.values(variables)]);
 
     return sendRequest;
 }
