@@ -5,7 +5,7 @@ import { APIProps, APISettings } from '../common';
 import GameImage from './GameImage';
 import GameSummary from './GameSummary';
 import { mutations, queries } from '../../graphql';
-import { GameCollection, GamePlatform, GamePlayTime, GameWishlist } from '../../models';
+import { GameCollection, GamePlatform, GameWishlist } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
 import { useMutation, useQuery } from '../../hooks/graphql';
@@ -21,7 +21,6 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
 
     const { 
         gamePlatform,
-        playtime,
         gameCollection,
         gameWishlist
     } = useGameDetails(api, gamePlatformId);
@@ -62,7 +61,9 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
                     <PlayTimeCounter 
                         api={api}
                         gamePlatform={gamePlatform} />
-                    <PlayTimeList playTime={playtime} />
+                    <PlayTimeList
+                        api={api}
+                        gamePlatform={gamePlatform} />
                 </div>
             ) : (
                 <>Game not found</>
@@ -88,12 +89,8 @@ function useGameDetails(api: APISettings, gamePlatformId: number) {
     const gameCollection = useQuery<GameCollection>(api, queries['GameCollection'], gamePlatformUserArgs);
     const gameWishlist = useQuery<GameWishlist>(api, queries['GameWishlist'], gamePlatformUserArgs);
 
-    // load the playtime
-    const playtime = useQuery<GamePlayTime>(api, queries['GamePlayTime'], gamePlatformUserArgs);
-
     return {
         gamePlatform,
-        playtime,
         gameCollection,
         gameWishlist
     };
