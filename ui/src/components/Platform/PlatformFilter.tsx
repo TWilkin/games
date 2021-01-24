@@ -56,14 +56,21 @@ export default class PlatformFilter extends Component<PlatformFilterProps, Platf
         return (
             <div>
                 {this.state.platforms ? (
-                    <select onChange={this.onChange} defaultValue='-1'>
-                        <option key='-1' value='-1'>-</option>
-                        {this.state.platforms.map(entry => 
-                            <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>
-                        )}
-                    </select>
+                    <div className='field'>
+                        <label htmlFor='platformFilterSelect' className='sr-only'>
+                            Select platform
+                        </label>
+                        <div className="field__input">
+                            <select onChange={this.onChange} defaultValue='-1'>
+                                <option key='-1' value='-1'>-</option>
+                                {this.state.platforms.map(entry => 
+                                    <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>
+                                )}
+                            </select>
+                        </div>
+                    </div>
                 ) : (
-                    <>No platforms found</>
+                    <p>No platforms found</p>
                 )}
             </div>
         );

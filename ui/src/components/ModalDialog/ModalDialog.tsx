@@ -29,10 +29,10 @@ export default class ModalDialog extends Component<ModalDialogProps> {
     public render(): JSX.Element {
         return this.props.visible && (
             <div className='modal'>
-                <div className='modal-content'>
-                    <span className='modal-close' onClick={this.onCancel}>&times;</span>
+                <div className='modal__content'>
+                    <button className='modal__close' onClick={this.onCancel}>&times;</button>
                     {this.props.children}
-                    <div className='controls'>
+                    <div className='modal__controls'>
                         <button onClick={this.onSubmit}>
                             {this.props.submit}
                         </button>

@@ -61,31 +61,49 @@ export default class Login extends Component<LoginProps, LoginState> {
 
     public render(): JSX.Element {
         return (
-            <div id='login'>
-                <form onSubmit={this.handleSubmit}>
-                    <label>Username:</label>
-                    <input 
-                        type='text'
-                        name='userName'
-                        value={this.state.userName}
-                        onChange={this.handleChange} />
-                    <br />
-
-                    <label>Password:</label>
-                    <input 
-                        type='password'
-                        name='password'
-                        value={this.state.password}
-                        onChange={this.handleChange} />
-                    <br />
-
-                    <input type='submit'value='Login' />
+            <div id='login' className='panel'>
+                <h1 className='panel__heading'>Login</h1>
+                <form onSubmit={this.handleSubmit} className='form'>
+                    <div className='field'>
+                        <div className='field__label'>
+                            <label htmlFor='loginUserName'>Username:</label>
+                        </div>
+                        <div className='field__input'>
+                            <input 
+                                type='text'
+                                name='userName'
+                                id='loginUserName'
+                                value={this.state.userName}
+                                onChange={this.handleChange} />
+                        </div>
+                    </div>
+        
+                    <div className='field'>
+                        <div className='field__label'>
+                            <label htmlFor='loginPassword'>Password:</label>
+                        </div>
+                        <div className='field__input'>
+                            <input 
+                                type='password'
+                                name='password'
+                                id='loginPassword'
+                                value={this.state.password}
+                                onChange={this.handleChange} />
+                        </div>
+                    </div>
+                    <div className='form__actions'>
+                        <button type='submit'>Login</button>
+                    </div>
                     
                     {this.state.success == true && (
-                        <div>Login successful!</div>
+                        <div className='panel panel--alert panel--success anim--slide-in'>
+                            Login successful!
+                        </div>
                     )}
                     {this.state.success == false && (
-                        <div>Login failed!</div>
+                        <div className='panel panel--alert panel--error anim--shake'>
+                            Login failed!
+                        </div>
                     )}
                 </form>
             </div>

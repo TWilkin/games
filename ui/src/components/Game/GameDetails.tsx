@@ -94,9 +94,12 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
 
     public render() {
         return (
-            <div className='game'>
+            <div className='panel'>
                 {this.state.gamePlatform ? (
-                    <div>
+                    <>
+                        <h1 className='panel__heading'>
+                            {this.state.gamePlatform?.game.title}
+                        </h1>
                         <GameImage api={this.props.api} game={this.state.gamePlatform?.game} />
                         <GameSummary gamePlatform={this.state.gamePlatform} />
                         {this.renderInCollectionOrWishlist()}
@@ -104,7 +107,7 @@ class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
                             api={this.props.api}
                             gamePlatform={this.state.gamePlatform} />
                         <PlayTimeList playTime={this.state.gamePlayTime} />
-                    </div>
+                    </>
                 ) : (
                     <>Game not found</>
                 )}

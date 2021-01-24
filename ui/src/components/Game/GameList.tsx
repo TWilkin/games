@@ -34,11 +34,11 @@ export class GameList extends Component<GameListProps, GameListState> {
 
     public render(): JSX.Element {
         return (
-            <div className='games'>
+            <div className='games panel'>
+                <h1 className='panel__heading'>All Games</h1>
                 <PlatformFilter
                     api={this.props.api}
                     onSelect={this.onPlatformSelect} />
-                <br />
                 {this.renderGames()}
             </div>
         );
@@ -46,21 +46,21 @@ export class GameList extends Component<GameListProps, GameListState> {
 
     private renderGames() {
         return(
-            <div>
+            <div className='games-list'>
                 {this.state.games ? (
-                    <>
+                    <ul>
                         {this.state.games.map(entry => {
                             return(
-                                <div key={entry.gamePlatform.gamePlatformId}>
+                                <li key={entry.gamePlatform.gamePlatformId}>
                                     <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
                                         <GameSummary gamePlatform={entry.gamePlatform} />
                                     </Link>
-                                </div>
+                                </li>
                             );
                         })}
-                    </>
+                    </ul>
                 ) : (
-                    <>No games found</>
+                    <p>No games found</p>
                 )}
             </div>
         );

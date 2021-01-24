@@ -56,10 +56,10 @@ export default class App extends Component<Record<string, never>, AppState> {
             <BrowserRouter>
                 {this.redirect()}
 
-                <div>
+                <header className='header'>
                     {this.renderNavigation()}
-                    <hr />
-                
+                </header>
+                <main className='full-page'>
                     <Switch>
                         <Route path='/login'>
                             <Login 
@@ -81,26 +81,24 @@ export default class App extends Component<Record<string, never>, AppState> {
                             <GameDetails api={this.getAPISettings} />
                         </Route>
                     </Switch>
-                </div>
+                </main>
             </BrowserRouter>
         );
     }
 
     private renderNavigation() {
         return (
-            <div className='menu'>
-                <nav>
-                    <NavLink to='/games'>Games</NavLink>
-                    {this.state.unauthorised ? (
-                        <NavLink to='/login'>Login</NavLink>
-                    ) : (
-                        <>
-                            <NavLink to={`/user/${this.state.user.userId}/collection`}>My Collection</NavLink>
-                            <NavLink to={`/user/${this.state.user.userId}/wishlist`}>My Wishlist</NavLink>
-                        </>
-                    )}
-                </nav>
-            </div>
+            <nav className='menu full-page'>
+                <NavLink to='/games'>Games</NavLink>
+                {this.state.unauthorised ? (
+                    <NavLink to='/login'>Login</NavLink>
+                ) : (
+                    <>
+                        <NavLink to={`/user/${this.state.user.userId}/collection`}>My Collection</NavLink>
+                        <NavLink to={`/user/${this.state.user.userId}/wishlist`}>My Wishlist</NavLink>
+                    </>
+                )}
+            </nav>
         );
     }
 

@@ -34,11 +34,8 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
 
         return (
             <table>
+                <caption>{this.props.title}</caption>
                 <thead>
-                    <tr>
-                        <th colSpan={columns}>{this.props.title}</th>
-                    </tr>
-
                     <tr>
                         {this.props.headings.map((heading, i) => 
                             this.renderSortableHeading(heading, this.props.sortColumns[i])

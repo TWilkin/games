@@ -156,9 +156,11 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
     private renderStart() {
         // show the start button when we are not counting
         return !this.state.gamePlayTime && (
-            <button type='button' onClick={this.onStart}>
-                Start Play Counter
-            </button>
+            <div className='playTimeCounter__actions'>
+                <button type='button' onClick={this.onStart}>
+                    Start Play Counter
+                </button>
+            </div>
         );
     }
 
@@ -171,10 +173,10 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                 onClose={this.onDialogClose}
             >
                 {this.renderCompilationSelect()}
-                <br />
-                <label>Demo? 
-                    <input type='checkbox' value='Demo' onChange={this.onDemoChange} />
-                </label>
+                <div className="field">
+                    <label htmlFor="isDemo">Demo?</label>
+                    <input type='checkbox' id='isDemo' value='Demo' onChange={this.onDemoChange} />
+                </div>
             </ModalDialog>
         );
     }
@@ -201,16 +203,18 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
     private renderStop() {
         // show the stop button while we are counting
         return this.state.gamePlayTime && (
-            <button type='button' onClick={this.onStop}>
-                Stop Play Counter
-            </button>
+            <div className='playTimeCounter__actions'>
+                <button type='button' onClick={this.onStop}>
+                    Stop Play Counter
+                </button>
+            </div>
         );
     }
 
     private renderTimer() {
         // show time timer if we have a start time
         return this.state.gamePlayTime && (
-            <span>{this.timeSince()}</span>
+            <span className='playTimeCounter__timer'>{this.timeSince()}</span>
         );
     }
 
