@@ -163,7 +163,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
     }
 
     private renderStartDialog() {
-        return (
+        return <></>;/*(
             <ModalDialog
                 submit='Start'
                 cancel='Cancel'
@@ -176,7 +176,7 @@ export default class PlayTimeCounter extends Component<PlayTimeCounterProps, Pla
                     <input type='checkbox' value='Demo' onChange={this.onDemoChange} />
                 </label>
             </ModalDialog>
-        );
+        );*/
     }
 
     private renderCompilationSelect() {

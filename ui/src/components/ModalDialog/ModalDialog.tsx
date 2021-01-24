@@ -1,27 +1,29 @@
-import React from 'react';
+import React, { Ref } from 'react';
 
 interface ModalDialogProps {
     submit: string;
     cancel: string;
-    visible: boolean;
-    onClose: (cancelled: boolean) => void;
-    children: JSX.Element[]
+    form?: Ref<any>;
+    onClose: () => void;
+    children: JSX.Element | JSX.Element[]
 }
 
-const ModalDialog = ({ submit, cancel, visible, onClose, children }: ModalDialogProps): JSX.Element => {
-    const onCancel = () => onClose(true);
-    const onSubmit = () => onClose(false);
+const ModalDialog = ({ submit, cancel, form, onClose, children }: ModalDialogProps): JSX.Element => {
+    const onCancel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        event.preventDefault();
+        onClose();
+    };
 
-    return visible && (
+    return (
         <div className='modal'>
             <div className='modal-content'>
                 <span className='modal-close' onClick={onCancel}>&times;</span>
                 {children}
                 <div className='controls'>
-                    <button onClick={onSubmit}>
+                    <button name={submit} ref={form}>
                         {submit}
                     </button>
-                    <button onClick={onCancel}>
+                    <button name={cancel} onClick={onCancel}>
                         {cancel}
                     </button>
                 </div>
