@@ -1,11 +1,10 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Cookies from 'react-cookies';
 import { BrowserRouter, NavLink, Redirect, Route, Switch } from 'react-router-dom';
 
 import Collection from '../Collection/Collection';
-import { APISettings } from '../common';
 import { AllGameList } from '../Game/GameList';
 import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
@@ -14,116 +13,81 @@ import Wishlist from '../Wishlist/Wishlist';
 
 const apiUrl = `${window.location.origin}/api`;
 
-interface AppState {
-    unauthorised?: boolean;
-    user?: User;
-}
+const App = (): JSX.Element => { 
+    const [user, setUser] = useState(getCookie());
+    const [authorised, setAuthorised] = useState(user !== null);
 
-export default class App extends Component<Record<string, never>, AppState> {
-
-    constructor(props: Record<string, never>) {
-        super(props);
-
-        const user = this.getUser;
-        this.state = {
-            unauthorised: user ? false : true,
-            user: user
-        };
-
-        this.onError = this.onError.bind(this);
-        this.onLogin = this.onLogin.bind(this);
-    }
-
-    public onLogin(): void {
-        const user = this.getUser;
-        this.setState({
-            unauthorised: user ? false : true,
-            user: user
-        });
-    }
-
-    public onError(error: Error): void {
-        // check if the error is 401/403
-        switch(error.message) {
-            case getStatusText(HttpStatus.FORBIDDEN):
-            case getStatusText(HttpStatus.UNAUTHORIZED):
-                this.setState({ unauthorised: true });
+    const api = {
+        url: apiUrl,
+        user: user,
+        onError: (error: Error) => {
+            switch(error.message) {
+                case getStatusText(HttpStatus.FORBIDDEN):
+                case getStatusText(HttpStatus.UNAUTHORIZED):
+                    setAuthorised(false);
+            }
         }
+    };
+
+    const onLogin = () => {
+        const user = getCookie();
+        setUser(user);
+        setAuthorised(user !== null);
+    };
+
+    return (
+        <BrowserRouter>
+            {!authorised && <Redirect to='/login' />}
+
+            <header className='header'>
+                <nav className='menu full-page'>
+                    <NavLink to='/games'>Games</NavLink>
+                    {!authorised ? (
+                        <NavLink to='/login'>Login</NavLink>
+                    ) : (
+                        <>
+                            <NavLink to={`/user/${user.userId}/collection`}>My Collection</NavLink>
+                            <NavLink to={`/user/${user.userId}/wishlist`}>My Wishlist</NavLink>
+                        </>
+                    )}
+                </nav>
+            </header>
+            
+            <main className='full-page'>
+                <Switch>
+                    <Route path='/login'>
+                        <Login 
+                            api={api}
+                            onLogin={onLogin} />
+                    </Route>
+                    
+                    <Route path='/user/:userId/collection'>
+                        <Collection api={api} />
+                    </Route>
+                    <Route path='/user/:userId/wishlist'>
+                        <Wishlist api={api} />
+                    </Route>
+
+                    <Route path='/games'>
+                        <AllGameList api={api} />
+                    </Route>
+                    <Route path='/game/:gamePlatformId'>
+                        <GameDetails api={api} />
+                    </Route>
+                </Switch>
+            </main>
+        </BrowserRouter>
+    );
+};
+
+export default App;
+
+function getCookie() {
+    // retrieve the user from the server's cookie
+    const jwt = Cookies.load('jwt');
+    if(jwt) {
+        return jsonwebtoken.decode(jwt) as User;
     }
 
-    public render(): JSX.Element {
-        return (
-            <BrowserRouter>
-                {this.redirect()}
-
-                <header className='header'>
-                    {this.renderNavigation()}
-                </header>
-                <main className='full-page'>
-                    <Switch>
-                        <Route path='/login'>
-                            <Login 
-                                api={this.getAPISettings}
-                                onLogin={this.onLogin} />
-                        </Route>
-                        
-                        <Route path='/user/:userId/collection'>
-                            <Collection api={this.getAPISettings} />
-                        </Route>
-                        <Route path='/user/:userId/wishlist'>
-                            <Wishlist api={this.getAPISettings} />
-                        </Route>
-
-                        <Route path='/games'>
-                            <AllGameList api={this.getAPISettings} />
-                        </Route>
-                        <Route path='/game/:gamePlatformId'>
-                            <GameDetails api={this.getAPISettings} />
-                        </Route>
-                    </Switch>
-                </main>
-            </BrowserRouter>
-        );
-    }
-
-    private renderNavigation() {
-        return (
-            <nav className='menu full-page'>
-                <NavLink to='/games'>Games</NavLink>
-                {this.state.unauthorised ? (
-                    <NavLink to='/login'>Login</NavLink>
-                ) : (
-                    <>
-                        <NavLink to={`/user/${this.state.user.userId}/collection`}>My Collection</NavLink>
-                        <NavLink to={`/user/${this.state.user.userId}/wishlist`}>My Wishlist</NavLink>
-                    </>
-                )}
-            </nav>
-        );
-    }
-
-    private redirect() {
-        if(this.state.unauthorised) {
-            return <Redirect to='/login' />;
-        }
-    }
-
-    private get getUser(): User | null {
-        // retrieve the user from the server's cookie
-        const jwt = Cookies.load('jwt');
-        if(jwt) {
-            return jsonwebtoken.decode(jwt) as User;
-        }
-
-        return null;
-    }
-
-    private get getAPISettings(): APISettings {
-        return {
-            url: apiUrl,
-            user: this.state.user,
-            onError: this.onError
-        };
-    }
-
+    return null;
 }

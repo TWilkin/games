@@ -11,7 +11,7 @@ export interface Game extends Model {
     includes?: GameCompilation[];
 }
 
-export interface GameCollection extends Model, UserGamePlatform {
+export interface GameCollection extends UserGamePlatform {
     gameCollectionId: number;
 }
 
@@ -37,7 +37,7 @@ export interface GamePlayTime extends Model {
     endTime?: number;
 }
 
-export interface GameWishlist extends Model, UserGamePlatform {
+export interface GameWishlist extends UserGamePlatform {
     gameWishlistId: number;
     gamePlatform: GamePlatform;
 }
@@ -53,6 +53,6 @@ export interface User extends Model {
     role: string;
 }
 
-export interface UserGamePlatform {
+export interface UserGamePlatform extends Model {
     gamePlatform: GamePlatform;
 }

@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { APIProps } from '../common';
+import { APIProps, APISettings } from '../common';
 import GameImage from './GameImage';
 import GameSummary from './GameSummary';
-import query, { queries, mutate, mutations, Query } from '../../graphql';
-import { GameCollection, GameCompilation, GamePlatform, GamePlayTime, GameWishlist, UserGamePlatform } from '../../models';
+import { mutations, queries } from '../../graphql';
+import { GameCollection, GamePlatform, GameWishlist } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
+import { useMutation, useQuery, useUpdatableQuery } from '../../hooks/graphql';
 
 interface GameDetailsMatch {
     gamePlatformId: string;
@@ -15,190 +16,86 @@ interface GameDetailsMatch {
 
 interface GameDetailsProps extends APIProps, RouteComponentProps<GameDetailsMatch> { }
 
-interface GameDetailsState {
-    gamePlatform?: GamePlatform;
-    gameCollectionId?: number;
-    gameWishlistId?: number;
-    gamePlayTime?: GamePlayTime[];
-}
+const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
+    const gamePlatformId = parseInt(match.params.gamePlatformId);
 
-class GameDetails extends Component<GameDetailsProps, GameDetailsState> {
+    const { 
+        gamePlatform,
+        gameCollection,
+        gameWishlist
+    } = useGameDetails(api, gamePlatformId);
 
-    constructor(props: GameDetailsProps) {
-        super(props);
+    const addArgs = {
+        input: { gamePlatformId }
+    };
+    const onAddToCollectionClick = useMutation(api, mutations['add']['GameCollection'], addArgs, gameCollection.setResults);
+    const onAddToWishlistClick = useMutation(api, mutations['add']['GameWishlist'], addArgs, gameWishlist.setResults);
 
-        this.state = {
-            gamePlatform: undefined,
-            gameCollectionId: undefined,
-            gameWishlistId: undefined
-        };
+    return (
+        <div className='panel'>
+            {gamePlatform ? (
+                <>
+                    <h1 className='panel__heading'>
+                        {gamePlatform?.alias ?? gamePlatform?.game.title}
+                    </h1>
 
-        this.onAddToCollectionClick = this.onAddToCollectionClick.bind(this);
-        this.onAddToWishlistClick = this.onAddToWishlistClick.bind(this);
-    }
-
-    public componentDidMount() {
-        const gamePlatformId = parseInt(this.props.match.params.gamePlatformId);
-        this.load(gamePlatformId);
-    }
-
-    public componentDidUpdate() {
-        // if the id has changed, load the new data
-        const gamePlatformId = parseInt(this.props.match.params.gamePlatformId);
-        if(this.state.gamePlatform && this.state.gamePlatform.gamePlatformId != gamePlatformId) {
-            this.load(gamePlatformId);
-        }
-    }
-
-    private async onAddToCollectionClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        event.preventDefault();
-
-        // add to the user's collection
-        try {
-            const args = {
-                input: {
-                    gamePlatformId: this.state.gamePlatform.gamePlatformId
-                }
-            };
-            const data: GameCollection = await mutate(this.props.api.url, mutations['add']['GameCollection'], args);
-            if(data) {
-                this.setState({
-                    gameCollectionId: data.gameCollectionId
-                });
-            }
-        } catch(error) {
-            this.props.api.onError(error);
-        }
-    }
-
-    private async onAddToWishlistClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        event.preventDefault();
-
-        // add to the user's wishlist
-        try {
-            const args = {
-                input: {
-                    gamePlatformId: this.state.gamePlatform.gamePlatformId
-                }
-            };
-            const data: GameWishlist = await mutate(this.props.api.url, mutations['add']['GameWishlist'], args);
-            if(data) {
-                this.setState({
-                    gameWishlistId: data.gameWishlistId
-                });
-            }
-        } catch(error) {
-            this.props.api.onError(error);
-        }
-    }
-
-    public render() {
-        return (
-            <div className='panel'>
-                {this.state.gamePlatform ? (
-                    <>
-                        <h1 className='panel__heading'>
-                            {this.state.gamePlatform?.game.title}
-                        </h1>
-                        <GameImage api={this.props.api} game={this.state.gamePlatform?.game} />
-                        <GameSummary gamePlatform={this.state.gamePlatform} />
-                        {this.renderInCollectionOrWishlist()}
-                        <PlayTimeCounter 
-                            api={this.props.api}
-                            gamePlatform={this.state.gamePlatform} />
-                        <PlayTimeList playTime={this.state.gamePlayTime} />
-                    </>
-                ) : (
-                    <>Game not found</>
-                )}
-            </div>
-        );
-    }
-
-    private renderInCollectionOrWishlist() {
-        return (
-            <div>
-                {this.state.gameCollectionId ? (
-                    <>In collection</>
-                ) : (
-                    <>
-                        <button onClick={this.onAddToCollectionClick}>
-                            Add to Collection
-                        </button>
-
-                        {this.state.gameWishlistId ? (
-                            <>In wishlist</>
+                    <GameImage api={api} game={gamePlatform?.game} />
+                    <GameSummary gamePlatform={gamePlatform} />
+                    
+                    <div>
+                        {gameCollection?.results?.length > 0 ? (
+                            <>In collection</>
                         ) : (
-                            <button onClick={this.onAddToWishlistClick}>
-                                Add to Wishlist
-                            </button>
+                            <>
+                                <button onClick={onAddToCollectionClick}>
+                                    Add to Collection
+                                </button>
+
+                                {gameWishlist?.results?.length > 0 ? (
+                                    <>In wishlist</>
+                                ) : (
+                                    <button onClick={onAddToWishlistClick}>
+                                        Add to Wishlist
+                                    </button>
+                                )}
+                            </>
                         )}
-                    </>
-                )}
-            </div>
-        );
-    }
+                    </div>
 
-    private async load(gamePlatformId: number) {
-        try {
-            // load the gamePlatform
-            let args: unknown = { gamePlatformId: gamePlatformId };
-            const games: GamePlatform[] = await query(this.props.api.url, queries['GamePlatform'], args);
-            const game = games && games.length >= 1 ? games[0] : undefined;
-
-            // load the compilations (if any)
-            if(game) {
-                args = { primaryGameId: games[0].game.gameId };
-                const compilations: GameCompilation[] = await query(this.props.api.url, queries['GameCompilation'], args);
-                games[0].game.includes = compilations;
-            }
-
-            // store the game
-            this.setState({
-                gamePlatform: game
-            });
-
-            // check if this game in the user's collection or wishlist
-            const gameCollection = await this.loadUserGamePlatform<GameCollection>(game, queries['GameCollection']);
-            const gameWishlist = await this.loadUserGamePlatform<GameWishlist>(game, queries['GameWishlist']);
-            this.setState({
-                gameCollectionId: gameCollection?.gameCollectionId,
-                gameWishlistId: gameWishlist?.gameWishlistId
-            });        
-
-            // load the playtime
-            if(game) {
-                args = {
-                    gamePlatformId: gamePlatformId,
-                    userId: this.props.api.user.userId
-                };
-
-                const playtime: GamePlayTime[] = await query(this.props.api.url, queries['GamePlayTime'], args);
-
-                if(playtime?.length >= 1) {
-                    this.setState({
-                        gamePlayTime: playtime
-                    });
-                }
-            }
-        } catch(error) {
-            this.props.api.onError(error);
-        }
-    }
-
-    private async loadUserGamePlatform<TGamePlatform extends UserGamePlatform>(game: GamePlatform, graphQLQuery: Query) {
-        if(game) {
-            const args = {
-                gamePlatformId: game.gamePlatformId,
-                userId: this.props.api.user.userId
-            };
-            const data = await query(this.props.api.url, graphQLQuery, args);
-            if(data && data.length >= 1) {
-                return data[0] as unknown as TGamePlatform;
-            }
-        }
-    }
-
-}
+                    <PlayTimeCounter 
+                        api={api}
+                        gamePlatform={gamePlatform} />
+                    <PlayTimeList
+                        api={api}
+                        gamePlatform={gamePlatform} />
+                </>
+            ) : (
+                <p>Game not found</p>
+            )}
+        </div>
+    );
+};
 
 export default withRouter(GameDetails);
+
+function useGameDetails(api: APISettings, gamePlatformId: number) {
+    // load the gamePlatform
+    const args = { gamePlatformId };
+    const gamePlatforms = useQuery<GamePlatform>(api, queries['GamePlatform'], args);
+    const gamePlatform = gamePlatforms && gamePlatforms.length >= 1 ? gamePlatforms[0] : undefined;
+
+    const gamePlatformUserArgs = {
+        gamePlatformId,
+        userId: api.user?.userId
+    };
+
+    // check if this game in the user's collection or wishlist
+    const gameCollection = useUpdatableQuery<GameCollection>(api, queries['GameCollection'], gamePlatformUserArgs);
+    const gameWishlist = useUpdatableQuery<GameWishlist>(api, queries['GameWishlist'], gamePlatformUserArgs);
+
+    return {
+        gamePlatform,
+        gameCollection,
+        gameWishlist
+    };
+}

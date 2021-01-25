@@ -1,33 +1,26 @@
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { Component } from 'react';
+import React from 'react';
 import Moment from 'react-moment';
+import { queries } from '../../graphql';
+import { useQuery } from '../../hooks/graphql';
 
-import { GamePlayTime } from '../../models';
+import { GamePlatform, GamePlayTime } from '../../models';
+import { APIProps } from '../common';
 import SortableTable from '../SortableTable/SortableTable';
 
-interface PlayTimeListProps {
-    playTime?: GamePlayTime[];
+interface PlayTimeListProps extends APIProps {
+    gamePlatform: GamePlatform;
 }
 
-export default class PlayTimeList extends Component<PlayTimeListProps> {
-    render(): JSX.Element {
-        return (
-            <div className='playTime'>
-                {this.props.playTime?.length > 0 ? (
-                    <SortableTable<GamePlayTime>
-                        title='Play Time'
-                        headings={['Start', 'End', 'For', 'Demo']}
-                        sortColumns={['startTime', 'endTime', null, 'demo']}
-                        data={this.props.playTime}
-                        row={this.renderCells}
-                    />
-                ) : null}
-            </div>
-        );
-    }
+const PlayTimeList = ({ api, gamePlatform }: PlayTimeListProps): JSX.Element => {
+    const args = {
+        gamePlatformId: gamePlatform.gamePlatformId,
+        userId: api.user?.userId
+    };
+    const playTime = useQuery<GamePlayTime>(api, queries['GamePlayTime'], args);
 
-    renderCells(playTime: GamePlayTime): JSX.Element[] {
+    const renderCells = (playTime: GamePlayTime): JSX.Element[] => {
         return playTime?.endTime && (
             [
                 <Moment key='startTime' date={playTime.startTime} format='L LT' />,
@@ -36,5 +29,21 @@ export default class PlayTimeList extends Component<PlayTimeListProps> {
                 playTime.demo ? <FontAwesomeIcon key='isDemo' icon={faCheckCircle} /> : null
             ]
         );
-    }
-}
+    };
+    
+    return (
+        <div className='playTime'>
+            {playTime?.length > 0 ? (
+                <SortableTable<GamePlayTime>
+                    title='Play Time'
+                    headings={['Start', 'End', 'For', 'Demo']}
+                    sortColumns={['startTime', 'endTime', null, 'demo']}
+                    data={playTime}
+                    row={renderCells}
+                />
+            ) : null}
+        </div>
+    );
+};
+
+export default PlayTimeList;

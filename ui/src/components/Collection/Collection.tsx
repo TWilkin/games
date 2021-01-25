@@ -1,40 +1,20 @@
-import React, { Component } from 'react';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import React from 'react';
+import { withRouter } from 'react-router-dom';
 
-import { APIProps } from '../common';
+import { UserRouteProps } from '../common';
 import { queries } from '../../graphql';
 import { GameList } from '../Game/GameList';
+import { GameCollection } from '../../models';
 
-interface CollectionMatch {
-    userId: string;
-}
-
-interface CollectionProps extends APIProps, RouteComponentProps<CollectionMatch> { }
-
-interface CollectionState {
-    userId: number;
-}
-
-class Collection extends Component<CollectionProps, CollectionState> {
-
-    constructor(props: CollectionProps) {
-        super(props);
-
-        this.state = {
-            userId: parseInt(this.props.match.params.userId)
-        };
-    }
-
-    public render() {
-        return (
-            <div className='collection'>
-                <h1>My Collection</h1>
-                <GameList api={this.props.api} 
-                    query={queries['GameCollection']}
-                    args={{ userId: this.state.userId }} />
-            </div>
-        );
-    }
-}
+const Collection = ({ api, match }: UserRouteProps): JSX.Element => {
+    return (
+        <div className='collection'>
+            <h1>My Collection</h1>
+            <GameList<GameCollection> api={api} 
+                query={queries['GameCollection']}
+                args={{ userId: parseInt(match.params.userId) }} />
+        </div>
+    );
+};
 
 export default withRouter(Collection);

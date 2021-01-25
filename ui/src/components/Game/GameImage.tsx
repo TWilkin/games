@@ -1,17 +1,17 @@
-import React, { Component } from 'react';
-import { Game } from '../../models';
+import React from 'react';
 
+import { Game } from '../../models';
 import { APIProps } from '../common';
 
 interface GameImageProps extends APIProps {
     game: Game;
 }
 
-export default class GameImage extends Component<GameImageProps> {
-    render(): JSX.Element {
-        return (
-            <img src={`${this.props.api.url}/images/games/${this.props.game.gameId}`}
-                alt={`Cover art for ${this.props.game.title}`} />
-        );
-    }
-}
+const GameImage = ({ api, game }: GameImageProps): JSX.Element => {
+    return (
+        <img src={`${api.url}/images/games/${game.gameId}`}
+            alt={`Cover art for ${game.title}`} />
+    );
+};
+
+export default GameImage;

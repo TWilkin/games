@@ -1,74 +1,45 @@
 import { faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
+import { Model } from '../../models';
 
-interface SortableTableProps<T> {
+interface SortableTableProps<TModel extends Model> {
     title: string;
     headings: string[];
-    sortColumns: (keyof T | null)[];
-    data: T[];
-    row: (data: T) => JSX.Element[];
+    sortColumns: (keyof TModel | null)[];
+    data: TModel[];
+    row: (data: TModel) => JSX.Element[];
 }
 
-interface SortableTableState<T> {
-    sortBy: keyof T;
-    ascending: boolean;
+interface CurrentSort<TModel extends Model> {
+    by: keyof TModel;
+    direction: boolean;
 }
 
-export default class SortableTable<T> extends Component<SortableTableProps<T>, SortableTableState<T>> {
-    constructor(props: SortableTableProps<T>) {
-        super(props);
+export default function SortableTable<TModel extends Model>(
+    { title, headings, sortColumns, data, row }: SortableTableProps<TModel>
+): JSX.Element {
+    const [ currentSort, setCurrentSort ] = useState<CurrentSort<TModel>>({
+        by: sortColumns[0],
+        direction: true
+    });
 
-        this.state = {
-            sortBy: this.props.sortColumns[0],
-            ascending: true
-        };
+    const onHeadingClick = (column: keyof TModel) => 
+        setCurrentSort({
+            by: column,
+            direction: column === currentSort.by ? !currentSort.direction : currentSort.direction
+        });
 
-        this.renderSortableHeading = this.renderSortableHeading.bind(this);
-        this.sort = this.sort.bind(this);
-        this.onSortClick = this.onSortClick.bind(this);
-    }
-
-    render(): JSX.Element {
-        const columns = this.props.headings.length;
-
-        return (
-            <table>
-                <caption>{this.props.title}</caption>
-                <thead>
-                    <tr>
-                        {this.props.headings.map((heading, i) => 
-                            this.renderSortableHeading(heading, this.props.sortColumns[i])
-                        )}
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {this.props.data
-                        .sort(this.sort)
-                        .map((data, i) => {
-                            const cells = this.props.row(data);
-                            return cells ? (
-                                <tr key={i}>
-                                    {cells.map((cell, j) => (
-                                        <td key={j}>{cell}</td>
-                                    ))}
-                                </tr>
-                            ) : null;
-                        })
-                    }
-                </tbody>
-            </table>
-        );
-    }
-
-    private renderSortableHeading(heading: string, column: keyof T) {
+    const renderSortableHeading = (heading: string, column: keyof TModel) => {
         const sort = column != null;
-        const sortedByThis = column == this.state.sortBy;
-        const directionIcon = this.state.ascending ? faSortUp : faSortDown;
-
+        const sortedByThis = column === currentSort.by;
+        const directionIcon = currentSort.direction ? faSortUp : faSortDown;
+    
         return (
-            <th key={heading} className='button' onClick={() => this.onSortClick(column)}>
+            <th key={heading} 
+                className='button' 
+                onClick={() => onHeadingClick(column)}
+            >
                 {heading}
                 {sort && sortedByThis && (
                     <>
@@ -78,28 +49,48 @@ export default class SortableTable<T> extends Component<SortableTableProps<T>, S
                 )}
             </th>
         );
-    }
+    };
 
-    private sort(field1: T, field2: T) {
-        const str1 = field1[this.state.sortBy]?.toString();
-        const str2 = field2[this.state.sortBy]?.toString();
-
+    const sort = (field1: TModel, field2: TModel) => {
+        const str1 = field1[currentSort.by]?.toString();
+        const str2 = field2[currentSort.by]?.toString();
+    
         let order = str1 == str2 ? 0 : str1 < str2 ? -1 : 1;
-
-        if(!this.state.ascending) {
+    
+        if(!currentSort.direction) {
             order *= -1;
         }
-
+    
         return order;
-    }
+    };
 
-    private onSortClick(column: keyof T) {
-        const changeDirection = column == this.state.sortBy;
-        const direction = changeDirection ? !this.state.ascending : this.state.ascending;
+    return (
+        <table>
+            <caption>{title}</caption>
+            
+            <thead>
+                <tr>
+                    {headings.map((heading, i) => 
+                        renderSortableHeading(heading, sortColumns[i])
+                    )}
+                </tr>
+            </thead>
 
-        this.setState({
-            sortBy: column,
-            ascending: direction
-        });
-    }
+            <tbody>
+                {data
+                    .sort(sort)
+                    .map((data, i) => {
+                        const cells = row(data);
+                        return cells ? (
+                            <tr key={i}>
+                                {cells.map((cell, j) => (
+                                    <td key={j}>{cell}</td>
+                                ))}
+                            </tr>
+                        ) : null;
+                    })
+                }
+            </tbody>
+        </table>
+    );
 }
