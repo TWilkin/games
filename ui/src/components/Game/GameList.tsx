@@ -9,11 +9,12 @@ import PlatformFilter from '../Platform/PlatformFilter';
 import { useQuery } from '../../hooks/graphql';
 
 interface GameListProps extends APIProps {
+    title: string;
     query: Query;
     args?: Record<string, any>;
 }
 
-export function GameList<TCollection extends Model>({ api, query, args }: GameListProps): JSX.Element {
+export function GameList<TCollection extends Model>({ api, title, query, args }: GameListProps): JSX.Element {
     const [platformId, setPlatformId] = useState(-1);
 
     const queryArgs = {
@@ -24,7 +25,7 @@ export function GameList<TCollection extends Model>({ api, query, args }: GameLi
 
     return (
         <div className='games panel'>
-            <h1 className='panel__heading'>All Games</h1>
+            <h1 className='panel__heading'>{title}</h1>
 
             <PlatformFilter
                 api={api}
@@ -69,11 +70,9 @@ function toUserGamePlatform(data: Model[]) {
 
 export const AllGameList = ({ api }: APIProps): JSX.Element => {
     return (
-        <div>
-            <h1>All Games</h1>
-            <GameList<GamePlatform> 
-                api={api} 
-                query={queries['GamePlatform']} />
-        </div>
+        <GameList<GamePlatform> 
+            title='All Games'
+            api={api} 
+            query={queries['GamePlatform']} />
     );
 };
