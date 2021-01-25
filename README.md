@@ -101,7 +101,7 @@ This will create `bundle.js` in the `dist` directory, copy this with the content
 ## Authors
 
 - **Tom Wilkin** - Most of what you see - [TWilkin](https://github.com/TWilkin/)
-- **Paul Sandwell** - Sprinkled some pretty dust [peasandwell](https://github.com/peasandwell)
+- **Paul Sandwell** - Sprinkled some pretty dust - [peasandwell](https://github.com/peasandwell)
 
 See also the list of [contributors](https://github.com/TWilkin/games/contributors) who participated in this project.
 
