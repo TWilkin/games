@@ -12,14 +12,14 @@ services:
       - db_password
     volumes:
       - /var/lib/docker-volumes/games/postgres/data:/var/lib/postgresql/data/pgdata
-  
+
   adminer:
     image: adminer:4.7.8
     depends_on:
       - db
     ports:
       - "8080:8080"
-  
+
   api:
     build: ./api
     image: ${REGISTRY}/games/api:0.0.3
@@ -42,7 +42,7 @@ services:
 
   ui:
     build: ./ui
-    image: ${REGISTRY}/games/ui:0.0.2
+    image: ${REGISTRY}/games/ui:0.0.3
     ports:
       - "80:80"
     depends_on:
