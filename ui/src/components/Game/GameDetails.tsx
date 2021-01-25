@@ -32,9 +32,13 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
     const onAddToWishlistClick = useMutation(api, mutations['add']['GameWishlist'], addArgs, gameWishlist.setResults);
 
     return (
-        <div className='game'>
+        <div className='panel'>
             {gamePlatform ? (
-                <div>
+                <>
+                    <h1 className='panel__heading'>
+                        {gamePlatform?.alias ?? gamePlatform?.game.title}
+                    </h1>
+
                     <GameImage api={api} game={gamePlatform?.game} />
                     <GameSummary gamePlatform={gamePlatform} />
                     
@@ -64,9 +68,9 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
                     <PlayTimeList
                         api={api}
                         gamePlatform={gamePlatform} />
-                </div>
+                </>
             ) : (
-                <>Game not found</>
+                <p>Game not found</p>
             )}
         </div>
     );

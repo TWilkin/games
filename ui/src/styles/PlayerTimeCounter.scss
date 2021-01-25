@@ -1,0 +1,15 @@
+.playTimeCounter {
+    margin-bottom: 10px;
+
+    &__timer {
+        display: block;
+        text-align: center;
+        font-size: 2rem; // 32px
+        font-weight: bold;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: center;
+    }
+}

@@ -39,22 +39,21 @@ const App = (): JSX.Element => {
         <BrowserRouter>
             {!authorised && <Redirect to='/login' />}
 
-            <div>
-                <div className='menu'>
-                    <nav>
-                        <NavLink to='/games'>Games</NavLink>
-                        {!authorised ? (
-                            <NavLink to='/login'>Login</NavLink>
-                        ) : (
-                            <>
-                                <NavLink to={`/user/${user.userId}/collection`}>My Collection</NavLink>
-                                <NavLink to={`/user/${user.userId}/wishlist`}>My Wishlist</NavLink>
-                            </>
-                        )}
-                    </nav>
-                </div>
-                <hr />
+            <header className='header'>
+                <nav className='menu full-page'>
+                    <NavLink to='/games'>Games</NavLink>
+                    {!authorised ? (
+                        <NavLink to='/login'>Login</NavLink>
+                    ) : (
+                        <>
+                            <NavLink to={`/user/${user.userId}/collection`}>My Collection</NavLink>
+                            <NavLink to={`/user/${user.userId}/wishlist`}>My Wishlist</NavLink>
+                        </>
+                    )}
+                </nav>
+            </header>
             
+            <main className='full-page'>
                 <Switch>
                     <Route path='/login'>
                         <Login 
@@ -76,7 +75,7 @@ const App = (): JSX.Element => {
                         <GameDetails api={api} />
                     </Route>
                 </Switch>
-            </div>
+            </main>
         </BrowserRouter>
     );
 };

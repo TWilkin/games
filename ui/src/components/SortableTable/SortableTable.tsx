@@ -66,11 +66,9 @@ export default function SortableTable<TModel extends Model>(
 
     return (
         <table>
+            <caption>{title}</caption>
+            
             <thead>
-                <tr>
-                    <th colSpan={headings.length}>{title}</th>
-                </tr>
-
                 <tr>
                     {headings.map((heading, i) => 
                         renderSortableHeading(heading, sortColumns[i])

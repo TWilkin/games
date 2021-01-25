@@ -54,14 +54,18 @@ const PlayTimeCounter = ({ api, gamePlatform}: PlayTimeCounterProps): JSX.Elemen
                 <>
                     <Timer startTime={playTime.results[0].startTime} />
                     {' '}
-                    <button type='button' onClick={() => onStopCounterSubmit(playTime.results[0])}>
-                        Stop Play Counter
-                    </button>
+                    <div className='playTimeCounter__actions'>
+                        <button type='button' onClick={() => onStopCounterSubmit(playTime.results[0])}>
+                            Stop Play Counter
+                        </button>
+                    </div>
                 </>
             ) : (
-                <button type='button' onClick={() => setStartCounterDialogVisible(true)}>
-                    Start Play Counter
-                </button>
+                <div className='playTimeCounter__actions'>
+                    <button type='button' onClick={() => setStartCounterDialogVisible(true)}>
+                        Start Play Counter
+                    </button>
+                </div>
             )}
 
             {startCounterDialogVisible && (
@@ -73,33 +77,32 @@ const PlayTimeCounter = ({ api, gamePlatform}: PlayTimeCounterProps): JSX.Elemen
                         onClose={() => setStartCounterDialogVisible(false)}
                     >
                         {gamePlatform.game.includes?.length > 0 && (
-                            <>
-                                <select 
-                                    name='gameCompilationId'
-                                    defaultValue={-1}
-                                    ref={startCounterForm}
-                                >
-                                    <option key={-1} value={-1}>-</option>
-                                    {gamePlatform.game.includes.map(compilation => {
-                                        return (
-                                            <option 
-                                                key={compilation.gameCompilationId} 
-                                                value={compilation.gameCompilationId}>
-                                                {compilation.included.title}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                                <br />
-                            </>
+                            <select 
+                                name='gameCompilationId'
+                                defaultValue={-1}
+                                ref={startCounterForm}
+                            >
+                                <option key={-1} value={-1}>-</option>
+                                {gamePlatform.game.includes.map(compilation => {
+                                    return (
+                                        <option 
+                                            key={compilation.gameCompilationId} 
+                                            value={compilation.gameCompilationId}>
+                                            {compilation.included.title}
+                                        </option>
+                                    );
+                                })}
+                            </select>
                         )}
 
-                        <label>Demo? 
+                        <div className="field">
+                            <label htmlFor="isDemo">Demo?</label>
                             <input 
-                                type='checkbox'
-                                name='demo' 
-                                ref={startCounterForm}  />
-                        </label>
+                                type='checkbox' 
+                                id='isDemo'
+                                name='demo'
+                                ref={startCounterForm} />
+                        </div>
                     </ModalDialog>
                 </form>
             )}

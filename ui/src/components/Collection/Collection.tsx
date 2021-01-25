@@ -8,12 +8,10 @@ import { GameCollection } from '../../models';
 
 const Collection = ({ api, match }: UserRouteProps): JSX.Element => {
     return (
-        <div className='collection'>
-            <h1>My Collection</h1>
-            <GameList<GameCollection> api={api} 
-                query={queries['GameCollection']}
-                args={{ userId: parseInt(match.params.userId) }} />
-        </div>
+        <GameList<GameCollection> api={api}
+            title='My Collection'
+            query={queries['GameCollection']}
+            args={{ userId: parseInt(match.params.userId) }} />
     );
 };
 

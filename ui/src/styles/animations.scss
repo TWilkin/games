@@ -1,0 +1,54 @@
+// Horizontal slide in
+@keyframes slide-in {
+    0% {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+@keyframes slide-out {
+    0% {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// Horizontal shake
+@keyframes shake {
+    0% {
+        opacity: 0;
+        transform: translateX(-16px);
+    }
+    25% {
+        opacity: 1;
+        transform: translateX(16px);
+    }
+    50% {
+        transform: translateX(-8px);
+    }
+    75% {
+        transform: translateX(8px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.anim {
+    &--slide-in {
+        animation: slide-in 0.3s;
+    }
+    &--slide-out {
+        animation: slide-out 0.3s;
+    }
+    &--shake {
+        animation: shake 0.3s ease-in-out;
+    }
+}

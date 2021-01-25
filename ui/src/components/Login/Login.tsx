@@ -26,36 +26,57 @@ const Login = ({ api, onLogin }: LoginProps): JSX.Element => {
     const onChange = () => setLoggedIn(undefined);
 
     return (
-        <div id='login'>
-            {!loggedId && (
-                <form onSubmit={onSubmit}>
-                    <label>Username:</label>
-                    <input 
-                        type='text'
-                        name='userName'
-                        ref={loginForm}
-                        onChange={onChange} />
-                    <br />
+        <div id='login' className='panel'>
+            <h1 className='panel__heading'>Login</h1>
 
-                    <label>Password:</label>
-                    <input 
-                        type='password'
-                        name='password'
-                        ref={loginForm}
-                        onChange={onChange} />
-                    <br />
+            <form onSubmit={onSubmit} className='form'>
+                {!loggedId && (
+                    <>
+                        <div className='field'>
+                            <div className='field__label'>
+                                <label htmlFor='loginUserName'>Username:</label>
+                            </div>
+                            <div className='field__input'>
+                                <input 
+                                    type='text'
+                                    name='userName'
+                                    id='loginUserName'
+                                    ref={loginForm}
+                                    onChange={onChange} />
+                            </div>
+                        </div>
 
-                    <input type='submit' value='Login' />
-                </form>
-            )}
+                        <div className='field'>
+                            <div className='field__label'>
+                                <label htmlFor='loginPassword'>Password:</label>
+                            </div>
+                            <div className='field__input'>
+                                <input 
+                                    type='password'
+                                    name='password'
+                                    id='loginPassword'
+                                    ref={loginForm}
+                                    onChange={onChange} />
+                            </div>
+                        </div>
+                        <div className='form__actions'>
+                            <button type='submit'>Login</button>
+                        </div>
+                    </>
+                )}
 
-            {loggedId === true && (
-                <div>Login successful!</div>
-            )}
+                {loggedId === true && (
+                    <div className='panel panel--alert panel--success anim--slide-in'>
+                        Login successful!
+                    </div>
+                )}
 
-            {loggedId === false && (
-                <div>Login failed!</div>
-            )}
+                {loggedId === false && (
+                    <div className='panel panel--alert panel--error anim--shake'>
+                        Login failed!
+                    </div>
+                )}
+            </form>
         </div>
     );
 };

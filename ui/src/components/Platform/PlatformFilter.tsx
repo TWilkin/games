@@ -22,16 +22,23 @@ const PlatformFilter = ({ api, onSelect }: PlatformFilterProps): JSX.Element => 
     };
 
     return (
-        <div className='platforms'>
+        <div>
             {platforms ? (
-                <select onChange={onChange} defaultValue='-1'>
-                    <option key='-1' value='-1'>-</option>
-                    {platforms.map(entry => 
-                        <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>
-                    )}
-                </select>
+                <div className='field'>
+                    <label htmlFor='platformFilterSelect' className='sr-only'>
+                        Select platform
+                    </label>
+                    <div className="field__input">
+                        <select onChange={onChange} defaultValue='-1'>
+                            <option key='-1' value='-1'>-</option>
+                            {platforms.map(entry => 
+                                <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>
+                            )}
+                        </select>
+                    </div>
+                </div>
             ) : (
-                <>No platforms found</>
+                <p>No platforms found</p>
             )}
         </div>
     );

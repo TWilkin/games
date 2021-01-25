@@ -9,11 +9,12 @@ import PlatformFilter from '../Platform/PlatformFilter';
 import { useQuery } from '../../hooks/graphql';
 
 interface GameListProps extends APIProps {
+    title: string;
     query: Query;
     args?: Record<string, any>;
 }
 
-export function GameList<TCollection extends Model>({ api, query, args }: GameListProps): JSX.Element {
+export function GameList<TCollection extends Model>({ api, title, query, args }: GameListProps): JSX.Element {
     const [platformId, setPlatformId] = useState(-1);
 
     const queryArgs = {
@@ -23,27 +24,28 @@ export function GameList<TCollection extends Model>({ api, query, args }: GameLi
     const games = useQuery<TCollection>(api, query, queryArgs);
 
     return (
-        <div className='games'>
+        <div className='games panel'>
+            <h1 className='panel__heading'>{title}</h1>
+
             <PlatformFilter
                 api={api}
                 onSelect={setPlatformId} />
-            <br />
-            
-            <div>
+
+            <div className='games-list'>
                 {games?.length > 0 ? (
-                    <>
+                    <ul>
                         {toUserGamePlatform(games).map(entry => {
                             return(
-                                <div key={entry.gamePlatform.gamePlatformId}>
+                                <li key={entry.gamePlatform.gamePlatformId}>
                                     <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
                                         <GameSummary gamePlatform={entry.gamePlatform} />
                                     </Link>
-                                </div>
+                                </li>
                             );
                         })}
-                    </>
+                    </ul>
                 ) : (
-                    <>No games found</>
+                    <p>No games found</p>
                 )}
             </div>
         </div>
@@ -68,11 +70,9 @@ function toUserGamePlatform(data: Model[]) {
 
 export const AllGameList = ({ api }: APIProps): JSX.Element => {
     return (
-        <div>
-            <h1>All Games</h1>
-            <GameList<GamePlatform> 
-                api={api} 
-                query={queries['GamePlatform']} />
-        </div>
+        <GameList<GamePlatform> 
+            title='All Games'
+            api={api} 
+            query={queries['GamePlatform']} />
     );
 };

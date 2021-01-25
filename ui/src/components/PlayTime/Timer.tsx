@@ -18,10 +18,12 @@ const Timer = ({ startTime }: TimerProps): JSX.Element => {
     );
 
     return (
-        <Moment 
-            duration={startTime} 
-            date={endTime} 
-            format='hh:mm:ss' />
+        <span className='playTimeCounter__timer'>
+            <Moment 
+                duration={startTime} 
+                date={endTime} 
+                format='hh:mm:ss' />
+        </span>
     );
 };
 

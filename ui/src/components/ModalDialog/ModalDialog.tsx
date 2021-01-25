@@ -16,10 +16,12 @@ const ModalDialog = ({ submit, cancel, form, onClose, children }: ModalDialogPro
 
     return (
         <div className='modal'>
-            <div className='modal-content'>
-                <span className='modal-close' onClick={onCancel}>&times;</span>
+            <div className='modal__content'>
+                <button className='modal__close' onClick={onCancel}>&times;</button>
+
                 {children}
-                <div className='controls'>
+
+                <div className='modal__controls'>
                     <button name={submit} ref={form}>
                         {submit}
                     </button>

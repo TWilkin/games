@@ -1,2 +1,69 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body,
+input,
+button {
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+a {
+    color: #000;
+    transition: color 0.3s ease;
+    
+    &:hover,
+    &:focus {
+        color: #666;
+    }
+}
+
+ul,
+ol {
+    padding-left: 20px;
+    li {
+        margin-bottom: 6px;
+    }
+}
+
+ul {
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 0;
+    li {
+        padding-left: 12px;
+        position: relative;
+        
+        &:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 3px;
+            height: 3px;
+            border: 2px solid #000;
+            border-radius: 50%;
+        }
+    }
+}
+
+.sr-only {
+    position:absolute;
+    left:-10000px;
+    top:auto;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+}
+
 @import "./layout.scss";
+@import "./forms.scss";
+@import "./animations.scss";
+@import "./header.scss";
 @import "./ModalDialog.scss";
+@import "./PlayerTimeCounter.scss";
