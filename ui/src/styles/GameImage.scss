@@ -1,0 +1,40 @@
+$box-width: 12px;
+
+.game-image {
+    margin: 15px auto 40px;
+    max-width: 100%;
+    width: 300px;
+    perspective: 1000px;
+    
+    &__inner {
+        position: relative;
+        transform-style: preserve-3d;
+        transform: rotateY(-25deg);
+        transition: transform 1s ease;
+        box-shadow: 0 5px 50px 10px #aaaaaa;
+        
+        &:hover {
+            transform: rotateY(0);
+        }
+        
+        &:before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: $box-width * 2;
+            height: calc(100% - 0px);
+            transform: translateX($box-width) rotateY(90deg);
+            background: #666;
+        }
+
+        img {
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: block;
+            height: auto;
+            transform: translateZ($box-width);
+        }
+    }
+}

@@ -9,8 +9,12 @@ interface GameImageProps extends APIProps {
 
 const GameImage = ({ api, game }: GameImageProps): JSX.Element => {
     return (
-        <img src={`${api.url}/images/games/${game.gameId}`}
-            alt={`Cover art for ${game.title}`} />
+        <div className='game-image'>
+            <div className='game-image__inner'>
+                <img src={`${api.url}/images/games/${game.gameId}`}
+                    alt={`Cover art for ${game.title}`} />
+            </div>
+        </div>
     );
 };
 
