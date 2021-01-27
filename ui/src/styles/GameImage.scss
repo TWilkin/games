@@ -35,6 +35,8 @@ $box-width: 12px;
             display: block;
             height: auto;
             transform: translateZ($box-width);
+            background: #000;
+            color: #fff;
         }
     }
 }
