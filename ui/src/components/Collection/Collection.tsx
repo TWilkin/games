@@ -2,16 +2,37 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 
 import { UserRouteProps } from '../common';
-import { queries } from '../../graphql';
 import { GameList } from '../Game/GameList';
 import { GameCollection } from '../../models';
+import { VariableType } from 'json-to-graphql-query';
 
 const Collection = ({ api, match }: UserRouteProps): JSX.Element => {
     return (
         <GameList<GameCollection> api={api}
             title='My Collection'
-            query={queries['GameCollection']}
-            args={{ userId: parseInt(match.params.userId) }} />
+            query={{
+                query: {
+                    __variables: {
+                        platformId: 'Int'
+                    },
+                    GetGameCollection: {
+                        __args: {
+                            platformId: new VariableType('platformId'),
+                            userId: parseInt(match.params.userId)
+                        },
+                        gamePlatform: {
+                            gamePlatformId: true,
+                            alias: true,
+                            game: {
+                                title: true
+                            },
+                            platform: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            }} />
     );
 };
 

@@ -1,7 +1,7 @@
+import { VariableType } from 'json-to-graphql-query';
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { mutations, queries } from '../../graphql';
 import { useMutation, useUpdatableQuery } from '../../hooks/graphql';
 import { GamePlatform, GamePlayTime } from '../../models';
 import { APIProps, APISettings } from '../common';
@@ -25,13 +25,38 @@ interface GamePlayTimeInput {
     endTime?: number;
 }
 
+const gamePlayTimeFields = {
+    gamePlayTimeId: true,
+    gameCompilationId: true,
+    demo: true,
+    startTime: true,
+    endTime: true
+};
+
 const PlayTimeCounter = ({ api, gamePlatform}: PlayTimeCounterProps): JSX.Element => {
+    const query = {
+        query: {
+            __variables: {
+                gamePlatformId: 'Int',
+                userId: 'Int',
+                endTime: 'DateTime'
+            },
+            GetGamePlayTime: {
+                __args: {
+                    gamePlatformId: new VariableType('gamePlatformId'),
+                    userId: new VariableType('userId'),
+                    endTime: new VariableType('endTime')
+                },
+                ... gamePlayTimeFields
+            }
+        }
+    };
     const args = {
         gamePlatformId: gamePlatform.gamePlatformId,
         userId: api.user?.userId,
         endTime: null as Date
     };
-    const playTime = useUpdatableQuery<GamePlayTime>(api, queries['GamePlayTime'], args);
+    const playTime = useUpdatableQuery<GamePlayTime>(api, query, args);
 
     const [ startCounterDialogVisible, setStartCounterDialogVisible ] = useState(false);
 
@@ -120,11 +145,23 @@ function useStartCounterForm(
 ) {
     const { register, handleSubmit } = useForm<StartCounterFormData>();
 
+    const query = {
+        mutation: {
+            __variables: {
+                input: 'GamePlayTimeInput!'
+            },
+            AddGamePlayTime: {
+                __args: {
+                    input: new VariableType('input')
+                },
+                ... gamePlayTimeFields
+            }
+        }
+    };
     const args = {
         input: { } as GamePlayTimeInput
     };
-
-    const addPlayTime = useMutation(api, mutations['add']['GamePlayTime'], args, setPlayTime);
+    const addPlayTime = useMutation(api, query, args, setPlayTime);
 
     const onSubmit = useCallback(
         (data: StartCounterFormData) => {
@@ -154,15 +191,30 @@ function useStopCounter(
     gamePlatform: GamePlatform,
     setPlayTime: React.Dispatch<React.SetStateAction<GamePlayTime[]>>
 ) {
+    const query = {
+        mutation: {
+            __variables: {
+                gamePlayTimeId: 'Int!',
+                input: 'GamePlayTimeInput!'
+            },
+            UpdateGamePlayTime: {
+                __args: {
+                    id: new VariableType('gamePlayTimeId'),
+                    input: new VariableType('input')
+                },
+                ... gamePlayTimeFields
+            }
+        }
+    };
     const args = {
-        id: -1,
+        gamePlayTimeId: -1,
         input: { } as GamePlayTimeInput
     };
-
-    const updatePlayTime = useMutation(api, mutations['update']['GamePlayTime'], args);
+    const updatePlayTime = useMutation(api, query, args);
 
     return useCallback(
         (playTime: GamePlayTime) => {
+            args.gamePlayTimeId = playTime.gamePlayTimeId;
             args.input = {
                 gamePlatformId: gamePlatform.gamePlatformId,
                 gameCompilationId: playTime.gameCompilationId,
@@ -170,7 +222,6 @@ function useStopCounter(
                 startTime: playTime.startTime,
                 endTime: Date.now()
             };
-            args.id = playTime.gamePlayTimeId;
 
             updatePlayTime();
             setPlayTime(undefined);

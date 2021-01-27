@@ -4,11 +4,11 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { APIProps, APISettings } from '../common';
 import GameImage from './GameImage';
 import GameSummary from './GameSummary';
-import { mutations, queries } from '../../graphql';
 import { GameCollection, GamePlatform, GameWishlist } from '../../models';
 import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
 import { useMutation, useQuery, useUpdatableQuery } from '../../hooks/graphql';
+import { VariableType } from 'json-to-graphql-query';
 
 interface GameDetailsMatch {
     gamePlatformId: string;
@@ -25,11 +25,12 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
         gameWishlist
     } = useGameDetails(api, gamePlatformId);
 
-    const addArgs = {
-        input: { gamePlatformId }
-    };
-    const onAddToCollectionClick = useMutation(api, mutations['add']['GameCollection'], addArgs, gameCollection.setResults);
-    const onAddToWishlistClick = useMutation(api, mutations['add']['GameWishlist'], addArgs, gameWishlist.setResults);
+    const { onAddToCollectionClick, onAddToWishlistClick } = useGameList(
+        api, 
+        gamePlatformId, 
+        gameCollection.setResults, 
+        gameWishlist.setResults
+    );
 
     return (
         <div className='panel'>
@@ -80,8 +81,35 @@ export default withRouter(GameDetails);
 
 function useGameDetails(api: APISettings, gamePlatformId: number) {
     // load the gamePlatform
+    const query = {
+        query: {
+            __variables: {
+                gamePlatformId: 'Int'
+            },
+            GetGamePlatform: {
+                __args: {
+                    gamePlatformId: new VariableType('gamePlatformId')
+                },
+                gamePlatformId: true,
+                alias: true,
+                game: {
+                    gameId: true,
+                    title: true,
+                    includes: {
+                        gameCompilationId: true,
+                        included: {
+                            title: true
+                        }
+                    }
+                },
+                platform: {
+                    name: true
+                }
+            }
+        }
+    };
     const args = { gamePlatformId };
-    const gamePlatforms = useQuery<GamePlatform>(api, queries['GamePlatform'], args);
+    const gamePlatforms = useQuery<GamePlatform>(api, query, args);
     const gamePlatform = gamePlatforms && gamePlatforms.length >= 1 ? gamePlatforms[0] : undefined;
 
     const gamePlatformUserArgs = {
@@ -89,9 +117,41 @@ function useGameDetails(api: APISettings, gamePlatformId: number) {
         userId: api.user?.userId
     };
 
-    // check if this game in the user's collection or wishlist
-    const gameCollection = useUpdatableQuery<GameCollection>(api, queries['GameCollection'], gamePlatformUserArgs);
-    const gameWishlist = useUpdatableQuery<GameWishlist>(api, queries['GameWishlist'], gamePlatformUserArgs);
+    // check if this game in the user's collection
+    const gameCollectionQuery = {
+        query: {
+            __variables: {
+                gamePlatformId: 'Int',
+                userId: 'Int'
+            },
+            GetGameCollection: {
+                __args: {
+                    gamePlatformId: new VariableType('gamePlatformId'),
+                    userId: new VariableType('userId')
+                },
+                gameCollectionId: true
+            }
+        }
+    };
+    const gameCollection = useUpdatableQuery<GameCollection>(api, gameCollectionQuery, gamePlatformUserArgs);
+
+    // check if this game in the user's wishlist
+    const gameWishlistQuery = {
+        query: {
+            __variables: {
+                gamePlatformId: 'Int',
+                userId: 'Int'
+            },
+            GetGameWishlist: {
+                __args: {
+                    gamePlatformId: new VariableType('gamePlatformId'),
+                    userId: new VariableType('userId')
+                },
+                gameWishlistId: true
+            }
+        }
+    };
+    const gameWishlist = useUpdatableQuery<GameWishlist>(api, gameWishlistQuery, gamePlatformUserArgs);
 
     return {
         gamePlatform,
@@ -99,3 +159,49 @@ function useGameDetails(api: APISettings, gamePlatformId: number) {
         gameWishlist
     };
 }
+
+const useGameList = (
+    api: APISettings,
+    gamePlatformId: number, 
+    setGameCollection: React.Dispatch<React.SetStateAction<GameCollection[]>>,
+    setGameWishlist: React.Dispatch<React.SetStateAction<GameWishlist[]>>
+) => {
+    const addArgs = {
+        input: { gamePlatformId }
+    };
+
+    const gameCollectionQuery = {
+        mutation: {
+            __variables: {
+                input: 'GameCollectionInput!'
+            },
+            AddGameCollection: {
+                __args: {
+                    input: new VariableType('input')
+                },
+                gameCollectionId: true
+            }
+        }
+    };
+    const onAddToCollectionClick = useMutation(api, gameCollectionQuery, addArgs, setGameCollection);
+
+    const gameWishlistQuery = {
+        mutation: {
+            __variables: {
+                input: 'GameWishlistInput!'
+            },
+            AddGameWishlist: {
+                __args: {
+                    input: new VariableType('input')
+                },
+                gameWishlistId: true
+            }
+        }
+    };
+    const onAddToWishlistClick = useMutation(api, gameWishlistQuery, addArgs, setGameWishlist);
+
+    return {
+        onAddToCollectionClick,
+        onAddToWishlistClick
+    };
+};

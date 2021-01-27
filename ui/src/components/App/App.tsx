@@ -46,8 +46,8 @@ const App = (): JSX.Element => {
                         <NavLink to='/login'>Login</NavLink>
                     ) : (
                         <>
-                            <NavLink to={`/user/${user.userId}/collection`}>My Collection</NavLink>
-                            <NavLink to={`/user/${user.userId}/wishlist`}>My Wishlist</NavLink>
+                            <NavLink to={`/users/${user.userId}/collection`}>My Collection</NavLink>
+                            <NavLink to={`/users/${user.userId}/wishlist`}>My Wishlist</NavLink>
                         </>
                     )}
                 </nav>
@@ -61,18 +61,18 @@ const App = (): JSX.Element => {
                             onLogin={onLogin} />
                     </Route>
                     
-                    <Route path='/user/:userId/collection'>
+                    <Route path='/users/:userId/collection'>
                         <Collection api={api} />
                     </Route>
-                    <Route path='/user/:userId/wishlist'>
+                    <Route path='/users/:userId/wishlist'>
                         <Wishlist api={api} />
                     </Route>
 
+                    <Route path='/games/:gamePlatformId'>
+                        <GameDetails api={api} />
+                    </Route>
                     <Route path='/games'>
                         <AllGameList api={api} />
-                    </Route>
-                    <Route path='/game/:gamePlatformId'>
-                        <GameDetails api={api} />
                     </Route>
                 </Switch>
             </main>

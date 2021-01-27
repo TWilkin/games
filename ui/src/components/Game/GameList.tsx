@@ -3,25 +3,24 @@ import { Link } from 'react-router-dom';
 
 import { APIProps } from '../common';
 import GameSummary from '../Game/GameSummary';
-import { queries, Query } from '../../graphql';
+import { GraphQLQuery } from '../../graphql';
 import { GamePlatform, Model, UserGamePlatform, } from '../../models';
 import PlatformFilter from '../Platform/PlatformFilter';
 import { useQuery } from '../../hooks/graphql';
+import { VariableType } from 'json-to-graphql-query';
 
 interface GameListProps extends APIProps {
     title: string;
-    query: Query;
-    args?: Record<string, any>;
+    query: GraphQLQuery;
 }
 
-export function GameList<TCollection extends Model>({ api, title, query, args }: GameListProps): JSX.Element {
+export function GameList<TCollection extends Model>({ api, title, query }: GameListProps): JSX.Element {
     const [platformId, setPlatformId] = useState(-1);
 
-    const queryArgs = {
-        ...args,
+    const args = {
         platformId
     };
-    const games = useQuery<TCollection>(api, query, queryArgs);
+    const games = useQuery<TCollection>(api, query, args);
 
     return (
         <div className='games panel'>
@@ -37,7 +36,7 @@ export function GameList<TCollection extends Model>({ api, title, query, args }:
                         {toUserGamePlatform(games).map(entry => {
                             return(
                                 <li key={entry.gamePlatform.gamePlatformId}>
-                                    <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
+                                    <Link to={`/games/${entry.gamePlatform.gamePlatformId}`}>
                                         <GameSummary gamePlatform={entry.gamePlatform} />
                                     </Link>
                                 </li>
@@ -57,9 +56,7 @@ function toUserGamePlatform(data: Model[]) {
         return [] as UserGamePlatform[];
     }
 
-    if('gameCollectionId' in data[0]
-        || 'gameWishlistId' in data[0])
-    {
+    if('gamePlatform' in data[0]) {
         return data as unknown as UserGamePlatform[];
     }
 
@@ -73,6 +70,25 @@ export const AllGameList = ({ api }: APIProps): JSX.Element => {
         <GameList<GamePlatform> 
             title='All Games'
             api={api} 
-            query={queries['GamePlatform']} />
+            query={{
+                query: {
+                    __variables: {
+                        platformId: 'Int'
+                    },
+                    GetGamePlatform: {
+                        __args: {
+                            platformId: new VariableType('platformId')
+                        },
+                        gamePlatformId: true,
+                        alias: true,
+                        game: {
+                            title: true
+                        },
+                        platform: {
+                            name: true
+                        }
+                    }
+                }
+            }} />
     );
 };

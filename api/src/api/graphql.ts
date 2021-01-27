@@ -79,7 +79,7 @@ export default class GraphQLAPI {
             .filter(field => getNestedQueryable(field))
             .forEach(field =>
                 getNestedQueryable(field).forEach(nestedFieldName => {
-                    const parentName = field.field?.toLowerCase().slice(0, -2);  
+                    const parentName = field.field?.slice(0, -2);
 
                     args[nestedFieldName] = {
                         type: GraphQLInt,
@@ -258,7 +258,7 @@ export default class GraphQLAPI {
                         if(Object.keys(obj[key]).length > 0) {
                             // find the model to join
                             const joinKey = Object.keys(model.associations)
-                                .find(association => association == key) as string;
+                                .find(association => association === key) as string;
 
                             // add this model to the includes
                             const child: IncludeOptions = {

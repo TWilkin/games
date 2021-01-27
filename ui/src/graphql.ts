@@ -1,125 +1,21 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
+import { jsonToGraphQLQuery } from 'json-to-graphql-query';
 
-import { Models } from './models';
-
-const fragments: { [name in Models]: string } = {
-    'Game': 'fragment GameFields on Game { gameId, title }',
-    'GameCollection': 'fragment GameCollectionFields on GameCollection { gameCollectionId, gamePlatform { ...GamePlatformFields } }',
-    'GameCompilation': 'fragment GameCompilationFields on GameCompilation { gameCompilationId, primary { ...GameFields }, included { ...GameFields } }',
-    'GamePlatform': 'fragment GamePlatformFields on GamePlatform { gamePlatformId, alias, game { ...GameFields, includes { ...GameCompilationFields } }, platform { ...PlatformFields } }',
-    'GamePlayTime': 'fragment GamePlayTimeFields on GamePlayTime { gamePlayTimeId, gamePlatformId, gameCompilationId, demo, startTime, endTime }',
-    'GameWishlist': 'fragment GameWishlistFields on GameWishlist { gameWishlistId, gamePlatform { ...GamePlatformFields } }',
-    'Platform': 'fragment PlatformFields on Platform { platformId, name }',
-    'User': 'fragment UserFields on User { userId, userName }'
-};
-
-export const queries: { [name in Models]: Query | null} = {
-    'Game': {
-        name: 'GetGame',
-        query: 'query($gameId: Int) { GetGame(gameId: $gameId) { ...GameFields } }',
-        fragments: [ 
-            'Game'
-        ]
+interface GraphQLQueryOrMutation {
+    __variables?: {
+        [key: string]: string
     },
-    'GameCollection': {
-        name: 'GetGameCollection',
-        query: 'query($userId: Int, $gamePlatformId: Int, $platformId: Int) { GetGameCollection(userId: $userId, gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GameCollectionFields } }',
-        fragments: [
-            'Game',
-            'GameCollection',
-            'GameCompilation',
-            'GamePlatform',
-            'Platform'
-        ]
-    },
-    'GameCompilation': {
-        name: 'GetGameCompilation',
-        query: 'query($primaryGameId: Int) { GetGameCompilation(primaryGameId: $primaryGameId) { ...GameCompilationFields } }',
-        fragments: [
-            'Game',
-            'GameCompilation'
-        ]
-    },
-    'GamePlatform': {
-        name: 'GetGamePlatform',
-        query: 'query($gamePlatformId: Int, $platformId: Int) { GetGamePlatform(gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GamePlatformFields } }',
-        fragments: [
-            'Game',
-            'GameCompilation',
-            'GamePlatform',
-            'Platform'
-        ]
-    },
-    'GamePlayTime': {
-        name: 'GetGamePlayTime',
-        query: 'query($gamePlatformId: Int, $userId: Int, $endTime: DateTime) { GetGamePlayTime(gamePlatformId: $gamePlatformId, userId: $userId, endTime: $endTime) { ...GamePlayTimeFields } }',
-        fragments: [ 'GamePlayTime' ]
-    },
-    'GameWishlist': {
-        name: 'GetGameWishlist',
-        query: 'query($userId: Int, $gamePlatformId: Int, $platformId: Int) { GetGameWishlist(userId: $userId, gamePlatformId: $gamePlatformId, platformId: $platformId) { ...GameWishlistFields } }',
-        fragments: [
-            'Game',
-            'GameCompilation',
-            'GamePlatform',
-            'GameWishlist',
-            'Platform'
-        ]
-    },
-    'Platform': {
-        name: 'GetPlatform',
-        query: 'query { GetPlatform { ...PlatformFields } }',
-        fragments: [ 'Platform' ]
-    },
-    'User': null
-};
-
-export const mutations: { [key in 'add'|'update']: { [name: string]: Query }} = {
-    'add': {
-        'GameCollection': {
-            name: 'AddGameCollection',
-            query: 'mutation($input: GameCollectionInput!) { AddGameCollection(input: $input) { ...GameCollectionFields } }',
-            fragments: [
-                'Game',
-                'GameCollection',
-                'GameCompilation',
-                'GamePlatform',
-                'Platform'
-            ]
-        },
-        'GamePlayTime': {
-            name: 'AddGamePlayTime',
-            query: 'mutation($input: GamePlayTimeInput!) { AddGamePlayTime(input: $input) { ...GamePlayTimeFields } }',
-            fragments: [ 'GamePlayTime' ]
-        },
-        'GameWishlist': {
-            name: 'AddGameWishlist',
-            query: 'mutation($input: GameWishlistInput!) { AddGameWishlist(input: $input) { ...GameWishlistFields } }',
-            fragments: [
-                'Game',
-                'GameCompilation',
-                'GamePlatform',
-                'GameWishlist',
-                'Platform'
-            ]
-        }
-    },
-    'update': {
-        'GamePlayTime': {
-            name: 'UpdateGamePlayTime',
-            query: 'mutation($id: Int!, $input: GamePlayTimeInput!) { UpdateGamePlayTime(id: $id, input: $input) { ...GamePlayTimeFields } }',
-            fragments: [ 'GamePlayTime' ]
-        }
-    }
-};
-
-export interface Query {
-    name: string;
-    query: string;
-    fragments: Models[];
+    [key: string]: any
 }
 
-export async function graphql(apiUrl: string, query: Query, variables={}): Promise<any> {
+export interface GraphQLQuery {
+    query?: GraphQLQueryOrMutation,
+    mutation?: GraphQLQueryOrMutation
+}
+
+export async function graphql(apiUrl: string, query: GraphQLQuery, variables={}): Promise<any> {
+    const graphqlQuery = jsonToGraphQLQuery(query);
+
     const response = await fetch(`${apiUrl}/graphql`, {
         method: 'POST',
         credentials: 'include',
@@ -127,7 +23,7 @@ export async function graphql(apiUrl: string, query: Query, variables={}): Promi
             'Content-Type': 'application/json'
         }),
         body: JSON.stringify({
-            'query': `${query.query} ${query.fragments.map(f => fragments[f]).join(' ')}`,
+            'query': graphqlQuery,
             'variables': variables
         })
     });
@@ -143,6 +39,5 @@ export async function graphql(apiUrl: string, query: Query, variables={}): Promi
         throw new Error(JSON.stringify(data.errors));
     }
 
-    // extract the response for the executed query
-    return data.data[query.name];
+    return data;
 }
