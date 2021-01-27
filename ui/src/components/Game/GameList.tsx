@@ -56,9 +56,7 @@ function toUserGamePlatform(data: Model[]) {
         return [] as UserGamePlatform[];
     }
 
-    if('gameCollectionId' in data[0]
-        || 'gameWishlistId' in data[0])
-    {
+    if('gamePlatform' in data[0]) {
         return data as unknown as UserGamePlatform[];
     }
 
