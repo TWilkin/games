@@ -1,8 +1,8 @@
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { VariableType } from 'json-to-graphql-query';
 import React from 'react';
 import Moment from 'react-moment';
-import { queries } from '../../graphql';
 import { useQuery } from '../../hooks/graphql';
 
 import { GamePlatform, GamePlayTime } from '../../models';
@@ -14,11 +14,28 @@ interface PlayTimeListProps extends APIProps {
 }
 
 const PlayTimeList = ({ api, gamePlatform }: PlayTimeListProps): JSX.Element => {
+    const query = {
+        query: {
+            __variables: {
+                gamePlatformId: 'Int',
+                userId: 'Int'
+            },
+            GetGamePlayTime: {
+                __args: {
+                    gamePlatformId: new VariableType('gamePlatformId'),
+                    userId: new VariableType('userId')
+                },
+                demo: true,
+                endTime: true,
+                startTime: true
+            }
+        }
+    };
     const args = {
         gamePlatformId: gamePlatform.gamePlatformId,
         userId: api.user?.userId
     };
-    const playTime = useQuery<GamePlayTime>(api, queries['GamePlayTime'], args);
+    const playTime = useQuery<GamePlayTime>(api, query, args);
 
     const renderCells = (playTime: GamePlayTime): JSX.Element[] => {
         return playTime?.endTime && (

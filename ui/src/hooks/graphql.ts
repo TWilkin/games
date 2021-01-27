@@ -1,21 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { APISettings } from '../components/common';
-import { graphql, Query } from '../graphql';
+import { graphql, GraphQLQuery } from '../graphql';
 import { Model } from '../models';
 
 export function useUpdatableQuery<TModel extends Model>(
     api: APISettings,
-    graphqlQuery: Query, 
+    query: GraphQLQuery,
     variables={}
 ): { results: TModel[], setResults: React.Dispatch<React.SetStateAction<TModel[]>> }
 {
     const [results, setResults] = useState<TModel[]>(undefined);
 
+    const queryName = getQueryName(query);
+
     useEffect(() => {
         (async () => {
             try {
-                setResults(await graphql(api.url, graphqlQuery, variables));
+                const result = await graphql(api.url, query, variables);
+                setResults(result.data[queryName] as unknown as TModel[]);
             } catch(error) {
                 api.onError(error);
             }
@@ -30,23 +33,25 @@ export function useUpdatableQuery<TModel extends Model>(
 
 export function useQuery<TModel extends Model>(
     api: APISettings,
-    graphqlQuery: Query, 
+    query: GraphQLQuery,
     variables={}
 ): TModel[]
 {
-    const { results } = useUpdatableQuery<TModel>(api, graphqlQuery, variables);
+    const { results } = useUpdatableQuery<TModel>(api, query, variables);
     return results;
 }
 
 export function useMutation<TModel extends Model>(
     api: APISettings,
-    graphqlQuery: Query, 
+    query: GraphQLQuery,
     variables={},
     setResults?: React.Dispatch<React.SetStateAction<TModel[]>>
 ): () => Promise<void>
 {
     const [isSending, setIsSending] = useState(false);
     const isMounted = useRef(true);
+
+    const queryName = getQueryName(query);
 
     const sendRequest = useCallback(async () => {
         if(isSending) {
@@ -55,10 +60,10 @@ export function useMutation<TModel extends Model>(
 
         try {
             setIsSending(true);
-            const results = await graphql(api.url, graphqlQuery, variables);
+            const results = await graphql(api.url, query, variables);
 
             if(setResults) {
-                setResults([results]);
+                setResults([results.data[queryName] as unknown as TModel]);
             }
         } catch(error) {
             api.onError(error);
@@ -67,7 +72,15 @@ export function useMutation<TModel extends Model>(
                 setIsSending(false);
             }
         }
-    }, [isSending, ...Object.values(variables)]);
+    }, [
+        isSending, 
+        ...Object.values(variables)
+    ]);
 
     return sendRequest;
+}
+
+function getQueryName(query: GraphQLQuery) {
+    return Object.keys(query.query ?? query.mutation)
+        .filter(key => key !== '__variables')[0];
 }
