@@ -36,7 +36,7 @@ export function GameList<TCollection extends Model>({ api, title, query }: GameL
                         {toUserGamePlatform(games).map(entry => {
                             return(
                                 <li key={entry.gamePlatform.gamePlatformId}>
-                                    <Link to={`/game/${entry.gamePlatform.gamePlatformId}`}>
+                                    <Link to={`/games/${entry.gamePlatform.gamePlatformId}`}>
                                         <GameSummary gamePlatform={entry.gamePlatform} />
                                     </Link>
                                 </li>
