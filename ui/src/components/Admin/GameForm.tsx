@@ -3,7 +3,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { GraphQLQuery } from '../../graphql';
+import { generateAddOrUpdateQuery, GraphQLQuery } from '../../graphql';
 import { useMutation, useQuery } from '../../hooks/graphql';
 import { Game } from '../../models';
 import { APIProps, APISettings } from '../common';
@@ -105,31 +105,11 @@ function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
     }), [game]);
 
     // construct the query
-    const queryName = edit ? 'UpdateGame' : 'AddGame';
-
-    const query = {
-        mutation: {
-            __variables: {
-                input: 'GameInput!'
-            }
-        }
-    } as GraphQLQuery;
-    query.mutation[queryName] = {
-        __args: {
-            input: new VariableType('input')
-        },
-        gameId: true
-    };
-
-    const args = {
-        id: undefined as number | undefined,
-        input: { } as GameInput
-    };
-
-    if(edit) {
-        query.mutation.__variables.id = 'Int!';
-        query.mutation[queryName].__args.id = new VariableType('id');
-    }
+    const { query, args } = generateAddOrUpdateQuery<GameInput>(
+        edit,
+        'Game',
+        { gameId: true }
+    );
 
     const submitGame = useMutation(api, query, args);
 
