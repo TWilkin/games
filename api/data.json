@@ -1,0 +1,176 @@
+[
+    {
+        "model": "User",
+        "data": [
+            {
+                "userId": 1,
+                "userName": "admin",
+                "password": "$2b$10$pFnf12gFYlh4ZhdLo7JRFuDSLMuMQcx/ZExhrC24SYqRUuB06n8MC",
+                "email": "user@a.com",
+                "role": "admin"
+            }, {
+                "userId": 2,
+                "userName": "user",
+                "password": "$2b$10$pFnf12gFYlh4ZhdLo7JRFuDSLMuMQcx/ZExhrC24SYqRUuB06n8MC",
+                "email": "user@b.com",
+                "role": "user"
+            }
+        ]
+    },
+    {
+        "model": "Game",
+        "data": [
+            {
+                "gameId": 1,
+                "title": "The Legend of Zelda: Ocarina of Time",
+                "igdbId": 1029
+            }, {
+                "gameId": 2,
+                "title": "Arcade Classic 4: Defender / Joust",
+                "igdbId": 79701
+            }, {
+                "gameId": 3,
+                "title": "Defender",
+                "igdbId": null
+            }, {
+                "gameId": 4,
+                "title": "Joust",
+                "igdbId": null
+            }, {
+                "gameId": 5,
+                "title": "The Legend of Zelda: Breath of the Wild",
+                "igdbId": 7346
+            }, {
+                "gameId": 6,
+                "title": "Starwing",
+                "igdbId": 8581
+            }, {
+                "gameId": 7,
+                "title": "Metroid Prime",
+                "igdbId": 1105
+            }, {
+                "gameId": 8,
+                "title": "Final Fantasy VII",
+                "igdbId": 427
+            }, {
+                "gameId": 9,
+                "title": "Final Fantasy VIII",
+                "igdbId": 425
+            }, {
+                "gameId": 10,
+                "title": "Final Fantasy IX",
+                "igdbId": 421
+            }, {
+                "gameId": 11,
+                "title": "Final Fantasy X",
+                "igdbId": 418
+            }, {
+                "gameId": 12,
+                "title": "Ōkami",
+                "igdbId": 1271
+            }
+        ]
+    }, {
+        "model": "Platform",
+        "data": [
+            {
+                "platformId": 1,
+                "name": "Nintendo 64"
+            }, {
+                "platformId": 2,
+                "name": "GameBoy"
+            }, {
+                "platformId": 3,
+                "name": "SNES"
+            }, {
+                "platformId": 4,
+                "name": "GameCube"
+            }, {
+                "platformId": 5,
+                "name": "Nintendo Switch"
+            }, {
+                "platformId": 6,
+                "name": "PlayStation"
+            }, {
+                "platformId": 7,
+                "name": "PlayStation 2"
+            }, {
+                "platformId": 8,
+                "name": "Wii"
+            }
+        ]
+    }, {
+        "model": "GameCompilation",
+        "data": [
+            {
+                "gameCompilationId": 1,
+                "primaryGameId": 2,
+                "includedGameId": 3
+            }, {
+                "gameCompilationId": 2,
+                "primaryGameId": 2,
+                "includedGameId": 4
+            }
+        ]
+    }, {
+        "model": "GamePlatform",
+        "data": [
+            {
+                "gamePlatformId": 1,
+                "gameId": 1,
+                "platformId": 1,
+                "alias": null
+            }, {
+                "gamePlatformId": 2,
+                "gameId": 2,
+                "platformId": 2,
+                "alias": null
+            }, {
+                "gamePlatformId": 3,
+                "gameId": 5,
+                "platformId": 5,
+                "alias": null
+            }, {
+                "gamePlatformId": 4,
+                "gameId": 6,
+                "platformId": 3,
+                "alias": null
+            }, {
+                "gamePlatformId": 5,
+                "gameId": 7,
+                "platformId": 4,
+                "alias": null
+            }, {
+                "gamePlatformId": 6,
+                "gameId": 8,
+                "platformId": 6,
+                "alias": null
+            }, {
+                "gamePlatformId": 7,
+                "gameId": 9,
+                "platformId": 6,
+                "alias": null
+            }, {
+                "gamePlatformId": 8,
+                "gameId": 10,
+                "platformId": 6,
+                "alias": null
+            }, {
+                "gamePlatformId": 9,
+                "gameId": 11,
+                "platformId": 7,
+                "alias": null
+            }, {
+                "gamePlatformId": 10,
+                "gameId": 12,
+                "platformId": 7,
+                "alias": null
+            }, {
+                "gamePlatformId": 11,
+                "gameId": 12,
+                "platformId": 8,
+                "alias": null
+            }
+        ]
+    }
+]
