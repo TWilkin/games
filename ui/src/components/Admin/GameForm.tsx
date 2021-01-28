@@ -3,6 +3,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
+import { GraphQLQuery } from '../../graphql';
 import { useMutation, useQuery } from '../../hooks/graphql';
 import { Game } from '../../models';
 import { APIProps, APISettings } from '../common';
@@ -44,7 +45,7 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
     const games = useQuery<Game>(api, query, args);
     const game = games?.length === 1 ? games[0] : undefined;
 
-    const { gameForm, onGameSubmit } = useGameForm(api, game);
+    const { gameForm, onGameSubmit } = useGameForm(api, game, gameId !== -1);
     
     return (
         <Restricted user={api.user}>
@@ -83,33 +84,55 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
 
 export default withRouter(GameForm);
 
-function useGameForm(api: APISettings, game: Game | undefined) {
+function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
     const { register, handleSubmit, reset } = useForm<GameFormData>();
 
+    // set default form values if editing
     useEffect(() => reset({
         gameId: game?.gameId?.toString() ?? '',
         title: game?.title ?? ''
     }), [game]);
 
-    const { addGame, addArgs } = useGameAdd(api);
-    const { updateGame, updateArgs } = useGameUpdate(api);
+    // construct the query
+    const queryName = edit ? 'UpdateGame' : 'AddGame';
+
+    const query = {
+        mutation: {
+            __variables: {
+                input: 'GameInput!'
+            }
+        }
+    } as GraphQLQuery;
+    query.mutation[queryName] = {
+        __args: {
+            input: new VariableType('input')
+        },
+        gameId: true
+    };
+
+    const args = {
+        id: undefined as number | undefined,
+        input: { } as GameInput
+    };
+
+    if(edit) {
+        query.mutation.__variables.id = 'Int!';
+        query.mutation[queryName].__args.id = new VariableType('id');
+    }
+
+    const submitGame = useMutation(api, query, args);
 
     const onSubmit = useCallback(
         (data: GameFormData) => {
-            if(data.gameId !== '') {
-                updateArgs.id = parseInt(data.gameId);
-                updateArgs.input = {
-                    title: data.title
-                };
-
-                updateGame();
-            } else {
-                addArgs.input = {
-                    title: data.title
-                };
-
-                addGame();
+            if(edit) {
+                args.id = parseInt(data.gameId);
             }
+
+            args.input = {
+                title: data.title
+            };
+
+            submitGame();
         },
         []
     );
@@ -117,60 +140,5 @@ function useGameForm(api: APISettings, game: Game | undefined) {
     return {
         gameForm: register,
         onGameSubmit: handleSubmit(onSubmit)
-    };
-}
-
-function useGameAdd(api: APISettings) {
-    const query = {
-        mutation: {
-            __variables: {
-                input: 'GameInput!'
-            },
-            AddGame: {
-                __args: {
-                    input: new VariableType('input')
-                },
-                gameId: true
-            }
-        }
-    };
-    const args = {
-        input: { } as GameInput
-    };
-    
-    const addGame = useMutation(api, query, args);
-
-    return {
-        addGame,
-        addArgs: args
-    };
-}
-
-function useGameUpdate(api: APISettings) {
-    const query = {
-        mutation: {
-            __variables: {
-                id: 'Int!',
-                input: 'GameInput!'
-            },
-            UpdateGame: {
-                __args: {
-                    id: new VariableType('id'),
-                    input: new VariableType('input')
-                },
-                gameId: true
-            }
-        }
-    };
-    const args = {
-        id: -1,
-        input: { } as GameInput
-    };
-    
-    const updateGame = useMutation(api, query, args);
-
-    return {
-        updateGame,
-        updateArgs: args
     };
 }
