@@ -7,6 +7,7 @@ export interface Model {
 
 export interface Game extends Model {
     gameId: number;
+    igdbId: number;
     title: string;
     includes?: GameCompilation[];
 }

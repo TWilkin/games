@@ -17,11 +17,13 @@ interface GameFormProps extends APIProps, RouteComponentProps<GameMatch> { }
 
 interface GameFormData {
     gameId: string;
+    igdbId: string;
     title: string;
 }
 
 interface GameInput {
     title: string
+    igdbId: number;
 }
 
 const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
@@ -37,6 +39,7 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
                     gameId: new VariableType('gameId')
                 },
                 gameId: true,
+                igdbId: true,
                 title: true
             }
         }
@@ -56,6 +59,10 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
                     <input 
                         type='hidden' 
                         name='gameId'
+                        ref={gameForm} />
+                    <input 
+                        type='hidden' 
+                        name='igdbId'
                         ref={gameForm} />
 
                     <div className='field'>
@@ -90,6 +97,7 @@ function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
     // set default form values if editing
     useEffect(() => reset({
         gameId: game?.gameId?.toString() ?? '',
+        igdbId: game?.igdbId?.toString() ?? '',
         title: game?.title ?? ''
     }), [game]);
 
@@ -129,7 +137,8 @@ function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
             }
 
             args.input = {
-                title: data.title
+                title: data.title,
+                igdbId: data.igdbId ? parseInt(data.igdbId) : undefined
             };
 
             submitGame();
