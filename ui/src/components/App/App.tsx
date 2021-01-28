@@ -50,7 +50,7 @@ const App = (): JSX.Element => {
                             <NavLink to={`/users/${user.userId}/collection`}>My Collection</NavLink>
                             <NavLink to={`/users/${user.userId}/wishlist`}>My Wishlist</NavLink>
                             {user.role === 'admin' && (
-                                <NavLink to={'/admin'}>Admin</NavLink>
+                                <NavLink to={'/games/create'}>Admin</NavLink>
                             )}
                         </>
                     )}
@@ -72,15 +72,17 @@ const App = (): JSX.Element => {
                         <Wishlist api={api} />
                     </Route>
 
+                    <Route path={[
+                        '/games/create',
+                        '/games/:gameId/edit'
+                    ]}>
+                        <GameForm api={api} />
+                    </Route>
                     <Route path='/games/:gamePlatformId'>
                         <GameDetails api={api} />
                     </Route>
                     <Route path='/games'>
                         <AllGameList api={api} />
-                    </Route>
-
-                    <Route path='/admin'>
-                        <GameForm api={api} />
                     </Route>
                 </Switch>
             </main>
