@@ -9,7 +9,7 @@ import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
 import { useMutation, useQuery, useUpdatableQuery } from '../../hooks/graphql';
 import { VariableType } from 'json-to-graphql-query';
-import { RestrictedButton } from '../Admin/Restricted';
+import { RestrictedNoError } from '../Admin/Restricted';
 
 interface GameDetailsMatch {
     gamePlatformId: string;
@@ -63,9 +63,9 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
                             </>
                         )}
 
-                        <RestrictedButton user={api.user}>
+                        <RestrictedNoError user={api.user}>
                             <NavLink to={`/games/${gamePlatform?.game?.gameId}/edit`}>Edit</NavLink>
-                        </RestrictedButton>
+                        </RestrictedNoError>
                     </div>
 
                     <PlayTimeCounter 

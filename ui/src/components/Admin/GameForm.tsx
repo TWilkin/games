@@ -52,12 +52,12 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
     const { gameForm, onGameSubmit } = useGameForm(api, game, gameId !== -1);
     
     return (
-        <Restricted user={api.user}>
-            <div className='panel'>
-                <h1 className='panel__heading'>
-                    {`${method} Game`}
-                </h1>
-
+        <div className='panel'>
+            <h1 className='panel__heading'>
+                {`${method} Game`}
+            </h1>
+            
+            <Restricted user={api.user}>
                 <form className='form' onSubmit={onGameSubmit}>
                     <input 
                         type='hidden' 
@@ -87,8 +87,8 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
                         </button>
                     </div>
                 </form>
-            </div>
-        </Restricted>
+            </Restricted>
+        </div>
     );
 };
 
