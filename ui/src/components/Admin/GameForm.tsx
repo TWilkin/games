@@ -28,6 +28,7 @@ interface GameInput {
 
 const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
     const gameId = match.params.gameId ? parseInt(match.params.gameId) : -1;
+    const method = gameId === -1 ? 'Add' : 'Update';
 
     const query = {
         query: {
@@ -53,7 +54,9 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
     return (
         <Restricted user={api.user}>
             <div className='panel'>
-                <h1 className='panel__heading'>Add Game</h1>
+                <h1 className='panel__heading'>
+                    {`${method} Game`}
+                </h1>
 
                 <form className='form' onSubmit={onGameSubmit}>
                     <input 
@@ -80,7 +83,7 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
 
                     <div className='form__actions'>
                         <button type='submit'>
-                            {gameId === -1 ? 'Add' : 'Update'}
+                            {method}
                         </button>
                     </div>
                 </form>
