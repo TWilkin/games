@@ -11,6 +11,7 @@ import Login from '../Login/Login';
 import { User } from '../../models';
 import Wishlist from '../Wishlist/Wishlist';
 import GameForm from '../Admin/GameForm';
+import { RestrictedButton } from '../Admin/Restricted';
 
 const apiUrl = `${window.location.origin}/api`;
 
@@ -49,9 +50,9 @@ const App = (): JSX.Element => {
                         <>
                             <NavLink to={`/users/${user.userId}/collection`}>My Collection</NavLink>
                             <NavLink to={`/users/${user.userId}/wishlist`}>My Wishlist</NavLink>
-                            {user.role === 'admin' && (
+                            <RestrictedButton user={user}>
                                 <NavLink to={'/games/create'}>Admin</NavLink>
-                            )}
+                            </RestrictedButton>
                         </>
                     )}
                 </nav>

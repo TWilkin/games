@@ -7,8 +7,8 @@ interface RestrictedProps {
     children: JSX.Element;
 }
 
-const Restricted = ({ user, children }: RestrictedProps): JSX.Element => {
-    if(user?.role === 'admin') {
+export const Restricted = ({ user, children }: RestrictedProps): JSX.Element => {
+    if(isAdmin(user)) {
         return children;
     }
 
@@ -23,4 +23,9 @@ const Restricted = ({ user, children }: RestrictedProps): JSX.Element => {
     );
 };
 
-export default Restricted;
+export const RestrictedButton = ({ user, children }: RestrictedProps): JSX.Element =>
+    isAdmin(user) ? children : <></>;
+
+function isAdmin(user?: User) {
+    return user?.role === 'admin';
+}

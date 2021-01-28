@@ -7,7 +7,7 @@ import { GraphQLQuery } from '../../graphql';
 import { useMutation, useQuery } from '../../hooks/graphql';
 import { Game } from '../../models';
 import { APIProps, APISettings } from '../common';
-import Restricted from './Restricted';
+import { Restricted } from './Restricted';
 
 interface GameMatch {
     gameId: string;
