@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { APIProps, APISettings } from '../common';
 import GameImage from './GameImage';
@@ -9,6 +9,7 @@ import PlayTimeCounter from '../PlayTime/PlayTimeCounter';
 import PlayTimeList from '../PlayTime/PlayTimeList';
 import { useMutation, useQuery, useUpdatableQuery } from '../../hooks/graphql';
 import { VariableType } from 'json-to-graphql-query';
+import { RestrictedButton } from '../Admin/Restricted';
 
 interface GameDetailsMatch {
     gamePlatformId: string;
@@ -61,6 +62,10 @@ const GameDetails = ({ api, match }: GameDetailsProps): JSX.Element => {
                                 )}
                             </>
                         )}
+
+                        <RestrictedButton user={api.user}>
+                            <NavLink to={`/games/${gamePlatform?.game?.gameId}/edit`}>Edit</NavLink>
+                        </RestrictedButton>
                     </div>
 
                     <PlayTimeCounter 
