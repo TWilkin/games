@@ -1,6 +1,10 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
 import { jsonToGraphQLQuery, VariableType } from 'json-to-graphql-query';
 
+interface GraphQLField {
+    [key: string]: boolean | GraphQLField
+}
+
 interface GraphQLQueryOrMutation {
     __variables?: {
         [key: string]: string
@@ -45,7 +49,7 @@ export async function graphql(apiUrl: string, query: GraphQLQuery, variables={})
 export function generateAddOrUpdateQuery<TInput>(
     edit: boolean, 
     type: string, 
-    fields: any
+    fields: GraphQLField
 ): { query: GraphQLQuery, args: { id: number | undefined, input: TInput }}
 {
     const queryName = edit ? `Update${type}` : `Add${type}`;
