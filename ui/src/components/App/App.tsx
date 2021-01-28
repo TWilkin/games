@@ -12,6 +12,7 @@ import { User } from '../../models';
 import Wishlist from '../Wishlist/Wishlist';
 import GameForm from '../Admin/GameForm';
 import { RestrictedButton } from '../Admin/Restricted';
+import Admin from '../Admin/Admin';
 
 const apiUrl = `${window.location.origin}/api`;
 
@@ -51,7 +52,7 @@ const App = (): JSX.Element => {
                             <NavLink to={`/users/${user.userId}/collection`}>My Collection</NavLink>
                             <NavLink to={`/users/${user.userId}/wishlist`}>My Wishlist</NavLink>
                             <RestrictedButton user={user}>
-                                <NavLink to={'/games/create'}>Admin</NavLink>
+                                <NavLink to={'/admin'}>Admin</NavLink>
                             </RestrictedButton>
                         </>
                     )}
@@ -84,6 +85,10 @@ const App = (): JSX.Element => {
                     </Route>
                     <Route path='/games'>
                         <AllGameList api={api} />
+                    </Route>
+
+                    <Route path='/admin'>
+                        <Admin user={user} />
                     </Route>
                 </Switch>
             </main>

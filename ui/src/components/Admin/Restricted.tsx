@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { User } from '../../models';
+import { UserProps } from '../common';
 
-interface RestrictedProps {
-    user?: User;
+interface RestrictedProps extends UserProps {
     children: JSX.Element;
 }
 
