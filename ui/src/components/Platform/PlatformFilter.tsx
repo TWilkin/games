@@ -5,10 +5,11 @@ import { Platform } from '../../models';
 import { useQuery } from '../../hooks/graphql';
 
 interface PlatformFilterProps extends APIProps {
-    onSelect: (platformId: number) => void;
+    multi?: boolean;
+    onSelect: (platforms: Platform[]) => void;
 }
 
-const PlatformFilter = ({ api, onSelect }: PlatformFilterProps): JSX.Element => {
+const PlatformFilter = ({ api, multi, onSelect }: PlatformFilterProps): JSX.Element => {
     const query = {
         query: {
             GetPlatform: {
@@ -23,11 +24,17 @@ const PlatformFilter = ({ api, onSelect }: PlatformFilterProps): JSX.Element => 
     const onChange = (event: FormEvent<HTMLSelectElement>) => {
         event.preventDefault();
 
-        const platformId = parseInt(event.currentTarget.value);
-        if(platformId != -1) {
-            onSelect(platformId);
+        const values = Array.from(event.currentTarget.selectedOptions, option => option.value)
+            .map(value => parseInt(value));
+
+        const selected = platforms.filter(platform => values.includes(platform.platformId));
+
+        if(selected?.length >= 0) {
+            onSelect(selected);
         }
     };
+
+    const defaultValue = multi ? ['-1'] : '-1';
 
     return (
         <div>
@@ -37,7 +44,7 @@ const PlatformFilter = ({ api, onSelect }: PlatformFilterProps): JSX.Element => 
                         Select platform
                     </label>
                     <div className="field__input">
-                        <select onChange={onChange} defaultValue='-1'>
+                        <select onChange={onChange} defaultValue={defaultValue} multiple={multi}>
                             <option key='-1' value='-1'>-</option>
                             {platforms.map(entry => 
                                 <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>
