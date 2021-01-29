@@ -6,10 +6,11 @@ import { useQuery } from '../../hooks/graphql';
 
 interface PlatformFilterProps extends APIProps {
     multi?: boolean;
+    selected?: number[]
     onSelect: (platforms: Platform[]) => void;
 }
 
-const PlatformFilter = ({ api, multi, onSelect }: PlatformFilterProps): JSX.Element => {
+const PlatformFilter = ({ api, multi, selected, onSelect }: PlatformFilterProps): JSX.Element => {
     const query = {
         query: {
             GetPlatform: {
@@ -34,7 +35,10 @@ const PlatformFilter = ({ api, multi, onSelect }: PlatformFilterProps): JSX.Elem
         }
     };
 
-    const defaultValue = multi ? ['-1'] : '-1';
+    let selectedValues: string | string[] = selected?.map(id => id.toString()) ?? ['-1'];
+    if(!multi) {
+        selectedValues = selectedValues[0];
+    }
 
     return (
         <div>
@@ -44,7 +48,7 @@ const PlatformFilter = ({ api, multi, onSelect }: PlatformFilterProps): JSX.Elem
                         Select platform
                     </label>
                     <div className="field__input">
-                        <select onChange={onChange} defaultValue={defaultValue} multiple={multi}>
+                        <select onChange={onChange} value={selectedValues} multiple={multi}>
                             <option key='-1' value='-1'>-</option>
                             {platforms.map(entry => 
                                 <option key={entry.platformId} value={entry.platformId}>{entry.name}</option>

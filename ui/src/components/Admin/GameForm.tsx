@@ -50,7 +50,7 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
     const games = useQuery<Game>(api, query, args);
     const game = games?.length === 1 ? games[0] : undefined;
 
-    const { gameForm, onGameSubmit } = useGameForm(api, game, gameId !== -1);
+    const { gameForm, gameFormSetValue, onGameSubmit } = useGameForm(api, game, gameId !== -1);
     
     return (
         <div className='panel'>
@@ -82,7 +82,11 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
                         </div>
                     </div>
 
-                    <GamePlatformForm api={api} form={gameForm} />
+                    <GamePlatformForm 
+                        api={api} 
+                        form={gameForm} 
+                        setValue={gameFormSetValue}
+                        game={game} />
 
                     <div className='form__actions'>
                         <button type='submit'>
@@ -98,7 +102,7 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
 export default withRouter(GameForm);
 
 function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
-    const { register, handleSubmit, reset } = useForm<GameFormData>();
+    const { register, handleSubmit, reset, setValue, getValues } = useForm<GameFormData>();
 
     // set default form values if editing
     useEffect(() => reset({
@@ -116,7 +120,7 @@ function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
 
     const submitGame = useMutation<Game>(api, query, args);
 
-    const submitGamePlatforms = useGamePlatformForm(api, edit);
+    const submitGamePlatforms = useGamePlatformForm(api);
 
     const onSubmit = useCallback(
         async (data: GameFormData) => {
@@ -138,6 +142,7 @@ function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
 
     return {
         gameForm: register,
+        gameFormSetValue: setValue,
         onGameSubmit: handleSubmit(onSubmit)
     };
 }
