@@ -3,10 +3,11 @@ import React, { useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-import { generateAddOrUpdateQuery, GraphQLQuery } from '../../graphql';
+import { generateAddOrUpdateQuery } from '../../graphql';
 import { useMutation, useQuery } from '../../hooks/graphql';
 import { Game } from '../../models';
 import { APIProps, APISettings } from '../common';
+import GamePlatformForm, { GamePlatformFormData, useGamePlatformForm } from './GamePlatformForm';
 import { Restricted } from './Restricted';
 
 interface GameMatch {
@@ -15,7 +16,7 @@ interface GameMatch {
 
 interface GameFormProps extends APIProps, RouteComponentProps<GameMatch> { }
 
-interface GameFormData {
+interface GameFormData extends GamePlatformFormData {
     gameId: string;
     igdbId: string;
     title: string;
@@ -81,6 +82,8 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
                         </div>
                     </div>
 
+                    <GamePlatformForm api={api} form={gameForm} />
+
                     <div className='form__actions'>
                         <button type='submit'>
                             {method}
@@ -111,10 +114,12 @@ function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
         { gameId: true }
     );
 
-    const submitGame = useMutation(api, query, args);
+    const submitGame = useMutation<Game>(api, query, args);
+
+    const submitGamePlatforms = useGamePlatformForm(api, edit);
 
     const onSubmit = useCallback(
-        (data: GameFormData) => {
+        async (data: GameFormData) => {
             if(edit) {
                 args.id = parseInt(data.gameId);
             }
@@ -124,7 +129,9 @@ function useGameForm(api: APISettings, game: Game | undefined, edit: boolean) {
                 igdbId: data.igdbId ? parseInt(data.igdbId) : undefined
             };
 
-            submitGame();
+            const game = await submitGame();
+
+            submitGamePlatforms(game.gameId, data);
         },
         []
     );

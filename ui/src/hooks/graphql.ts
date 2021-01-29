@@ -46,7 +46,7 @@ export function useMutation<TModel extends Model>(
     query: GraphQLQuery,
     variables={},
     setResults?: React.Dispatch<React.SetStateAction<TModel[]>>
-): () => Promise<void>
+): () => Promise<TModel>
 {
     const [isSending, setIsSending] = useState(false);
     const isMounted = useRef(true);
@@ -61,10 +61,13 @@ export function useMutation<TModel extends Model>(
         try {
             setIsSending(true);
             const results = await graphql(api.url, query, variables);
+            const result = results.data[queryName] as unknown as TModel;
 
             if(setResults) {
-                setResults([results.data[queryName] as unknown as TModel]);
+                setResults([result]);
             }
+
+            return result;
         } catch(error) {
             api.onError(error);
         } finally {
