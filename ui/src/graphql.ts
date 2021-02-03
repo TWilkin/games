@@ -1,5 +1,9 @@
 import HttpStatus, { getStatusText } from 'http-status-codes';
-import { jsonToGraphQLQuery } from 'json-to-graphql-query';
+import { jsonToGraphQLQuery, VariableType } from 'json-to-graphql-query';
+
+interface GraphQLField {
+    [key: string]: boolean | GraphQLField
+}
 
 interface GraphQLQueryOrMutation {
     __variables?: {
@@ -40,4 +44,43 @@ export async function graphql(apiUrl: string, query: GraphQLQuery, variables={})
     }
 
     return data;
+}
+
+export function generateAddOrUpdateQuery<TInput>(
+    edit: boolean, 
+    type: string, 
+    fields: GraphQLField
+): { query: GraphQLQuery, args: { id: number | undefined, input: TInput }}
+{
+    const queryName = edit ? `Update${type}` : `Add${type}`;
+
+    const query = {
+        mutation: {
+            __variables: {
+                input: `${type}Input!`
+            }
+        }
+    } as GraphQLQuery;
+
+    query.mutation[queryName] = {
+        __args: {
+            input: new VariableType('input')
+        },
+        ...fields
+    };
+
+    const args = {
+        id: undefined as number | undefined,
+        input: { } as TInput
+    };
+
+    if(edit) {
+        query.mutation.__variables.id = 'Int!';
+        query.mutation[queryName].__args.id = new VariableType('id');
+    }
+
+    return {
+        query,
+        args
+    };
 }

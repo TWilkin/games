@@ -10,6 +10,9 @@ import GameDetails from '../Game/GameDetails';
 import Login from '../Login/Login';
 import { User } from '../../models';
 import Wishlist from '../Wishlist/Wishlist';
+import GameForm from '../Admin/GameForm';
+import { RestrictedNoError } from '../Admin/Restricted';
+import Admin from '../Admin/Admin';
 
 const apiUrl = `${window.location.origin}/api`;
 
@@ -48,6 +51,9 @@ const App = (): JSX.Element => {
                         <>
                             <NavLink to={`/users/${user.userId}/collection`}>My Collection</NavLink>
                             <NavLink to={`/users/${user.userId}/wishlist`}>My Wishlist</NavLink>
+                            <RestrictedNoError user={user}>
+                                <NavLink to={'/admin'}>Admin</NavLink>
+                            </RestrictedNoError>
                         </>
                     )}
                 </nav>
@@ -68,11 +74,21 @@ const App = (): JSX.Element => {
                         <Wishlist api={api} />
                     </Route>
 
+                    <Route path={[
+                        '/games/create',
+                        '/games/:gameId/edit'
+                    ]}>
+                        <GameForm api={api} />
+                    </Route>
                     <Route path='/games/:gamePlatformId'>
                         <GameDetails api={api} />
                     </Route>
                     <Route path='/games'>
                         <AllGameList api={api} />
+                    </Route>
+
+                    <Route path='/admin'>
+                        <Admin user={user} />
                     </Route>
                 </Switch>
             </main>

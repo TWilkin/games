@@ -22,7 +22,7 @@ services:
 
   api:
     build: ./api
-    image: ${REGISTRY}/games/api:0.0.3
+    image: ${REGISTRY}/games/api:0.0.4
     depends_on:
       - db
     environment:

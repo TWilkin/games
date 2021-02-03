@@ -170,6 +170,11 @@
                 "gameId": 12,
                 "platformId": 8,
                 "alias": null
+            }, {
+                "gamePlatformId": 12,
+                "gameId": 12,
+                "platformId": 5,
+                "alias": "Ōkami HD"
             }
         ]
     }

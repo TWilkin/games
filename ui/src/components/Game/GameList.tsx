@@ -28,7 +28,7 @@ export function GameList<TCollection extends Model>({ api, title, query }: GameL
 
             <PlatformFilter
                 api={api}
-                onSelect={setPlatformId} />
+                onSelect={(platforms) => setPlatformId(platforms[0].platformId)} />
 
             <div className='games-list'>
                 {games?.length > 0 ? (

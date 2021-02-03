@@ -12,6 +12,10 @@ export interface APIProps {
     api: APISettings;
 }
 
+export interface UserProps {
+    user?: User;
+}
+
 export interface UserRouteMatch {
     userId: string;
 }

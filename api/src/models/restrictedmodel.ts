@@ -8,7 +8,7 @@ export abstract class AbstractRestrictedModel<T extends Model<T>> extends Model<
     @BeforeCreate
     public static checkAdmin(_, context: GraphQLContext): void {
         // confirm the user is an admin
-        if(context.user?.isAdmin) {
+        if(context.user?.role === 'admin') {
             return;
         }
 
