@@ -22,7 +22,7 @@ services:
 
   api:
     build: ./api
-    image: ${REGISTRY}/games/api:0.0.4
+    image: ${REGISTRY}/games/api:0.0.3
     depends_on:
       - db
     environment:
@@ -42,7 +42,7 @@ services:
 
   ui:
     build: ./ui
-    image: ${REGISTRY}/games/ui:0.0.3
+    image: ${REGISTRY}/games/ui:0.0.4
     ports:
       - "80:80"
     depends_on:
