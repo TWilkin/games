@@ -1,12 +1,9 @@
-import { expect } from 'chai';
-import { ExecutionResult, graphql, GraphQLInt } from 'graphql';
-import { ExecutionResultDataDefault } from 'graphql/execution/execute';
+import { graphql, GraphQLInt } from 'graphql';
 import 'mocha';
-import { Model, ModelCtor } from 'sequelize';
 
 import GraphQLAPI from '../../src/api/graphql';
 import { sequelize } from '../../src/db';
-import { generateQuery, generateMutation } from '../utility/util';
+import { generateQuery, generateMutation, checkMutationResponse, checkQueryResponse } from '../utility/util';
 import { generateData, mockContext, mockSequelize } from '../utility/mock';
 
 // initialise GraphQL
@@ -121,26 +118,3 @@ describe('GraphQL', () => {
         });
     });
 });
-
-function checkResponse(response: ExecutionResult<ExecutionResultDataDefault>, queryName: string) {
-    expect(response).to.be.not.null;
-
-    expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
-
-    expect(response.data).to.be.not.null;
-    return expect(response.data).to.have.key(queryName);
-}
-
-function checkQueryResponse(response: ExecutionResult<ExecutionResultDataDefault>, queryName: string, length: number) {
-    return checkResponse(response, queryName)
-        .which.is.not.null
-        .and.length.is.equal(length);
-}
-
-function checkMutationResponse(response: ExecutionResult<ExecutionResultDataDefault>, mutationName: string, model: ModelCtor<Model<any, any>>) {
-    return checkResponse(response, mutationName)
-        .which.is.not.null
-        .and.is.not.an('array')
-        .which.has.key(model.primaryKeyAttribute)
-        .which.is.a('number');
-}

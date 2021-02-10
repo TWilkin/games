@@ -329,6 +329,7 @@ export default class GraphQLAPI {
     
     public static init(app: Express | null, auth: Auth | null, ...extensions: GraphQLExtension[]): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
+        GraphQLAPI.models = [];
         Object.values(sequelize.models)
             .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
 
