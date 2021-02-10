@@ -21,6 +21,10 @@ export interface GraphQLUpdateOptions extends UpdateOptions {
     context: GraphQLContext
 }
 
+export interface GraphQLExtension {
+    generateQuery(): GraphQLFieldConfigMap<any, any, any>;
+}
+
 export default class GraphQLAPI {
 
     // the list of models
@@ -310,7 +314,7 @@ export default class GraphQLAPI {
         return columnName;
     }
     
-    public static init(app: Express | null, auth: Auth | null): GraphQLSchema {
+    public static init(app: Express | null, auth: Auth | null, ...extensions: GraphQLExtension[]): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
         Object.values(sequelize.models)
             .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
@@ -328,6 +332,14 @@ export default class GraphQLAPI {
             fields: {}
         };
         GraphQLAPI.models.forEach(model => model.appendMutation(mutations));
+
+        // add extension methods
+        for(const extension of extensions) {
+            queries.fields = {
+                ...queries.fields,
+                ...extension.generateQuery()
+            };
+        }
 
         // generate the schema
         GraphQLAPI.schema = new GraphQLSchema({
