@@ -34,8 +34,14 @@ class IGDBGraphQL implements GraphQLExtension {
             'GetIGDBGame': {
                 type: new GraphQLList(this.generateType()),
                 args,
-                resolve: async (_: any, queryArgs: NameQuery) => 
-                    await this.convertDate(this.igdbService.getGames(queryArgs.name))
+                resolve: async (_: any, queryArgs: NameQuery) => {
+                    // don't bother querying when there is no query string
+                    if(queryArgs.name) {
+                        return await this.convertDate(this.igdbService.getGames(queryArgs.name));
+                    }
+
+                    return [];
+                }
             }
         };
     }

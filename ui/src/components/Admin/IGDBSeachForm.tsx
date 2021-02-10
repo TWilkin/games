@@ -68,24 +68,26 @@ const IGDBSearchForm = ({ api, onGameSelect }: IGDBSearchFormProps): JSX.Element
                 </div>
             </div>
 
-            <SortableTable<IGDBGame> 
-                title='IGDB Seach Results'
-                headings={['', 'Name']}
-                sortColumns={['id', 'name']}
-                data={games}
-                row={(game: IGDBGame) => 
-                    [
-                        <input 
-                            key={'id'}
-                            type='radio'
-                            name='igdbId'
-                            value={game.id}
-                            onChange={onRadioSelect} />,
-                        <a key='name' href={game.url} target='_blank' rel='noreferrer'>
-                            {game.name}
-                        </a>
-                    ]
-                } />
+            {games?.length > 0 && (
+                <SortableTable<IGDBGame> 
+                    title='IGDB Seach Results'
+                    headings={['', 'Name']}
+                    sortColumns={['id', 'name']}
+                    data={games}
+                    row={(game: IGDBGame) => 
+                        [
+                            <input 
+                                key={'id'}
+                                type='radio'
+                                name='igdbId'
+                                value={game.id}
+                                onChange={onRadioSelect} />,
+                            <a key='name' href={game.url} target='_blank' rel='noreferrer'>
+                                {game.name}
+                            </a>
+                        ]
+                    } />
+            )}
         </>
     );
 };
