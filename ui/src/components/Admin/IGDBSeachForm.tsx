@@ -52,7 +52,7 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
 
     const onSearchChange = (event: FormEvent<HTMLInputElement>) => {
         event.preventDefault();
-
+        
         const value = event.currentTarget.value;
         if(value && value.length >= 3) {
             setSearchQuery({
@@ -87,7 +87,7 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
                 type='radio'
                 name='igdbId'
                 value={igdbGame.id}
-                checked={igdbGame.id === game?.igdbId}
+                defaultChecked={igdbGame.id === game?.igdbId}
                 onChange={onRadioSelect} />,
             <a key='name' href={igdbGame.url} target='_blank' rel='noreferrer'>
                 {igdbGame.name}
