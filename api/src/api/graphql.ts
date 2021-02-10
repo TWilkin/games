@@ -100,7 +100,7 @@ export default class GraphQLAPI {
             type: new GraphQLList(this.type),
             args: args,
             resolve: async (_: any, queryArgs: any, __: any, info: GraphQLResolveInfo) => {
-                const query: FindOptions = this.restrictColumns(info);
+                const query = this.restrictColumns(info) as FindOptions;
 
                 if(queryArgs) {
                     // replace args.id with the actual name of the field
@@ -116,7 +116,7 @@ export default class GraphQLAPI {
                             queryArgs[args[key].fullyQualifiedName] = queryArgs[key];
                             delete queryArgs[key];
                         });
-
+                    
                     query.where = queryArgs;
                 }
 
@@ -245,7 +245,7 @@ export default class GraphQLAPI {
         return type;
     }
 
-    public restrictColumns(info: GraphQLResolveInfo, level?: string): FindOptions {
+    public restrictColumns(info: GraphQLResolveInfo, level?: string): FindOptions | undefined {
         const originalModel = this.model;
         const result: FindOptions = {
             attributes: [],
@@ -290,7 +290,11 @@ export default class GraphQLAPI {
         // find the lists of columns and models
         let fields = graphqlFields(info);
         if(level) {
-            fields = fields[level];
+            if(fields[level]) {
+                fields = fields[level];
+            } else {
+                return undefined;
+            }
         }
         restrictNestedColumns(fields, result);
         

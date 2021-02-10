@@ -63,13 +63,15 @@ class IGDBGraphQL implements GraphQLExtension {
     private generateField = (type: GraphQLScalarType) =>
         ({ type });
 
-    private async updateResults(builder: IGDBRequestBuilder, options: FindOptions) {
+    private async updateResults(builder: IGDBRequestBuilder, options?: FindOptions) {
         // we always need IGDB id to join the platforms to the results
-        (options.attributes as string[]).push('igdbId');
+        if(options) {
+            (options.attributes as string[]).push('igdbId');
+        }
 
         const [ results, platforms ] = await Promise.all([
             builder.fetch(),
-            Platform.findAll(options)
+            options ? Platform.findAll(options) : []
         ]);
 
         return results.map(result => {
@@ -84,7 +86,7 @@ class IGDBGraphQL implements GraphQLExtension {
             }
 
             // convert the IGDB platform ids to local platform ids
-            if(result.platforms?.length > 0) {
+            if(result.platforms?.length > 0 && platforms.length > 0) {
                 result.platforms = result.platforms
                     .map(igdbPlatform => 
                         platforms.find(platform => platform.igdbId === igdbPlatform)
