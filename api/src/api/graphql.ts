@@ -119,7 +119,7 @@ export default class GraphQLAPI {
 
                     query.where = queryArgs;
                 }
-                
+
                 let result = await model.findAll(query);
 
                 // check if there is a sorting column
@@ -245,7 +245,7 @@ export default class GraphQLAPI {
         return type;
     }
 
-    private restrictColumns(info: GraphQLResolveInfo): FindOptions {
+    public restrictColumns(info: GraphQLResolveInfo, level?: string): FindOptions {
         const originalModel = this.model;
         const result: FindOptions = {
             attributes: [],
@@ -288,7 +288,12 @@ export default class GraphQLAPI {
         };
 
         // find the lists of columns and models
-        restrictNestedColumns(graphqlFields(info), result);
+        let fields = graphqlFields(info);
+        if(level) {
+            fields = fields[level];
+        }
+        restrictNestedColumns(fields, result);
+        
         return result;
     }
 

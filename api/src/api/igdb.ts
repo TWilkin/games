@@ -1,4 +1,5 @@
-import { GraphQLFieldConfigMap, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLScalarType, GraphQLString } from 'graphql';
+import { GraphQLFieldConfigMap, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLResolveInfo, GraphQLScalarType, GraphQLString } from 'graphql';
+import { FindOptions } from 'sequelize';
 
 import Platform from '../models/platform.model';
 import IGDBRequestBuilder from '../services/igdb/builder';
@@ -14,13 +15,7 @@ interface IGDBQuery {
 class IGDBGraphQL implements GraphQLExtension {
     constructor(private igdbService: IGDBService) { }
 
-    generateType(models: GraphQLAPI[]): GraphQLObjectType<any, any, any> {
-        const platformModel = models.find(model => model.getType.name === 'Platform');
-        if(!platformModel) {
-            // should not happen
-            throw new Error();
-        }
-
+    generateType(platformModel: GraphQLAPI): GraphQLObjectType<any, any, any> {
         return new GraphQLObjectType({
             name: 'IGDBGame',
             fields: {
@@ -37,6 +32,8 @@ class IGDBGraphQL implements GraphQLExtension {
     }
 
     generateQuery(models: GraphQLAPI[]): GraphQLFieldConfigMap<any, any, any> {
+        const platformModel = models.find(model => model.getType.name === 'Platform') as GraphQLAPI;
+
         const args = {
             id: this.generateField(GraphQLInt),
             name: this.generateField(GraphQLString)
@@ -44,13 +41,16 @@ class IGDBGraphQL implements GraphQLExtension {
 
         return {
             'GetIGDBGame': {
-                type: new GraphQLList(this.generateType(models)),
+                type: new GraphQLList(this.generateType(platformModel)),
                 args,
-                resolve: async (_: any, queryArgs: IGDBQuery) => {
+                resolve: async (_: any, queryArgs: IGDBQuery, __: any, info: GraphQLResolveInfo) => {
                     // don't bother querying when there is no query
                     if(queryArgs.id || queryArgs.name) {
+                        const options = platformModel.restrictColumns(info, 'platforms');
+
                         return await this.updateResults(
-                            this.igdbService.getGames(queryArgs.id, queryArgs.name)
+                            this.igdbService.getGames(queryArgs.id, queryArgs.name),
+                            options
                         );
                     }
 
@@ -63,10 +63,13 @@ class IGDBGraphQL implements GraphQLExtension {
     private generateField = (type: GraphQLScalarType) =>
         ({ type });
 
-    private async updateResults(builder: IGDBRequestBuilder) {
+    private async updateResults(builder: IGDBRequestBuilder, options: FindOptions) {
+        // we always need IGDB id to join the platforms to the results
+        (options.attributes as string[]).push('igdbId');
+
         const [ results, platforms ] = await Promise.all([
             builder.fetch(),
-            Platform.findAll()
+            Platform.findAll(options)
         ]);
 
         return results.map(result => {
