@@ -35,7 +35,11 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
                 },
                 id: true,
                 name: true,
-                url: true
+                url: true,
+                platforms: {
+                    platformId: true,
+                    name: true
+                }
             }
         }
     };
@@ -70,6 +74,27 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
             onGameSelect(game);
         }
     };
+
+    const renderCells = (igdbGame: IGDBGame) => {
+        const platforms = igdbGame.platforms
+            ?.sort((a, b) => a.name.localeCompare(b.name))
+            ?.map(platform => platform.name)
+            ?.join(', ');
+
+        return [
+            <input 
+                key={'id'}
+                type='radio'
+                name='igdbId'
+                value={igdbGame.id}
+                checked={igdbGame.id === game?.igdbId}
+                onChange={onRadioSelect} />,
+            <a key='name' href={igdbGame.url} target='_blank' rel='noreferrer'>
+                {igdbGame.name}
+            </a>,
+            <p key='platforms'>{platforms}</p>
+        ];
+    };
     
     return (
         <>
@@ -90,24 +115,11 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
             {games?.length > 0 && (
                 <SortableTable<IGDBGame> 
                     title='IGDB Seach Results'
-                    headings={['', 'Name']}
-                    sortColumns={['id', 'name']}
+                    headings={['', 'Name', 'Platforms']}
+                    sortColumns={['id', 'name', 'platforms']}
                     defaultSortColumn='name'
                     data={games}
-                    row={(igdbGame: IGDBGame) => 
-                        [
-                            <input 
-                                key={'id'}
-                                type='radio'
-                                name='igdbId'
-                                value={igdbGame.id}
-                                checked={igdbGame.id === game?.igdbId}
-                                onChange={onRadioSelect} />,
-                            <a key='name' href={igdbGame.url} target='_blank' rel='noreferrer'>
-                                {igdbGame.name}
-                            </a>
-                        ]
-                    } />
+                    row={renderCells} />
             )}
         </>
     );
