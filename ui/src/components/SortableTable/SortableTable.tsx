@@ -64,7 +64,7 @@ export default function SortableTable<TModel extends Model>(
         return order;
     };
 
-    return (
+    return data ? (
         <table>
             <caption>{title}</caption>
             
@@ -81,16 +81,16 @@ export default function SortableTable<TModel extends Model>(
                     .sort(sort)
                     .map((data, i) => {
                         const cells = row(data);
-                        return cells ? (
+                        return cells && (
                             <tr key={i}>
                                 {cells.map((cell, j) => (
                                     <td key={j}>{cell}</td>
                                 ))}
                             </tr>
-                        ) : null;
+                        );
                     })
                 }
             </tbody>
         </table>
-    );
+    ) : null;
 }

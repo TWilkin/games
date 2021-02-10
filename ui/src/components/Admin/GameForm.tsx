@@ -8,6 +8,7 @@ import { useMutation, useQuery } from '../../hooks/graphql';
 import { Game } from '../../models';
 import { APIProps, APISettings } from '../common';
 import GamePlatformForm, { GamePlatformFormData, useGamePlatformForm } from './GamePlatformForm';
+import IGDBSearchForm from './IGDBSeachForm';
 import { Restricted } from './Restricted';
 
 interface GameMatch {
@@ -59,6 +60,9 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
             </h1>
             
             <Restricted user={api.user}>
+                <IGDBSearchForm api={api} />
+                <hr />
+
                 <form className='form' onSubmit={onGameSubmit}>
                     <input 
                         type='hidden' 
