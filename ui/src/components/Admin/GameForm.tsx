@@ -1,11 +1,11 @@
 import { VariableType } from 'json-to-graphql-query';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { generateAddOrUpdateQuery } from '../../graphql';
 import { useMutation, useQuery } from '../../hooks/graphql';
-import { Game } from '../../models';
+import { Game, IGDBGame } from '../../models';
 import { APIProps, APISettings } from '../common';
 import GamePlatformForm, { GamePlatformFormData, useGamePlatformForm } from './GamePlatformForm';
 import IGDBSearchForm from './IGDBSeachForm';
@@ -52,6 +52,16 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
     const game = games?.length === 1 ? games[0] : undefined;
 
     const { gameForm, gameFormSetValue, onGameSubmit } = useGameForm(api, game, gameId !== -1);
+
+    const [ igdbGame, setIGDBGame ] = useState<IGDBGame>(undefined);
+    useEffect(() => {
+        if(igdbGame) {
+            gameFormSetValue('igdbId', igdbGame.id);
+            gameFormSetValue('title', igdbGame.name, {
+                shouldDirty: true
+            });
+        }
+    }, [igdbGame]);
     
     return (
         <div className='panel'>
@@ -60,7 +70,7 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
             </h1>
             
             <Restricted user={api.user}>
-                <IGDBSearchForm api={api} />
+                <IGDBSearchForm api={api} onGameSelect={setIGDBGame} />
                 <hr />
 
                 <form className='form' onSubmit={onGameSubmit}>

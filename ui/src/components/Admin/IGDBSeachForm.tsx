@@ -6,7 +6,11 @@ import { IGDBGame } from '../../models';
 import { APIProps } from '../common';
 import SortableTable from '../SortableTable/SortableTable';
 
-const IGDBSearchForm = ({ api }: APIProps): JSX.Element => {
+interface IGDBSearchFormProps extends APIProps {
+    onGameSelect: (game: IGDBGame) => void;
+}
+
+const IGDBSearchForm = ({ api, onGameSelect }: IGDBSearchFormProps): JSX.Element => {
     const [ searchQuery, setSearchQuery ] = useState('');
 
     const query = {
@@ -35,6 +39,19 @@ const IGDBSearchForm = ({ api }: APIProps): JSX.Element => {
             setSearchQuery(value);
         }
     };
+
+    const onRadioSelect = (event: FormEvent<HTMLInputElement>) => {
+        event.persist();
+
+        const id = event.currentTarget.value 
+            ? parseInt(event.currentTarget.value)
+            : -1;
+        const game = games.find(game => game.id === id);
+
+        if(game) {
+            onGameSelect(game);
+        }
+    };
     
     return (
         <>
@@ -58,7 +75,12 @@ const IGDBSearchForm = ({ api }: APIProps): JSX.Element => {
                 data={games}
                 row={(game: IGDBGame) => 
                     [
-                        <p key='id'>.</p>,
+                        <input 
+                            key={'id'}
+                            type='radio'
+                            name='igdbId'
+                            value={game.id}
+                            onChange={onRadioSelect} />,
                         <a key='name' href={game.url} target='_blank' rel='noreferrer'>
                             {game.name}
                         </a>
