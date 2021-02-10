@@ -32,8 +32,11 @@ services:
       - DB_DATABASE=games
       - DB_USER=games
       - DB_PASSWORD_FILE=/var/run/secrets/db_password
+      - IGDB_ID=${IGDB_ID}
+      - IGDB_SECRET_FILE=/var/run/secrets/igdb_secret
     secrets:
       - db_password
+      - igdb_secret
     volumes:
       - /var/lib/docker-volumes/games/api:/usr/src/app/src/cache
     configs:
@@ -51,6 +54,8 @@ services:
 secrets:
   db_password:
     file: ./config/mysql.txt
+  igdb_secret:
+    external: true
 
 configs:
   api_config:

@@ -37,21 +37,11 @@ export default class Configuration {
         }
 
         const user = config.get('database.user');
-        const password = Configuration.getDatabasePassword();
+        const password = Configuration.getKeyOrFile('database.password');
         const host = config.get('database.host');
         const port = config.get('database.port');
         const schema = config.get('database.schema');
         return `${dialect}://${user}:${password}@${host}:${port}/${schema}`;
-    }
-
-    private static getDatabasePassword(): string {
-        // check if it's in a file (e.g. docker)
-        if(config.get('database.password_file')) {
-            return fs.readFileSync(config.get('database.password_file')).toString().trim();
-        }
-
-        // otherwise return it directly
-        return config.get('database.password');
     }
 
     public static get getExpress(): ExpressConfiguration {
@@ -71,7 +61,7 @@ export default class Configuration {
     public static get getIGDBClientCredentials(): OAuthCredentials {
         return {
             id: config.get('igdb.id'),
-            secret: config.get('igdb.secret')
+            secret: Configuration.getKeyOrFile('igdb.secret')
         };
     }
 
@@ -79,4 +69,14 @@ export default class Configuration {
         return `games/${process.env.npm_package_version}`;
     }
 
+    private static getKeyOrFile(keyBase: string): string {
+        // check if it's in a file (e.g. docker)
+        const passwordKey = `${keyBase}_file`;
+        if(config.has(passwordKey)) {
+            return fs.readFileSync(config.get(passwordKey)).toString().trim();
+        }
+
+        // otherwise return it directly
+        return config.get(keyBase);
+    }
 }

@@ -13,9 +13,13 @@ The application consists of two services:
 - The API backend which connects to the database behind GraphQL.
 - The React UI frontend which allows easy use of the API for end-users.
 
+The API utilises the [IGDB](https://igdb.com) to retrieve game data and images directly from this service. If you wish to use this functionality you will need to request an API client id and secret pair using these [instructions](https://api-docs.igdb.com/#about).
+
 ### With Docker
 
-To check-out and build the code on your development environment using docker and buildx (for AMD64 and ARM containers). Remember to change the `REGISTRY` variable to the IP address/hostname of your local docker repository:
+To check-out and build the code on your development environment using docker and buildx (for AMD64 and ARM containers).
+
+Remember to change the `REGISTRY` variable to the IP address/hostname of your local docker repository.
 
 ```bash
 git clone https://github.com/TWilkin/games.git
@@ -69,20 +73,26 @@ There are currently no tests for the UI.
 
 ## Deployment
 
-### Docker
+### With Docker
 
 The application supports deployment using Docker, and includes Dockerfiles for both services and a `docker-compose.yml` file. The database used when deploying with Docker is PostgreSQL to easily support deployment on ARM based Raspberry Pis.
+
+Remember, if you wish to use the IGDB functionality you will need to change the `IGDB_ID` variable to set your client id, the instructions for the client secret are below.
 
 ```bash
 git clone https://github.com/TWilkin/games.git
 cd games
+
+# if you want IGDB
+echo "mysecret" | docker secret create igdb_secret -
+
 docker-compose build
 docker-compose up
 ```
 
 ### Without Docker
 
-The application can also be deployed without using Docker. Simply copy the API `src` directory into your web host's published node hosting directory. A configuration file will be needed containing the database configuration and credentials, see [default.json](https://github.com/TWilkin/games/blob/master/api/config/default.json) as an example.
+The application can also be deployed without using Docker. Simply copy the API `src` directory into your web host's published node hosting directory. A configuration file will be needed containing the database configuration, credentials and IGDB credentials, see [default.json](https://github.com/TWilkin/games/blob/master/api/config/default.json) as an example.
 
 The UI will need to be built first using webpack, which can be accomplished with the following commands:
 
