@@ -129,40 +129,48 @@ const GamePlatformForm = ({ api, form, setValue, game }: GamePlatformFormProps):
 export default GamePlatformForm;
 
 export function useGamePlatformForm(api: APISettings)
-    : (gameId: number, data: GamePlatformFormData) => Promise<void>
+    : (gameId: number, data: GamePlatformFormData) => Promise<GamePlatform[]>
 {
     const add = generateAddOrUpdateQuery<GamePlatformInput>(
         false,
         'GamePlatform',
-        { gamePlatformId: true }
+        { 
+            gamePlatformId: true,
+            alias: true
+        }
     );
-    const addGamePlatform = useMutation(api, add.query, add.args);
+    const addGamePlatform = useMutation<GamePlatform>(api, add.query, add.args);
 
     const update = generateAddOrUpdateQuery<GamePlatformInput>(
         true,
         'GamePlatform',
-        { gamePlatformId: true }
+        { 
+            gamePlatformId: true,
+            alias: true
+        }
     );
-    const updateGamePlatform = useMutation(api, update.query, update.args);
+    const updateGamePlatform = useMutation<GamePlatform>(api, update.query, update.args);
 
     return async (gameId: number, data: GamePlatformFormData) => {
-        await Promise.all(
-            data.gamePlatforms?.map(async (gamePlatform) => {
-                if(!gamePlatform.gamePlatformId?.isNullOrWhitespace()) {
-                    // use update
-                    update.args.id = gamePlatform.gamePlatformId
-                        ? parseInt(gamePlatform?.gamePlatformId)
-                        : undefined;
-                
-                    update.args.input = {
-                        gameId: gameId,
-                        platformId: parseInt(gamePlatform.platformId),
-                        alias: gamePlatform.alias || gamePlatform.alias !== ''
-                            ? gamePlatform.alias : undefined
-                    };
+        return await Promise.all(
+            data.gamePlatforms
+                ?.map(async (gamePlatform) => {
+                    if(!gamePlatform.gamePlatformId?.isNullOrWhitespace()) {
+                        // use update
+                        update.args.id = gamePlatform.gamePlatformId
+                            ? parseInt(gamePlatform?.gamePlatformId)
+                            : undefined;
+                    
+                        update.args.input = {
+                            gameId: gameId,
+                            platformId: parseInt(gamePlatform.platformId),
+                            alias: gamePlatform.alias || gamePlatform.alias !== ''
+                                ? gamePlatform.alias : undefined
+                        };
 
-                    await updateGamePlatform();
-                } else {
+                        return await updateGamePlatform();
+                    }
+
                     // use add
                     add.args.input = {
                         gameId: gameId,
@@ -171,9 +179,8 @@ export function useGamePlatformForm(api: APISettings)
                             ? gamePlatform.alias : undefined
                     };
 
-                    await addGamePlatform();
-                }
-            })
+                    return await addGamePlatform();
+                })
         );
     };
 }

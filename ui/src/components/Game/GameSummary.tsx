@@ -11,7 +11,7 @@ const GameSummary = ({ gamePlatform }: GameSummaryProps): JSX.Element => {
         
     return (
         <div className='gameSummary'>
-            {title} ({gamePlatform.platform.name})
+            {title} ({gamePlatform.platform?.name})
         </div>
     );
 };
