@@ -22,7 +22,7 @@ export interface GraphQLUpdateOptions extends UpdateOptions {
 }
 
 export interface GraphQLExtension {
-    generateQuery(): GraphQLFieldConfigMap<any, any, any>;
+    generateQuery(model: GraphQLAPI[]): GraphQLFieldConfigMap<any, any, any>;
 }
 
 export default class GraphQLAPI {
@@ -57,6 +57,10 @@ export default class GraphQLAPI {
 
     public get getModel(): ModelCtor<Model<any, any>> {
         return this.model;
+    }
+
+    public get getType(): GraphQLObjectType {
+        return this.type;
     }
 
     private appendQuery(query: GraphQLObjectTypeConfig<any, any, any>) {
@@ -337,7 +341,7 @@ export default class GraphQLAPI {
         for(const extension of extensions) {
             queries.fields = {
                 ...queries.fields,
-                ...extension.generateQuery()
+                ...extension.generateQuery(GraphQLAPI.models)
             };
         }
 

@@ -4,7 +4,7 @@ import Platform from '../models/platform.model';
 import IGDBRequestBuilder from '../services/igdb/builder';
 import IGDBService from '../services/igdb/igdb';
 import DateTimeScalarType from './datetime';
-import { GraphQLExtension } from './graphql';
+import GraphQLAPI, { GraphQLExtension } from './graphql';
 
 interface IGDBQuery {
     id?: number;
@@ -14,14 +14,20 @@ interface IGDBQuery {
 class IGDBGraphQL implements GraphQLExtension {
     constructor(private igdbService: IGDBService) { }
 
-    generateType(): GraphQLObjectType<any, any, any> {
+    generateType(models: GraphQLAPI[]): GraphQLObjectType<any, any, any> {
+        const platformModel = models.find(model => model.getType.name === 'Platform');
+        if(!platformModel) {
+            // should not happen
+            throw new Error();
+        }
+
         return new GraphQLObjectType({
             name: 'IGDBGame',
             fields: {
                 'id': this.generateField(GraphQLInt),
                 'name': this.generateField(GraphQLString),
                 'platforms': {
-                    type: new GraphQLList(GraphQLInt)
+                    type: new GraphQLList(platformModel.getType)
                 },
                 'url': this.generateField(GraphQLString),
                 'createdAt': this.generateField(DateTimeScalarType),
@@ -30,7 +36,7 @@ class IGDBGraphQL implements GraphQLExtension {
         });
     }
 
-    generateQuery(): GraphQLFieldConfigMap<any, any, any> {
+    generateQuery(models: GraphQLAPI[]): GraphQLFieldConfigMap<any, any, any> {
         const args = {
             id: this.generateField(GraphQLInt),
             name: this.generateField(GraphQLString)
@@ -38,7 +44,7 @@ class IGDBGraphQL implements GraphQLExtension {
 
         return {
             'GetIGDBGame': {
-                type: new GraphQLList(this.generateType()),
+                type: new GraphQLList(this.generateType(models)),
                 args,
                 resolve: async (_: any, queryArgs: IGDBQuery) => {
                     // don't bother querying when there is no query
@@ -60,9 +66,7 @@ class IGDBGraphQL implements GraphQLExtension {
     private async updateResults(builder: IGDBRequestBuilder) {
         const [ results, platforms ] = await Promise.all([
             builder.fetch(),
-            Platform.findAll({
-                attributes: [ 'platformId', 'igdbId' ]
-            })
+            Platform.findAll()
         ]);
 
         return results.map(result => {
@@ -76,12 +80,12 @@ class IGDBGraphQL implements GraphQLExtension {
                 delete result.updated_at;
             }
 
-            // conver the IGDB platform ids to local platform ids
+            // convert the IGDB platform ids to local platform ids
             if(result.platforms?.length > 0) {
                 result.platforms = result.platforms
                     .map(igdbPlatform => 
-                        platforms.find(platform => platform.igdbId === igdbPlatform)?.platformId
-                    );
+                        platforms.find(platform => platform.igdbId === igdbPlatform)
+                    ).filter((platform: Platform | undefined | null) => platform !== undefined && platform !== null);
             }
 
             return result;

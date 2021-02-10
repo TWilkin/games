@@ -61,5 +61,6 @@ export interface UserGamePlatform extends Model {
 export interface IGDBGame extends Model {
     id: number;
     name: string;
+    platforms?: Platform[];
     url: string;
 }
