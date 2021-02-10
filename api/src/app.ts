@@ -42,10 +42,6 @@ app.use(`${Configuration.getExpress.root}/igdb/covers/:id`.replace('//', '/'), a
     const result = await igdbService.getCover(parseInt(req.params.id)).fetch();
     res.json(result);
 });
-app.use(`${Configuration.getExpress.root}/igdb/games/:name`.replace('//', '/'), async (req, res) => {
-    const result = await igdbService.getGames(req.params.name).fetch();
-    res.json(result);
-});
 app.use(`${Configuration.getExpress.root}/igdb/platforms/:name`.replace('//', '/'), async (req, res) => {
     const result = await igdbService.getPlatforms(req.params.name).fetch();
     res.json(result);

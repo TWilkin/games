@@ -5,8 +5,9 @@ import IGDBService from '../services/igdb/igdb';
 import DateTimeScalarType from './datetime';
 import { GraphQLExtension } from './graphql';
 
-interface NameQuery {
-    name: string;
+interface IGDBQuery {
+    id?: number;
+    name?: string;
 }
 
 class IGDBGraphQL implements GraphQLExtension {
@@ -27,6 +28,7 @@ class IGDBGraphQL implements GraphQLExtension {
 
     generateQuery(): GraphQLFieldConfigMap<any, any, any> {
         const args = {
+            id: this.generateField(GraphQLInt),
             name: this.generateField(GraphQLString)
         };
 
@@ -34,10 +36,12 @@ class IGDBGraphQL implements GraphQLExtension {
             'GetIGDBGame': {
                 type: new GraphQLList(this.generateType()),
                 args,
-                resolve: async (_: any, queryArgs: NameQuery) => {
-                    // don't bother querying when there is no query string
-                    if(queryArgs.name) {
-                        return await this.convertDate(this.igdbService.getGames(queryArgs.name));
+                resolve: async (_: any, queryArgs: IGDBQuery) => {
+                    // don't bother querying when there is no query
+                    if(queryArgs.id || queryArgs.name) {
+                        return await this.convertDate(
+                            this.igdbService.getGames(queryArgs.id, queryArgs.name)
+                        );
                     }
 
                     return [];

@@ -1,25 +1,36 @@
 import { VariableType } from 'json-to-graphql-query';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 
 import { useQuery } from '../../hooks/graphql';
-import { IGDBGame } from '../../models';
+import { Game, IGDBGame } from '../../models';
 import { APIProps } from '../common';
 import SortableTable from '../SortableTable/SortableTable';
 
 interface IGDBSearchFormProps extends APIProps {
+    game?: Game;
     onGameSelect: (game: IGDBGame) => void;
 }
 
-const IGDBSearchForm = ({ api, onGameSelect }: IGDBSearchFormProps): JSX.Element => {
-    const [ searchQuery, setSearchQuery ] = useState('');
+interface SearchQuery {
+    id?: number;
+    name?: string;
+}
+
+const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.Element => {
+    const [ searchQuery, setSearchQuery ] = useState<SearchQuery>({
+        id: game?.igdbId,
+        name: undefined
+    });
 
     const query = {
         query: {
             __variables: {
+                id: 'Int',
                 name: 'String'
             },
             GetIGDBGame: {
                 __args: {
+                    id: new VariableType('id'),
                     name: new VariableType('name')
                 },
                 id: true,
@@ -28,15 +39,22 @@ const IGDBSearchForm = ({ api, onGameSelect }: IGDBSearchFormProps): JSX.Element
             }
         }
     };
-    const args = { name: searchQuery };
-    const games = useQuery<IGDBGame>(api, query, args);
+    const games = useQuery<IGDBGame>(api, query, searchQuery);
+
+    useEffect(() => setSearchQuery({
+        id: game?.igdbId,
+        name: game?.igdbId ? undefined : game?.title
+    }), [game]);
 
     const onSearchChange = (event: FormEvent<HTMLInputElement>) => {
         event.preventDefault();
 
         const value = event.currentTarget.value;
         if(value && value.length >= 3) {
-            setSearchQuery(value);
+            setSearchQuery({
+                id: undefined,
+                name: value
+            });
         }
     };
 
@@ -64,6 +82,7 @@ const IGDBSearchForm = ({ api, onGameSelect }: IGDBSearchFormProps): JSX.Element
                         type='text'
                         name='gameNameSearch'
                         id='gameNameSearch'
+                        defaultValue={game?.title}
                         onChange={onSearchChange} />
                 </div>
             </div>
@@ -75,16 +94,17 @@ const IGDBSearchForm = ({ api, onGameSelect }: IGDBSearchFormProps): JSX.Element
                     sortColumns={['id', 'name']}
                     defaultSortColumn='name'
                     data={games}
-                    row={(game: IGDBGame) => 
+                    row={(igdbGame: IGDBGame) => 
                         [
                             <input 
                                 key={'id'}
                                 type='radio'
                                 name='igdbId'
-                                value={game.id}
+                                value={igdbGame.id}
+                                checked={igdbGame.id === game?.igdbId}
                                 onChange={onRadioSelect} />,
-                            <a key='name' href={game.url} target='_blank' rel='noreferrer'>
-                                {game.name}
+                            <a key='name' href={igdbGame.url} target='_blank' rel='noreferrer'>
+                                {igdbGame.name}
                             </a>
                         ]
                     } />

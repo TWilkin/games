@@ -70,7 +70,9 @@ const GameForm = ({ api, match }: GameFormProps): JSX.Element => {
             </h1>
             
             <Restricted user={api.user}>
-                <IGDBSearchForm api={api} onGameSelect={setIGDBGame} />
+                <IGDBSearchForm api={api} 
+                    game={game}
+                    onGameSelect={setIGDBGame} />
                 <hr />
 
                 <form className='form' onSubmit={onGameSubmit}>
