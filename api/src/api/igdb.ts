@@ -1,5 +1,6 @@
 import { GraphQLFieldConfigMap, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLScalarType, GraphQLString } from 'graphql';
 
+import Platform from '../models/platform.model';
 import IGDBRequestBuilder from '../services/igdb/builder';
 import IGDBService from '../services/igdb/igdb';
 import DateTimeScalarType from './datetime';
@@ -19,6 +20,9 @@ class IGDBGraphQL implements GraphQLExtension {
             fields: {
                 'id': this.generateField(GraphQLInt),
                 'name': this.generateField(GraphQLString),
+                'platforms': {
+                    type: new GraphQLList(GraphQLInt)
+                },
                 'url': this.generateField(GraphQLString),
                 'createdAt': this.generateField(DateTimeScalarType),
                 'updatedAt': this.generateField(DateTimeScalarType)
@@ -39,7 +43,7 @@ class IGDBGraphQL implements GraphQLExtension {
                 resolve: async (_: any, queryArgs: IGDBQuery) => {
                     // don't bother querying when there is no query
                     if(queryArgs.id || queryArgs.name) {
-                        return await this.convertDate(
+                        return await this.updateResults(
                             this.igdbService.getGames(queryArgs.id, queryArgs.name)
                         );
                     }
@@ -53,8 +57,13 @@ class IGDBGraphQL implements GraphQLExtension {
     private generateField = (type: GraphQLScalarType) =>
         ({ type });
 
-    private async convertDate(builder: IGDBRequestBuilder) {
-        const results = await builder.fetch();
+    private async updateResults(builder: IGDBRequestBuilder) {
+        const [ results, platforms ] = await Promise.all([
+            builder.fetch(),
+            Platform.findAll({
+                attributes: [ 'platformId', 'igdbId' ]
+            })
+        ]);
 
         return results.map(result => {
             if(result.created_at) {
@@ -65,6 +74,14 @@ class IGDBGraphQL implements GraphQLExtension {
             if(result.updated_at) {
                 result.updatedAt = result.updated_at * 1000;
                 delete result.updated_at;
+            }
+
+            // conver the IGDB platform ids to local platform ids
+            if(result.platforms?.length > 0) {
+                result.platforms = result.platforms
+                    .map(igdbPlatform => 
+                        platforms.find(platform => platform.igdbId === igdbPlatform)?.platformId
+                    );
             }
 
             return result;
