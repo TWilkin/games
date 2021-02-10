@@ -7,6 +7,7 @@ interface SortableTableProps<TModel extends Model> {
     title: string;
     headings: string[];
     sortColumns: (keyof TModel | null)[];
+    defaultSortColumn?: keyof TModel;
     data: TModel[];
     row: (data: TModel) => JSX.Element[];
 }
@@ -17,10 +18,10 @@ interface CurrentSort<TModel extends Model> {
 }
 
 export default function SortableTable<TModel extends Model>(
-    { title, headings, sortColumns, data, row }: SortableTableProps<TModel>
+    { title, headings, sortColumns, defaultSortColumn, data, row }: SortableTableProps<TModel>
 ): JSX.Element {
     const [ currentSort, setCurrentSort ] = useState<CurrentSort<TModel>>({
-        by: sortColumns[0],
+        by: defaultSortColumn ?? sortColumns[0],
         direction: true
     });
 

@@ -73,6 +73,7 @@ const IGDBSearchForm = ({ api, onGameSelect }: IGDBSearchFormProps): JSX.Element
                     title='IGDB Seach Results'
                     headings={['', 'Name']}
                     sortColumns={['id', 'name']}
+                    defaultSortColumn='name'
                     data={games}
                     row={(game: IGDBGame) => 
                         [
