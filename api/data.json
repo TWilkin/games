@@ -68,6 +68,9 @@
                 "gameId": 12,
                 "title": "Ōkami",
                 "igdbId": 1271
+            }, {
+                "gameId": 13,
+                "title": "Metroid Prime 2"
             }
         ]
     }, {
@@ -175,6 +178,11 @@
                 "gameId": 12,
                 "platformId": 5,
                 "alias": "Ōkami HD"
+            }, {
+                "gamePlatformId": 13,
+                "gameId": 13,
+                "platformId": 4,
+                "alias": null
             }
         ]
     }
