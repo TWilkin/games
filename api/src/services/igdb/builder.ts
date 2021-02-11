@@ -46,6 +46,11 @@ export default class IGDBRequestBuilder {
         return this;
     }
 
+    sort(field: string, ascending=true): IGDBRequestBuilder {
+        this.query['sort'] = `${field} ${ascending ? 'asc' : 'desc'}`;
+        return this;
+    }
+
     fetch(): Promise<any> {
         let body = Object.keys(this.query)
             .filter(key => key != 'where')

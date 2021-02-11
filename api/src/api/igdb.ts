@@ -58,6 +58,7 @@ class IGDBGraphQL implements GraphQLExtension {
                         return await this.updateResults(
                             this.igdbService.getGames(queryArgs.id, queryArgs.name)
                                 .fields(...fields)
+                                .sort('name')
                                 .limit(perPage)
                                 .offset(page * perPage),
                             options
