@@ -1,3 +1,5 @@
+import { faArrowCircleLeft, faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { VariableType } from 'json-to-graphql-query';
 import React, { FormEvent, useEffect, useState } from 'react';
 
@@ -14,24 +16,28 @@ interface IGDBSearchFormProps extends APIProps {
 interface SearchQuery {
     id?: number;
     name?: string;
+    page?: number;
 }
 
 const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.Element => {
     const [ searchQuery, setSearchQuery ] = useState<SearchQuery>({
         id: game?.igdbId,
-        name: undefined
+        name: undefined,
+        page: 0
     });
 
     const query = {
         query: {
             __variables: {
                 id: 'Int',
-                name: 'String'
+                name: 'String',
+                page: 'Int'
             },
             GetIGDBGame: {
                 __args: {
                     id: new VariableType('id'),
-                    name: new VariableType('name')
+                    name: new VariableType('name'),
+                    page: new VariableType('page')
                 },
                 id: true,
                 name: true,
@@ -47,7 +53,8 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
 
     useEffect(() => setSearchQuery({
         id: game?.igdbId,
-        name: game?.igdbId ? undefined : game?.title
+        name: game?.igdbId ? undefined : game?.title,
+        page: 0
     }), [game]);
 
     const onSearchChange = (event: FormEvent<HTMLInputElement>) => {
@@ -57,9 +64,18 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
         if(value && value.length >= 3) {
             setSearchQuery({
                 id: undefined,
-                name: value
+                name: value,
+                page: 0
             });
         }
+    };
+
+    const onPageChange = (increment: number) => {
+        setSearchQuery({
+            id: searchQuery.id,
+            name: searchQuery.name,
+            page: searchQuery.page + increment
+        });
     };
 
     const onRadioSelect = (event: FormEvent<HTMLInputElement>) => {
@@ -113,13 +129,29 @@ const IGDBSearchForm = ({ api, game, onGameSelect }: IGDBSearchFormProps): JSX.E
             </div>
 
             {games?.length > 0 && (
-                <SortableTable<IGDBGame> 
-                    title='IGDB Seach Results'
-                    headings={['', 'Name', 'Platforms']}
-                    sortColumns={['id', 'name', 'platforms']}
-                    defaultSortColumn='name'
-                    data={games}
-                    row={renderCells} />
+                <>
+                    <SortableTable<IGDBGame> 
+                        title='IGDB Seach Results'
+                        headings={['', 'Name', 'Platforms']}
+                        sortColumns={['id', 'name', 'platforms']}
+                        defaultSortColumn='name'
+                        data={games}
+                        row={renderCells} />
+                    
+                    <div>
+                        <button onClick={() => onPageChange(-1)}
+                            disabled={searchQuery.page === 0}
+                        >
+                            <FontAwesomeIcon icon={faArrowCircleLeft} />
+                        </button>
+
+                        {`Page ${searchQuery.page + 1}`}
+
+                        <button onClick={() => onPageChange(1)}>
+                            <FontAwesomeIcon icon={faArrowCircleRight} />
+                        </button>
+                    </div>
+                </>
             )}
         </>
     );
