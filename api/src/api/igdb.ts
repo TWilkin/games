@@ -1,4 +1,5 @@
 import { GraphQLFieldConfigMap, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLResolveInfo, GraphQLScalarType, GraphQLString } from 'graphql';
+import graphqlFields from 'graphql-fields';
 import { FindOptions } from 'sequelize';
 
 import Platform from '../models/platform.model';
@@ -51,11 +52,12 @@ class IGDBGraphQL implements GraphQLExtension {
                         const perPage = 20;
                         const page = queryArgs.page ?? 0;
 
+                        const fields = this.restrictColumns(info);
                         const options = platformModel.restrictColumns(info, 'platforms');
 
                         return await this.updateResults(
                             this.igdbService.getGames(queryArgs.id, queryArgs.name)
-                                .fields('id', 'name', 'platforms', 'url', 'created_at', 'updated_at')
+                                .fields(...fields)
                                 .limit(perPage)
                                 .offset(page * perPage),
                             options
@@ -103,6 +105,12 @@ class IGDBGraphQL implements GraphQLExtension {
 
             return result;
         });
+    }
+
+    private restrictColumns(info: GraphQLResolveInfo) {
+        const fields = graphqlFields(info);
+        
+        return Object.keys(fields);
     }
 }
 
