@@ -21,6 +21,11 @@ export default class IGDBRequestBuilder {
         return this;
     }
 
+    offset(n: number): IGDBRequestBuilder {
+        this.query['offset'] = n;
+        return this;
+    }
+
     fields(...fields: string[]): IGDBRequestBuilder {
         this.query['fields'] = fields.join(',');
         return this;

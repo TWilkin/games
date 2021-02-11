@@ -10,6 +10,7 @@ import GraphQLAPI, { GraphQLExtension } from './graphql';
 interface IGDBQuery {
     id?: number;
     name?: string;
+    page?: number;
 }
 
 class IGDBGraphQL implements GraphQLExtension {
@@ -36,7 +37,8 @@ class IGDBGraphQL implements GraphQLExtension {
 
         const args = {
             id: this.generateField(GraphQLInt),
-            name: this.generateField(GraphQLString)
+            name: this.generateField(GraphQLString),
+            page: this.generateField(GraphQLInt)
         };
 
         return {
@@ -46,10 +48,16 @@ class IGDBGraphQL implements GraphQLExtension {
                 resolve: async (_: any, queryArgs: IGDBQuery, __: any, info: GraphQLResolveInfo) => {
                     // don't bother querying when there is no query
                     if(queryArgs.id || queryArgs.name) {
+                        const perPage = 20;
+                        const page = queryArgs.page ?? 0;
+
                         const options = platformModel.restrictColumns(info, 'platforms');
 
                         return await this.updateResults(
-                            this.igdbService.getGames(queryArgs.id, queryArgs.name),
+                            this.igdbService.getGames(queryArgs.id, queryArgs.name)
+                                .fields('id', 'name', 'platforms', 'url', 'created_at', 'updated_at')
+                                .limit(perPage)
+                                .offset(page * perPage),
                             options
                         );
                     }
