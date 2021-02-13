@@ -3,11 +3,11 @@ import { Express, NextFunction, Request, RequestHandler, Response } from 'expres
 import HttpStatus from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
-import { ExtractJwt, JwtFromRequestFunction, Strategy as JWTStrategy } from 'passport-jwt';
-import { Strategy as LocalStrategy } from 'passport-local';
 
 import Configuration from '../config';
 import User, { Role } from '../models/user.model';
+import JWTStrategy from './jwt';
+import LocalStrategy from './local';
 
 // interface for the extra property in an authenticated request
 export interface AuthenticatedRequest {
@@ -23,12 +23,10 @@ export interface AuthenticatedRequest {
 
 class PassportAuth {
     // the JWT cookie identifier
-    private static COOKIE_KEY = 'jwt';
+    public static COOKIE_KEY = 'jwt';
 
     // the expiry length
     private static EXPIRY = 24 * 60 * 1000;
-
-    private constructor(private app: Express) { }
 
     public requireUserRole = this.requireRoles;
 
@@ -45,23 +43,24 @@ class PassportAuth {
     }
 
     public static init(app: Express): PassportAuth {
-        const auth = new PassportAuth(app);
+        const auth = new PassportAuth();
 
         app.use(cookieParser());
         app.use(passport.initialize());
 
-        this.initStrategies(auth);
+        JWTStrategy();
+        LocalStrategy(auth, app);
 
         return auth;
     }
 
-    private async authenticate(
+    public async authenticate(
         request: Request,
         response: Response,
         error: string, 
         identifier: User | boolean, 
         info: { message: string }
-    ) {
+    ): Promise<void> {
         if(error) {
             console.error(error);
             response.status(HttpStatus.UNAUTHORIZED).send();
@@ -144,98 +143,6 @@ class PassportAuth {
         return response.status(HttpStatus.UNAUTHORIZED).send({
             message: info?.message
         });
-    }
-
-    private static initStrategies(auth: PassportAuth): void {
-        this.initJWTStrategy(auth);
-        this.initLocalStrategy();
-    }
-
-    private static initJWTStrategy(auth: PassportAuth): void {
-        passport.use(
-            'jwt',
-            new JWTStrategy(
-                {
-                    jwtFromRequest: PassportAuth.extractToken(),
-                    secretOrKey: Configuration.getAuth.secret
-                },
-                async (jwt, done) => {                    
-                    try {
-                        const user = await User.findOne({
-                            attributes: [
-                                'userId',
-                                'userName',
-                                'role'
-                            ],
-                            where: {
-                                userId: jwt.userId
-                            }
-                        });
-
-                        if(user) {
-                            done(null, user);
-                        } else {
-                            done(null, false, { message: 'No user found for token'});
-                        }
-                    } catch(error) {
-                        console.error(error);
-                        done('An error occurred');
-                    }
-                }
-            )
-        );
-
-        auth.app.post(
-            `${Configuration.getExpress.root}/login`.replace('//', '/'),
-            (request, response, next) => 
-                passport.authenticate(
-                    'local', 
-                    (error: string, identifier: User | boolean, info: { message: string }) => 
-                        auth.authenticate(request, response, error, identifier, info)
-                )(request, response, next)
-        );
-    }
-
-    private static initLocalStrategy(): void {
-        passport.use(
-            'local',
-            new LocalStrategy(
-                {
-                    usernameField: 'userName',
-                    passwordField: 'password'
-                },
-                async (username, password, done) => {
-                    try {
-                        const user = await User.authenticate(username, password);
-
-                        if(!user) {
-                            return done(null, false, { message: 'Wrong username or password'});
-                        }
-
-                        return done(null, user, { message: 'Logged in successfully'});
-                    } catch(error) {
-                        console.error(error);
-                        return done('An error occurred');
-                    }
-                }
-            )
-        );
-    }
-
-    private static extractToken(): JwtFromRequestFunction {
-        const bearerExtractor = ExtractJwt.fromAuthHeaderAsBearerToken();
-    
-        return (request: Request) => {
-            // first try extracting an authorisation bearer
-            let token = bearerExtractor(request);
-    
-            // next try a cookie
-            if(!token) {
-                token = request.cookies?.[PassportAuth.COOKIE_KEY];
-            }
-    
-            return token;
-        };
     }
 }
 
