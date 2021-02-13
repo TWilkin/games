@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import { AddressInfo } from 'net';
 import fetch from 'node-fetch';
+import passport from 'passport';
 
 import Auth from './api/auth';
 import Configuration from './config';
@@ -10,6 +11,7 @@ import GraphQLAPI from './api/graphql';
 import IGDB from './services/igdb/igdb';
 import ImageController from './api/image';
 import IGDBGraphQL from './api/igdb';
+import PassportAuth from './auth/passport-auth';
 
 // add fetch to global
 if(!globalThis.fetch) {
@@ -25,9 +27,11 @@ app.use(cors({
     credentials: true
 }));
 app.use(bodyParser.json());
+app.use(passport.initialize());
 
 // add authentication middleware
 const auth = Auth.init(app);
+PassportAuth.init(app);
 
 // initialise IGDB
 const igdbService = new IGDB();
