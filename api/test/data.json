@@ -35,10 +35,12 @@
         "data": [
             {
                 "platformId": 1,
-                "name": "Test Platform 1"
+                "name": "Test Platform 1",
+                "igdbId": 100
             }, {
                 "platformId": 2,
-                "name": "Test Platform 2"
+                "name": "Test Platform 2",
+                "igdbId": 200
             }
         ]
     }, {

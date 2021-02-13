@@ -57,3 +57,10 @@ export interface User extends Model {
 export interface UserGamePlatform extends Model {
     gamePlatform: GamePlatform;
 }
+
+export interface IGDBGame extends Model {
+    id: number;
+    name: string;
+    platforms?: Platform[];
+    url: string;
+}

@@ -1,4 +1,6 @@
-import { GraphQLSchema, GraphQLObjectType, isScalarType, isNonNullType, isListType, assertNonNullType, assertListType } from 'graphql';
+import { expect } from 'chai';
+import { GraphQLSchema, GraphQLObjectType, isScalarType, isNonNullType, isListType, assertNonNullType, assertListType, ExecutionResult } from 'graphql';
+import { ExecutionResultDataDefault } from 'graphql/execution/execute';
 import { Model, ModelCtor } from 'sequelize';
 
 export function generateQuery(schema: GraphQLSchema, typeName: string, params: any=null): string {
@@ -49,4 +51,27 @@ export function generateMutation(model: ModelCtor<Model<any, any>>, isAdd: boole
             updatedAt 
         }
     }`;
+}
+
+function checkResponse(response: ExecutionResult<ExecutionResultDataDefault>, queryName: string) {
+    expect(response).to.be.not.null;
+
+    expect(response.errors, JSON.stringify(response.errors)).to.be.undefined;
+
+    expect(response.data).to.be.not.null;
+    return expect(response.data).to.have.key(queryName);
+}
+
+export function checkQueryResponse(response: ExecutionResult<ExecutionResultDataDefault>, queryName: string, length: number) {
+    return checkResponse(response, queryName)
+        .which.is.not.null
+        .and.length.is.equal(length);
+}
+
+export function checkMutationResponse(response: ExecutionResult<ExecutionResultDataDefault>, mutationName: string, model: ModelCtor<Model<any, any>>) {
+    return checkResponse(response, mutationName)
+        .which.is.not.null
+        .and.is.not.an('array')
+        .which.has.key(model.primaryKeyAttribute)
+        .which.is.a('number');
 }

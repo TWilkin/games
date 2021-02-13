@@ -21,6 +21,11 @@ export default class IGDBRequestBuilder {
         return this;
     }
 
+    offset(n: number): IGDBRequestBuilder {
+        this.query['offset'] = n;
+        return this;
+    }
+
     fields(...fields: string[]): IGDBRequestBuilder {
         this.query['fields'] = fields.join(',');
         return this;
@@ -38,6 +43,11 @@ export default class IGDBRequestBuilder {
 
         where.push({ field, value, operator });
 
+        return this;
+    }
+
+    sort(field: string, ascending=true): IGDBRequestBuilder {
+        this.query['sort'] = `${field} ${ascending ? 'asc' : 'desc'}`;
         return this;
     }
 

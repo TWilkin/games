@@ -5,5 +5,10 @@
         "schema": "DB_DATABASE",
         "user": "DB_USER",
         "password_file": "DB_PASSWORD_FILE"
+    },
+
+    "igdb": {
+        "id": "IGDB_ID",
+        "secret_file": "IGDB_SECRET_FILE"
     }
 }

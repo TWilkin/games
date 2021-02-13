@@ -68,6 +68,9 @@
                 "gameId": 12,
                 "title": "Ōkami",
                 "igdbId": 1271
+            }, {
+                "gameId": 13,
+                "title": "Metroid Prime 2"
             }
         ]
     }, {
@@ -75,28 +78,36 @@
         "data": [
             {
                 "platformId": 1,
-                "name": "Nintendo 64"
+                "name": "Nintendo 64",
+                "igdbId": 4
             }, {
                 "platformId": 2,
-                "name": "GameBoy"
+                "name": "GameBoy",
+                "igdbId": 33
             }, {
                 "platformId": 3,
-                "name": "SNES"
+                "name": "SNES",
+                "igdbId": 19
             }, {
                 "platformId": 4,
-                "name": "GameCube"
+                "name": "GameCube",
+                "igdbId": 21
             }, {
                 "platformId": 5,
-                "name": "Nintendo Switch"
+                "name": "Nintendo Switch",
+                "igdbId": 130
             }, {
                 "platformId": 6,
-                "name": "PlayStation"
+                "name": "PlayStation",
+                "igdbId": 7
             }, {
                 "platformId": 7,
-                "name": "PlayStation 2"
+                "name": "PlayStation 2",
+                "igdbId": 8
             }, {
                 "platformId": 8,
-                "name": "Wii"
+                "name": "Wii",
+                "igdbId": 5
             }
         ]
     }, {
@@ -175,6 +186,11 @@
                 "gameId": 12,
                 "platformId": 5,
                 "alias": "Ōkami HD"
+            }, {
+                "gamePlatformId": 13,
+                "gameId": 13,
+                "platformId": 4,
+                "alias": null
             }
         ]
     }

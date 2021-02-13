@@ -35,9 +35,19 @@ export default class IGDBService {
         new IGDBRequestBuilder((body) => this.request('covers', body))
             .equal('game', gameId)
 
-    public getGames = (name: string): IGDBRequestBuilder => 
-        new IGDBRequestBuilder((body) => this.request('games', body))
-            .like('name', name);
+    public getGames = (id?: number, name?: string): IGDBRequestBuilder => {
+        let builder = new IGDBRequestBuilder((body) => this.request('games', body));
+
+        if(id) {
+            builder = builder.equal('id', id);
+        }
+
+        if(name) {
+            builder = builder.like('name', name);
+        }
+
+        return builder;
+    }
     
     public getPlatforms = (name: string): IGDBRequestBuilder => 
         new IGDBRequestBuilder((body) => this.request('platforms', body))

@@ -21,6 +21,10 @@ export interface GraphQLUpdateOptions extends UpdateOptions {
     context: GraphQLContext
 }
 
+export interface GraphQLExtension {
+    generateQuery(model: GraphQLAPI[]): GraphQLFieldConfigMap<any, any, any>;
+}
+
 export default class GraphQLAPI {
 
     // the list of models
@@ -53,6 +57,10 @@ export default class GraphQLAPI {
 
     public get getModel(): ModelCtor<Model<any, any>> {
         return this.model;
+    }
+
+    public get getType(): GraphQLObjectType {
+        return this.type;
     }
 
     private appendQuery(query: GraphQLObjectTypeConfig<any, any, any>) {
@@ -92,7 +100,7 @@ export default class GraphQLAPI {
             type: new GraphQLList(this.type),
             args: args,
             resolve: async (_: any, queryArgs: any, __: any, info: GraphQLResolveInfo) => {
-                const query: FindOptions = this.restrictColumns(info);
+                const query = this.restrictColumns(info) as FindOptions;
 
                 if(queryArgs) {
                     // replace args.id with the actual name of the field
@@ -108,10 +116,10 @@ export default class GraphQLAPI {
                             queryArgs[args[key].fullyQualifiedName] = queryArgs[key];
                             delete queryArgs[key];
                         });
-
+                    
                     query.where = queryArgs;
                 }
-                
+
                 let result = await model.findAll(query);
 
                 // check if there is a sorting column
@@ -237,7 +245,7 @@ export default class GraphQLAPI {
         return type;
     }
 
-    private restrictColumns(info: GraphQLResolveInfo): FindOptions {
+    public restrictColumns(info: GraphQLResolveInfo, level?: string): FindOptions | undefined {
         const originalModel = this.model;
         const result: FindOptions = {
             attributes: [],
@@ -280,7 +288,16 @@ export default class GraphQLAPI {
         };
 
         // find the lists of columns and models
-        restrictNestedColumns(graphqlFields(info), result);
+        let fields = graphqlFields(info);
+        if(level) {
+            if(fields[level]) {
+                fields = fields[level];
+            } else {
+                return undefined;
+            }
+        }
+        restrictNestedColumns(fields, result);
+        
         return result;
     }
 
@@ -310,8 +327,9 @@ export default class GraphQLAPI {
         return columnName;
     }
     
-    public static init(app: Express | null, auth: Auth | null): GraphQLSchema {
+    public static init(app: Express | null, auth: Auth | null, ...extensions: GraphQLExtension[]): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
+        GraphQLAPI.models = [];
         Object.values(sequelize.models)
             .forEach(model => GraphQLAPI.models.push(new GraphQLAPI(model)));
 
@@ -328,6 +346,14 @@ export default class GraphQLAPI {
             fields: {}
         };
         GraphQLAPI.models.forEach(model => model.appendMutation(mutations));
+
+        // add extension methods
+        for(const extension of extensions) {
+            queries.fields = {
+                ...queries.fields,
+                ...extension.generateQuery(GraphQLAPI.models)
+            };
+        }
 
         // generate the schema
         GraphQLAPI.schema = new GraphQLSchema({
