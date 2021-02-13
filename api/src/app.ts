@@ -31,7 +31,7 @@ app.use(passport.initialize());
 
 // add authentication middleware
 const auth = Auth.init(app);
-PassportAuth.init(app);
+const passportAuth = PassportAuth.init(app);
 
 // initialise IGDB
 const igdbService = new IGDB();
@@ -50,6 +50,13 @@ app.use(`${Configuration.getExpress.root}/igdb/platforms/:name`.replace('//', '/
     const result = await igdbService.getPlatforms(req.params.name).fetch();
     res.json(result);
 });
+
+// TEMP testing passport auth
+app.get(
+    `${Configuration.getExpress.root}/passport/test`.replace('//', '/'),
+    passportAuth.requireAdminRole(),
+    (req, res) => res.sendStatus(200)
+);
 
 // start listening
 const server = app.listen(Configuration.getExpress.port, () => {

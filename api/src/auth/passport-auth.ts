@@ -1,4 +1,4 @@
-import { Express, Response } from 'express';
+import { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import HttpStatus from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
@@ -6,46 +6,23 @@ import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt';
 import { Strategy as LocalStrategy } from 'passport-local';
 
 import Configuration from '../config';
-import User from '../models/user.model';
+import User, { Role } from '../models/user.model';
 
 class PassportAuth {
     private constructor(private app: Express) { }
 
-    private async login(
-        response: Response,
-        error: string, 
-        identifier: User | boolean, 
-        info: { message: string }
-    ) {
-        if(error) {
-            console.error(error);
-            response.status(HttpStatus.UNAUTHORIZED).send();
-            return;
-        }
+    public requireUserRole = this.requireRoles;
 
-        if(identifier) {
-            const user = identifier as User;
-            console.log(`Authenticating user '${user?.userName}'`);
+    public requireAdminRole = () => this.requireRoles(['admin']);
 
-            const token = jsonwebtoken.sign(
-                { 
-                    userId: user.userId,
-                    userName: user.userName,
-                    role: user.role
-                },
-                Configuration.getAuth.secret
-            );
-
-            response.status(HttpStatus.OK).send({
-                token,
-                message: info?.message
-            });
-            return;
-        }
-
-        response.status(HttpStatus.UNAUTHORIZED).send({
-            message: info?.message
-        });
+    private requireRoles(roles: Role[]=['user', 'admin']): RequestHandler {
+        return (request, response, next) => 
+            passport.authenticate(
+                'jwt',
+                { session: false },
+                (error: string, identifier: User | boolean, info: { message: string }) => 
+                    this.authorise(response, next, roles, error, identifier, info)
+            )(request, response, next);
     }
 
     public static init(app: Express): PassportAuth {
@@ -58,6 +35,83 @@ class PassportAuth {
         return auth;
     }
 
+    private async authenticate(
+        request: Request,
+        response: Response,
+        error: string, 
+        identifier: User | boolean, 
+        info: { message: string }
+    ) {
+        if(error) {
+            console.error(error);
+            response.status(HttpStatus.UNAUTHORIZED).send();
+            return;
+        }
+
+        if(identifier) {
+            request.logIn(identifier, (error) => {
+                const user = identifier as User;
+                console.log(`Authenticating user '${user?.userName}'`);
+
+                const token = jsonwebtoken.sign(
+                    { 
+                        userId: user.userId,
+                        userName: user.userName,
+                        role: user.role
+                    },
+                    Configuration.getAuth.secret
+                );
+
+                response.status(HttpStatus.OK).send({
+                    token,
+                    message: info?.message
+                });
+                return;
+            });
+        } else {
+            response.status(HttpStatus.UNAUTHORIZED).send({
+                message: info?.message
+            });
+        }
+    }
+
+    private async authorise(
+        response: Response,
+        next: NextFunction,
+        roles: Role[],
+        error: string, 
+        identifier: User | boolean, 
+        info: { message: string }
+    ) {
+        if(error) {
+            console.error(error);
+            response.status(HttpStatus.UNAUTHORIZED).send({
+                message: info?.message
+            });
+            return;
+        }
+
+        if(identifier) {
+            const user = identifier as User;
+            console.log(`Authorising user '${user?.userName}' with role '${user.role}'`);
+            
+            // check the user has one of the required roles
+            if(roles.includes(user.role)) {
+                return next();
+            }
+
+            // insufficient privileges
+            return response.status(HttpStatus.FORBIDDEN).send({
+                message: 'Insufficient privileges'
+            });
+        }
+
+        // the user does not have the correct role
+        return response.status(HttpStatus.FORBIDDEN).send({
+            message: info?.message
+        });
+    }
+
     private static initStrategies(auth: PassportAuth): void {
         this.initJWTStrategy(auth);
         this.initLocalStrategy();
@@ -68,10 +122,10 @@ class PassportAuth {
             'jwt',
             new JWTStrategy(
                 {
-                    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
+                    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
                     secretOrKey: Configuration.getAuth.secret
                 },
-                async (jwt, done) => {
+                async (jwt, done) => {                    
                     try {
                         const user = await User.findOne({
                             attributes: [
@@ -84,10 +138,10 @@ class PassportAuth {
                             }
                         });
 
-                        if(!user) {
-                            done(null, false, { message: 'No user found for token'});
-                        } else {
+                        if(user) {
                             done(null, user);
+                        } else {
+                            done(null, false, { message: 'No user found for token'});
                         }
                     } catch(error) {
                         console.error(error);
@@ -103,7 +157,7 @@ class PassportAuth {
                 passport.authenticate(
                     'local', 
                     (error: string, identifier: User | boolean, info: { message: string }) => 
-                        auth.login(response, error, identifier, info)
+                        auth.authenticate(request, response, error, identifier, info)
                 )(request, response, next)
         );
     }

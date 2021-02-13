@@ -7,6 +7,8 @@ import GameCompletion from './game_completion.model';
 import GamePlayTime from './game_playtime.model';*/
 import { AbstractRestrictedModel } from './restrictedmodel';
 
+export type Role = 'admin' | 'user';
+
 @Table
 export default class User extends AbstractRestrictedModel<User> {
 
@@ -30,7 +32,7 @@ export default class User extends AbstractRestrictedModel<User> {
     @Secret(true, true)
     @Default('user')
     @Column(DataType.ENUM('admin', 'user'))
-    role!: 'admin' | 'user';
+    role!: Role;
 
     /*@HasMany(() => GameCollection)
     games!: GameCollection[];
@@ -57,7 +59,7 @@ export default class User extends AbstractRestrictedModel<User> {
             attributes: [ 'userId', 'userName', 'password', 'role' ],
             where: { userName: userName }
         });
-        
+
         if(user) {
             // check the password
             if(await bcrypt.compare(password, user.password)) {
