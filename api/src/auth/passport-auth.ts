@@ -17,17 +17,10 @@ class PassportAuth {
         identifier: User | boolean, 
         info: { message: string }
     ) {
-        console.log(JSON.stringify(identifier));
-        console.log(JSON.stringify(info));
-        
         if(error) {
             console.error(error);
             response.status(HttpStatus.UNAUTHORIZED).send();
             return;
-        }
-
-        if(info?.message) {
-            console.log(info.message);
         }
 
         if(identifier) {
@@ -50,7 +43,9 @@ class PassportAuth {
             return;
         }
 
-        response.status(HttpStatus.UNAUTHORIZED).send();
+        response.status(HttpStatus.UNAUTHORIZED).send({
+            message: info?.message
+        });
     }
 
     public static init(app: Express): PassportAuth {
@@ -70,14 +65,13 @@ class PassportAuth {
 
     private static initJWTStrategy(auth: PassportAuth): void {
         passport.use(
-            'login',
+            'jwt',
             new JWTStrategy(
                 {
                     jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
                     secretOrKey: Configuration.getAuth.secret
                 },
                 async (jwt, done) => {
-                    console.log(JSON.stringify(jwt));
                     try {
                         const user = await User.findOne({
                             attributes: [
@@ -86,12 +80,12 @@ class PassportAuth {
                                 'role'
                             ],
                             where: {
-                                userName: jwt.id
+                                userId: jwt.userId
                             }
                         });
 
                         if(!user) {
-                            done(null, false, { message: 'No user found in token'});
+                            done(null, false, { message: 'No user found for token'});
                         } else {
                             done(null, user);
                         }
@@ -107,7 +101,7 @@ class PassportAuth {
             `${Configuration.getExpress.root}/passport/login`.replace('//', '/'),
             (request, response, next) => 
                 passport.authenticate(
-                    'login', 
+                    'local', 
                     (error: string, identifier: User | boolean, info: { message: string }) => 
                         auth.login(response, error, identifier, info)
                 )(request, response, next)
@@ -116,7 +110,7 @@ class PassportAuth {
 
     private static initLocalStrategy(): void {
         passport.use(
-            'login',
+            'local',
             new LocalStrategy(
                 {
                     usernameField: 'username',

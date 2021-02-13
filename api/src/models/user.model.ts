@@ -57,10 +57,15 @@ export default class User extends AbstractRestrictedModel<User> {
             attributes: [ 'userId', 'userName', 'password', 'role' ],
             where: { userName: userName }
         });
+        
         if(user) {
             // check the password
             if(await bcrypt.compare(password, user.password)) {
-                return user;
+                return {
+                    userId: user.userId,
+                    userName: user.userName,
+                    role: user.role
+                } as User;
             }
         }
 
