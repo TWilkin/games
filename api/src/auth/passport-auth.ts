@@ -168,7 +168,7 @@ class PassportAuth {
         );
 
         auth.app.post(
-            `${Configuration.getExpress.root}/passport/login`.replace('//', '/'),
+            `${Configuration.getExpress.root}/login`.replace('//', '/'),
             (request, response, next) => 
                 passport.authenticate(
                     'local', 
@@ -183,7 +183,7 @@ class PassportAuth {
             'local',
             new LocalStrategy(
                 {
-                    usernameField: 'username',
+                    usernameField: 'userName',
                     passwordField: 'password'
                 },
                 async (username, password, done) => {
