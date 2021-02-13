@@ -1,8 +1,9 @@
+import cookieParser from 'cookie-parser';
 import { Express, NextFunction, Request, RequestHandler, Response } from 'express';
 import HttpStatus from 'http-status-codes';
 import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
-import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt';
+import { ExtractJwt, JwtFromRequestFunction, Strategy as JWTStrategy } from 'passport-jwt';
 import { Strategy as LocalStrategy } from 'passport-local';
 
 import Configuration from '../config';
@@ -21,11 +22,17 @@ export interface AuthenticatedRequest {
 }
 
 class PassportAuth {
+    // the JWT cookie identifier
+    private static COOKIE_KEY = 'jwt';
+
+    // the expiry length
+    private static EXPIRY = 24 * 60 * 1000;
+
     private constructor(private app: Express) { }
 
     public requireUserRole = this.requireRoles;
 
-    public requireAdminRole = () => this.requireRoles(['admin']);
+    public requireAdminRole = (): RequestHandler => this.requireRoles(['admin']);
 
     private requireRoles(roles: Role[]=['user', 'admin']): RequestHandler {
         return (request, response, next) => 
@@ -40,6 +47,7 @@ class PassportAuth {
     public static init(app: Express): PassportAuth {
         const auth = new PassportAuth(app);
 
+        app.use(cookieParser());
         app.use(passport.initialize());
 
         this.initStrategies(auth);
@@ -61,7 +69,7 @@ class PassportAuth {
         }
 
         if(identifier) {
-            request.logIn(identifier, (error) => {
+            request.logIn(identifier, () => {
                 const user = identifier as User;
                 console.log(`Authenticating user '${user?.userName}'`);
 
@@ -71,13 +79,23 @@ class PassportAuth {
                         userName: user.userName,
                         role: user.role
                     },
-                    Configuration.getAuth.secret
+                    Configuration.getAuth.secret,
+                    { expiresIn: PassportAuth.EXPIRY }
                 );
 
-                response.status(HttpStatus.OK).send({
-                    token,
-                    message: info?.message
-                });
+                response.status(HttpStatus.OK)
+                    .cookie(
+                        PassportAuth.COOKIE_KEY,
+                        token,
+                        {
+                            secure: Configuration.getAuth.secureCookie,
+                            httpOnly: false,
+                            sameSite: true
+                        }
+                    ).send({
+                        token,
+                        message: info?.message
+                    });
                 return;
             });
         } else {
@@ -138,7 +156,7 @@ class PassportAuth {
             'jwt',
             new JWTStrategy(
                 {
-                    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+                    jwtFromRequest: PassportAuth.extractToken(),
                     secretOrKey: Configuration.getAuth.secret
                 },
                 async (jwt, done) => {                    
@@ -202,6 +220,22 @@ class PassportAuth {
                 }
             )
         );
+    }
+
+    private static extractToken(): JwtFromRequestFunction {
+        const bearerExtractor = ExtractJwt.fromAuthHeaderAsBearerToken();
+    
+        return (request: Request) => {
+            // first try extracting an authorisation bearer
+            let token = bearerExtractor(request);
+    
+            // next try a cookie
+            if(!token) {
+                token = request.cookies?.[PassportAuth.COOKIE_KEY];
+            }
+    
+            return token;
+        };
     }
 }
 
