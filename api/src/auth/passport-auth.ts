@@ -8,6 +8,18 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import Configuration from '../config';
 import User, { Role } from '../models/user.model';
 
+// interface for the extra property in an authenticated request
+export interface AuthenticatedRequest {
+
+    // the user retrieved from the header
+    user?: {
+        userId: number,
+        userName: string,
+        role: Role
+    };
+
+}
+
 class PassportAuth {
     private constructor(private app: Express) { }
 
@@ -21,7 +33,7 @@ class PassportAuth {
                 'jwt',
                 { session: false },
                 (error: string, identifier: User | boolean, info: { message: string }) => 
-                    this.authorise(response, next, roles, error, identifier, info)
+                    this.authorise(request, response, next, roles, error, identifier, info)
             )(request, response, next);
     }
 
@@ -76,6 +88,7 @@ class PassportAuth {
     }
 
     private async authorise(
+        request: Request,
         response: Response,
         next: NextFunction,
         roles: Role[],
@@ -94,6 +107,9 @@ class PassportAuth {
         if(identifier) {
             const user = identifier as User;
             console.log(`Authorising user '${user?.userName}' with role '${user.role}'`);
+
+            // ensure user is specified in request
+            request.user = user;
             
             // check the user has one of the required roles
             if(roles.includes(user.role)) {

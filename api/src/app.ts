@@ -5,7 +5,6 @@ import { AddressInfo } from 'net';
 import fetch from 'node-fetch';
 import passport from 'passport';
 
-import Auth from './api/auth';
 import Configuration from './config';
 import GraphQLAPI from './api/graphql';
 import IGDB from './services/igdb/igdb';
@@ -30,7 +29,6 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 
 // add authentication middleware
-const auth = Auth.init(app);
 const passportAuth = PassportAuth.init(app);
 
 // initialise IGDB
@@ -38,7 +36,7 @@ const igdbService = new IGDB();
 const igdbGraphQL = new IGDBGraphQL(igdbService);
 
 // add the API routes
-GraphQLAPI.init(app, auth, igdbGraphQL);
+GraphQLAPI.init(app, passportAuth, igdbGraphQL);
 ImageController.init(app, igdbService);
 
 // TEMP for testing IGDB

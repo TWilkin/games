@@ -4,13 +4,13 @@ import { GraphQLSchema, GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLFie
 import graphqlFields from 'graphql-fields';
 import { Model, ModelCtor, ModelAttributeColumnOptions, AbstractDataType, DataTypes, FindOptions, UpdateOptions, IncludeOptions, CreateOptions, Sequelize, Includeable } from 'sequelize';
 
-import Auth, { AuthenticatedRequest } from './auth';
 import Configuration from '../config';
 import { sequelize } from '../db';
 import DateTimeScalarType from './datetime';
 import { getNestedQueryable, isInputSecret, isQueryable, isResultSecret, isSortable } from './decorators';
 import sortBy from '../models/sortable';
 import User from '../models/user.model';
+import PassportAuth, { AuthenticatedRequest } from '../auth/passport-auth';
 
 export interface GraphQLContext {
     database: Sequelize,
@@ -327,7 +327,7 @@ export default class GraphQLAPI {
         return columnName;
     }
     
-    public static init(app: Express | null, auth: Auth | null, ...extensions: GraphQLExtension[]): GraphQLSchema {
+    public static init(app: Express | null, auth: PassportAuth | null, ...extensions: GraphQLExtension[]): GraphQLSchema {
         // create a GraphQL model for each Sequelize model
         GraphQLAPI.models = [];
         Object.values(sequelize.models)
@@ -365,7 +365,7 @@ export default class GraphQLAPI {
         if(app) {
             app.use(
                 `${Configuration.getExpress.root}/graphql`.replace('//', '/'),
-                auth ? auth.getHandlers : [],
+                auth?.requireUserRole() ?? [],
                 graphqlHTTP((req) => ({
                     schema: GraphQLAPI.schema,
                     context: {
