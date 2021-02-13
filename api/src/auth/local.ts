@@ -7,6 +7,10 @@ import User from '../models/user.model';
 import PassportAuth from './passport-auth';
 
 export default function local(auth: PassportAuth, app: Express): void {
+    if(!Configuration.getAuth.useLocal) {
+        return;
+    }
+    
     passport.use(
         'local',
         new Strategy(

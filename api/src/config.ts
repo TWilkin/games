@@ -12,6 +12,7 @@ interface ExpressConfiguration {
 interface AuthConfiguration {
     secret: string;
     secureCookie: boolean;
+    useLocal: boolean;
 }
 
 // OAuth service credentials
@@ -54,7 +55,8 @@ export default class Configuration {
     public static get getAuth(): AuthConfiguration {
         return {
             secret: config.get('auth.secret'),
-            secureCookie: config.get('auth.secure_cookie')
+            secureCookie: config.get('auth.secure_cookie'),
+            useLocal: config.get('auth.use_local')
         };
     }
 

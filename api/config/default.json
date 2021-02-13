@@ -17,7 +17,8 @@
 
     "auth": {
         "secret": "secret",
-        "secure_cookie": false
+        "secure_cookie": false,
+        "use_local": true
     },
 
     "igdb": {
