@@ -27,7 +27,7 @@ describe('User model', () => {
         expect(result).to.be.not.null;
         expect(result?.userId).to.equal(user.userId);
         expect(result?.userName).to.equal(user.userName);
-        expect(result?.password).to.equal(user.password);
+        expect(result?.password).to.be.undefined;
         expect(result?.role).to.equal(user.role);
     });
 

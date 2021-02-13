@@ -21,7 +21,7 @@ describe('Restricted Model', () => {
 
     it('checkAdmin fail', () => {
         expect(() => { AbstractRestrictedModel.checkAdmin(null, mockContext('user')); })
-            .to.throw('Unauthorised');
+            .to.throw('Forbidden');
     });
 
     it('checkAdminUpdate fail', () => {
@@ -30,7 +30,7 @@ describe('Restricted Model', () => {
             context: mockContext('user')
         };
         expect(() => { AbstractRestrictedModel.checkAdminUpdate(null, options); })
-            .to.throw('Unauthorised');
+            .to.throw('Forbidden');
     });
 
 });
