@@ -12,8 +12,7 @@ export abstract class AbstractRestrictedModel<T extends Model<T>> extends Model<
             return;
         }
 
-        // not authorised
-        throw new Error('Unauthorised');
+        throw new Error('Forbidden');
     }
 
     @BeforeUpdate

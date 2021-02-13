@@ -106,8 +106,8 @@ class PassportAuth {
             });
         }
 
-        // the user does not have the correct role
-        return response.status(HttpStatus.FORBIDDEN).send({
+        // the user was not logged in
+        return response.status(HttpStatus.UNAUTHORIZED).send({
             message: info?.message
         });
     }

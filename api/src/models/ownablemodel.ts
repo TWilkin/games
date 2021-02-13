@@ -23,8 +23,7 @@ export abstract class AbstractOwnableModel<T extends Model<T>> extends Model<T> 
             return;
         }
 
-        // not authorised
-        throw new Error('Unauthorised');
+        throw new Error('Forbidden');
     }
 
     @BeforeUpdate
@@ -39,8 +38,7 @@ export abstract class AbstractOwnableModel<T extends Model<T>> extends Model<T> 
             }
         }
 
-        // not authorised
-        throw new Error('Unauthorised');
+        throw new Error('Forbidden');
     }
 
 }
