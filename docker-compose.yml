@@ -45,7 +45,7 @@ services:
 
   ui:
     build: ./ui
-    image: ${REGISTRY}/games/ui:0.0.5
+    image: ${REGISTRY}/games/ui:0.0.6
     ports:
       - "80:80"
     depends_on:
