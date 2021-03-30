@@ -11,12 +11,14 @@
   "main": "src/index.tsx",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
-    "start": "webpack-dev-server --config webpack.dev.js"
+    "start": "webpack serve --config webpack.dev.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
     "http-status-codes": "^1.4.0",
     "json-to-graphql-query": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
@@ -26,7 +28,9 @@
     "react-dom": "^16.14.0",
     "react-hook-form": "^6.15.5",
     "react-moment": "^1.1.1",
-    "react-router-dom": "^5.2.0"
+    "react-router-dom": "^5.2.0",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.3"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.1",

@@ -6,7 +6,13 @@ module.exports = {
     },
     target: 'web',
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.tsx', '.js'],
+        alias: {
+            'buffer': 'buffer',
+            'crypto': 'crypto-browserify',
+            'stream': 'stream-browserify',
+            'util': 'util'
+        }
     },
     module: {
         rules: [
