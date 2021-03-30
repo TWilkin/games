@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: {
@@ -10,6 +11,7 @@ module.exports = {
         alias: {
             'buffer': 'buffer',
             'crypto': 'crypto-browserify',
+            'process': 'process/browser',
             'stream': 'stream-browserify',
             'util': 'util'
         }
@@ -40,5 +42,10 @@ module.exports = {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
         publicPath: '/',
-    }
+    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            process: 'process/browser'
+        })
+    ]
 };
