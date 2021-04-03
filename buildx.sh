@@ -31,6 +31,6 @@ echo "Done"
 # build the UI
 echo "Building UI"
 cd ui
-docker buildx build --platform linux/amd64,linux/arm/v7 --push -t $REGISTRY/games/ui:0.0.5 .
+docker buildx build --platform linux/amd64,linux/arm/v7 --push -t $REGISTRY/games/ui:0.0.6 .
 cd ..
 echo "Done"
