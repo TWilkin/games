@@ -1,0 +1,409 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:  
+    app.kubernetes.io/name: api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 0.0.4
+
+spec:
+  selector:
+    matchLabels:    
+      app.kubernetes.io/name: api
+      app.kubernetes.io/component: api
+      app.kubernetes.io/part-of: games
+  
+  template:
+    metadata:  
+      labels:  
+        app.kubernetes.io/name: api
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: games
+  
+    spec:
+  
+      containers:
+      - name: api
+  
+        image: 192.168.2.12:32000/games/api:0.0.4
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DB_HOST
+          value: database
+        - name: DB_SCHEMA
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: schema
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: username
+        - name: DB_SECRET_FILE
+          value: /var/run/secrets/database-secret/password
+        - name: IGDB_ID
+          valueFrom:
+            secretKeyRef:
+              name: igdb-secret
+              key: id
+        - name: IGDB_SECRET_FILE
+          value: /var/run/secrets/igdb-secret/secret
+  
+        resources:
+          requests:
+            cpu: 50m
+            memory: 100Mi
+  
+          limits:
+            cpu: 1
+            memory: 200Mi
+
+        volumeMounts:
+        - name: database-secret
+          mountPath: /var/run/secrets/database-secret
+          readOnly: true
+        - name: igdb-secret
+          mountPath: /var/run/secrets/igdb-secret
+          readOnly: true
+  
+      restartPolicy: Always
+      volumes:
+      - name: database-secret
+        secret:
+          secretName: database-secret
+      - name: igdb-secret
+        secret:
+          secretName: igdb-secret
+  
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels:  
+    app.kubernetes.io/name: api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 0.0.4
+spec:
+  selector:  
+    app.kubernetes.io/name: api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: games
+  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+  labels:  
+    app.kubernetes.io/name: ui
+    app.kubernetes.io/component: ui
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 0.0.6
+
+spec:
+  selector:
+    matchLabels:    
+      app.kubernetes.io/name: ui
+      app.kubernetes.io/component: ui
+      app.kubernetes.io/part-of: games
+  
+  template:
+    metadata:  
+      labels:  
+        app.kubernetes.io/name: ui
+        app.kubernetes.io/component: ui
+        app.kubernetes.io/part-of: games
+  
+    spec:
+  
+      containers:
+      - name: ui
+  
+        image: 192.168.2.12:32000/games/ui:0.0.6
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+  
+        resources:
+          requests:
+            cpu: 50m
+            memory: 25Mi
+  
+          limits:
+            cpu: 1
+            memory: 100Mi
+  
+      restartPolicy: Always
+
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui
+  labels:  
+    app.kubernetes.io/name: ui
+    app.kubernetes.io/component: ui
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 0.0.6
+spec:
+  selector:  
+    app.kubernetes.io/name: ui
+    app.kubernetes.io/component: ui
+    app.kubernetes.io/part-of: games
+  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  labels:  
+    app.kubernetes.io/name: database
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 15.2-alpine3.17
+
+spec:
+  selector:
+    matchLabels:    
+      app.kubernetes.io/name: database
+      app.kubernetes.io/component: database
+      app.kubernetes.io/part-of: games
+  
+  template:
+    metadata:  
+      labels:  
+        app.kubernetes.io/name: database
+        app.kubernetes.io/component: database
+        app.kubernetes.io/part-of: games
+  
+    spec:
+      nodeSelector:
+        games-storage: "true"
+  
+      containers:
+      - name: database
+  
+        image: postgres:15.2-alpine3.17
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: postgres
+          containerPort: 5432
+        env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: schema
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: database-secret
+              key: username
+        - name: POSTGRES_PASSWORD_FILE
+          value: /var/run/secrets/database-secret/password
+  
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+  
+          limits:
+            cpu: 1
+            memory: 200Mi
+        readinessProbe:
+          tcpSocket:
+            port: postgres
+          initialDelaySeconds: 25
+        
+        livenessProbe:
+          tcpSocket:
+            port: postgres
+          initialDelaySeconds: 50
+        volumeMounts:
+        - name: database-data
+          mountPath: /var/lib/postgresql/data/pgdata
+        - name: database-secret
+          mountPath: /var/run/secrets/database-secret
+          readOnly: true
+  
+      restartPolicy: Always
+      volumes:
+      - name: database-data
+        persistentVolumeClaim:
+          claimName: database-volume-claim
+      - name: database-secret
+        secret:
+          secretName: database-secret
+  
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  labels:  
+    app.kubernetes.io/name: database
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 15.2-alpine3.17
+spec:
+  selector:  
+    app.kubernetes.io/name: database
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: games
+  type: ClusterIP
+  ports:
+  - name: postgres
+    protocol: TCP
+    port: 5432
+    targetPort: postgres
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: database-backup
+  labels:  
+    app.kubernetes.io/name: database
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 15.2-alpine3.17
+
+spec:
+  schedule: "5 23 * * *"
+  concurrencyPolicy: Replace
+
+  jobTemplate:
+    spec:      
+      
+      template:
+        metadata:  
+          labels:  
+            app.kubernetes.io/name: database
+            app.kubernetes.io/component: database
+            app.kubernetes.io/part-of: games
+      
+        spec:
+          nodeSelector:
+            games-storage: "true"
+      
+          containers:
+          - name: database-backup
+      
+            image: postgres:15.2-alpine3.17
+            imagePullPolicy: IfNotPresent
+            command:
+            - "/bin/sh"
+            args:
+            - "-c"
+            - "pg_dump --host=database --data-only --compress=9 --file=/srv/backup/$(date +%Y-%m-%d-%H-%M)-games.sql.gz"
+            env:
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret
+                  key: schema
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database-secret
+                  key: password
+      
+            resources:
+              requests:
+                cpu: 50m
+                memory: 50Mi
+      
+              limits:
+                cpu: 1
+                memory: 200Mi
+            volumeMounts:
+            - name: database-backup-data
+              mountPath: /srv/backup
+            - name: database-secret
+              mountPath: /var/run/secrets/database-secret
+              readOnly: true
+      
+          restartPolicy: Never
+          volumes:
+          - name: database-backup-data
+            persistentVolumeClaim:
+              claimName: database-backup-volume-claim
+          - name: database-secret
+            secret:
+              secretName: database-secret
+      
+          terminationGracePeriodSeconds: 30
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: games-storage
+  labels:  
+    app.kubernetes.io/name: games
+    app.kubernetes.io/component: games
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 0.1.0
+provisioner: microk8s.io/hostpath
+reclaimPolicy: Retain
+parameters:
+  pvDir: /srv/k8s-volumes
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-backup-volume-claim
+  labels:  
+    app.kubernetes.io/name: database
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 15.2-alpine3.17
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi 
+  storageClassName: games-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-volume-claim
+  labels:  
+    app.kubernetes.io/name: database
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: games
+    app.kubernetes.io/version: 15.2-alpine3.17
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi 
+  storageClassName: games-storage
