@@ -174,7 +174,7 @@ spec:
     app.kubernetes.io/name: ui
     app.kubernetes.io/component: ui
     app.kubernetes.io/part-of: games
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - name: http
     protocol: TCP
