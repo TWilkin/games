@@ -45,8 +45,6 @@ spec:
           value: docker
         - name: DB_HOST
           value: database
-        - name: DB_PORT
-          value: "5432"
         - name: DB_DATABASE
           valueFrom:
             secretKeyRef:
@@ -57,7 +55,7 @@ spec:
             secretKeyRef:
               name: database-secret
               key: username
-        - name: DB_SECRET_FILE
+        - name: DB_PASSWORD_FILE
           value: /var/run/secrets/database-secret/password
         - name: IGDB_ID
           valueFrom:
