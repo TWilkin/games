@@ -36,11 +36,18 @@ spec:
       - name: api
   
         image: 192.168.2.12:32000/games/api:0.0.4
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 3000
         env:
+        - name: NODE_CONFIG_ENV
+          value: docker
         - name: DB_HOST
           value: database
-        - name: DB_SCHEMA
+        - name: DB_PORT
+          value: 5432
+        - name: DB_DATABASE
           valueFrom:
             secretKeyRef:
               name: database-secret
@@ -141,7 +148,7 @@ spec:
       - name: ui
   
         image: 192.168.2.12:32000/games/ui:0.0.6
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - name: http
           containerPort: 80
