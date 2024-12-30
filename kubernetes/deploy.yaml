@@ -35,7 +35,7 @@ spec:
       containers:
       - name: api
   
-        image: 192.168.2.12:32000/games/api:0.0.4
+        image: localhost:32000/games/api:0.0.4
         imagePullPolicy: Always
         ports:
         - name: http
@@ -145,7 +145,7 @@ spec:
       containers:
       - name: ui
   
-        image: 192.168.2.12:32000/games/ui:0.0.6
+        image: localhost:32000/games/ui:0.0.6
         imagePullPolicy: Always
         ports:
         - name: http
